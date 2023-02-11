@@ -7,45 +7,81 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Example {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
 // Necessary for Next auth
-model Account {
-    id                String  @id @default(auto()) @map("_id") @db.ObjectId
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? // @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+// model Account {
+//     id                String  @id @default(auto()) @map("_id") @db.ObjectId
+//     userId            String
+//     type              String
+//     provider          String
+//     providerAccountId String
+//     refresh_token     String? // @db.Text
+//     access_token      String? // @db.Text
+//     expires_at        Int?
+//     token_type        String?
+//     scope             String?
+//     id_token          String? // @db.Text
+//     session_state     String?
+//     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+//     @@unique([provider, providerAccountId])
+// }
+
+// model User {
+//     id            String    @id @default(auto()) @map("_id") @db.ObjectId
+//     name          String?
+//     email         String?   @unique
+//     emailVerified DateTime?
+//     image         String?
+//     accounts      Account[]
+// }
+
+// model VerificationToken {
+//     id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//     identifier String
+//     token      String   @unique
+//     expires    DateTime
+
+//     @@unique([identifier, token])
+// }
+
+model Product {
+    id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+    brand              String
+    category           String
+    description        String
+    discountPercentage Float
+    images             String[]
+    price              Int
+    promotion          String[]
+    rating             Float
+    shortDescription   String
+    status             String
+    stock              Int
+    tags               String[]
+    thumbnail          String
+    title              String
+    sold               Int
 }
 
-model User {
-    id            String    @id @default(auto()) @map("_id") @db.ObjectId
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
+enum MRole {
+    owner
+    admin
 }
 
-model VerificationToken {
-    id         String   @id @default(auto()) @map("_id") @db.ObjectId
-    identifier String
-    token      String   @unique
-    expires    DateTime
+enum MStatus {
+    disabled
+    active
+    review
+}
 
-    @@unique([identifier, token])
+type Merchant {
+    id     String
+    role   MRole
+    status MStatus
+}
+
+model Store {
+    id        String     @id @default(auto()) @map("_id") @db.ObjectId
+    merchants Merchant[]
+    name      String
 }
