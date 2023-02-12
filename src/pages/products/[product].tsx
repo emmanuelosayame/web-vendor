@@ -79,15 +79,10 @@ const Product = () => {
               <XMarkIcon width={20} />
             </IconButton>
 
-            <div className="flex rounded-lg bg-white py-1 px-2 md:w-56 h-9 items-center gap-2">
-              <Select
-                defaultSelected="top-deal"
-                contentStyles="w-40"
-                selectList={[{ value: "top-deal", item: "Top Deal" }]}
-                onValueChange={(value) => {}}
-              />
-              <div className="w-1 h-full border-l-2 border-neutral-400 rounded-xl" />
-              <p className={`text-green-500`}>published</p>
+            <div className="rounded-lg bg-white py-1 px-2 md:w-28 drop-shadow-md items-center">
+              <p className={`text-green-500 text-center w-full font-semibold`}>
+                published
+              </p>
             </div>
 
             <IconButton type="submit" className="bg-white" disabled={!dirty}>

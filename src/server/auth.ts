@@ -5,8 +5,6 @@ import {
   type DefaultSession,
 } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "./db";
 
 /**
  * Module augmentation for `next-auth` types.
@@ -18,7 +16,7 @@ import { prisma } from "./db";
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
-      // id: string;
+      id: string;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -32,9 +30,14 @@ declare module "next-auth" {
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session({ session, user }) {
+    async jwt({ token, user }) {
+      // if (user) token = user;
+      console.log(token);
+      return token;
+    },
+    session({ session, token, user }) {
       if (session.user) {
-        // session.user.id = user.id;
+        // session.user.id = "user.id";
         // session.user.role = user.role; <-- put other properties on the session here
       }
       return session;

@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { devtools, combine, persist } from "zustand/middleware";
 import type { ColorSchemeSlice } from "types/shared";
 import { colorSchemeSlice } from "./colorSchemeSlice";

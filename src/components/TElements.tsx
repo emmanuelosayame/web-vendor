@@ -92,7 +92,8 @@ export const IconButton = ({
   <button
     onClick={onClick}
     disabled={disabled}
-    className={`inline-flex gap-1 items-center rounded-md py-1 px-3 hover:opacity-75 disabled:opacity-75 bg-white ${className}`}
+    className={`inline-flex gap-1 items-center rounded-md py-1 px-3 drop-shadow-md
+     hover:opacity-75 disabled:opacity-75 bg-white ${className}`}
   >
     {children}
   </button>

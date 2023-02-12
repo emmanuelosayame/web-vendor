@@ -1,12 +1,14 @@
 import type { AppProps } from "next/app";
 import { type Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import { api } from "../../utils/api";
 import font from "@next/font/local";
 
 import "../styles/globals.css";
 import type { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
+import Login from "@components/Login";
+import { LoadingBlur } from "@components/Loading";
 
 export type NextPageWithLayout<P = Record<string, never>, IP = P> = NextPage<
   P,
@@ -47,11 +49,17 @@ const MyApp = ({
 
       <main className={` ${spaceGrotesk.variable} font-spaceGrotesk`}>
         <SessionProvider session={session}>
-          {getLayout(<Component {...pageProps} />)}
+          <Auth page={getLayout(<Component {...pageProps} />)} />
         </SessionProvider>
       </main>
     </>
   );
+};
+
+const Auth = ({ page }: { page: ReactNode }) => {
+  const status = useSession()?.status;
+  if (status === "loading") return <LoadingBlur />;
+  return <>{status !== "authenticated" ? <Login /> : <>{page}</>}</>;
 };
 
 export default api.withTRPC(MyApp);

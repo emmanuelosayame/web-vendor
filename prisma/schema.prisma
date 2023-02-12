@@ -60,12 +60,17 @@ model Product {
     tags               String[]
     thumbnail          String
     title              String
-    sold               Int
+    sold               Int?
 }
 
 enum MRole {
     owner
     admin
+}
+
+enum AuthRole {
+    merchant
+    superAdmin
 }
 
 enum MStatus {
@@ -84,4 +89,15 @@ model Store {
     id        String     @id @default(auto()) @map("_id") @db.ObjectId
     merchants Merchant[]
     name      String
+}
+
+model Admin {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    firstName String
+    lastName  String
+    role      AuthRole
+    email     String
+    photoUrl  String?
+    phoneNo   String
+    store     String[]
 }
