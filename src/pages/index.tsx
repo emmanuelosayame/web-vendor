@@ -11,11 +11,11 @@ import {
 } from "@heroicons/react/24/solid";
 import { Card1 } from "../components/Card";
 import { LineChart, PieChart } from "../components/Charts";
-import { TFlex, THStack, TStack } from "@components/TElements";
+import { TFlex } from "@components/TElements";
 import Layout from "@components/Layout";
 import type { NextPageWithLayout } from "./_app";
 
-const data = {
+const mockdata = {
   labels: [
     "Red",
     "Blue",
@@ -114,13 +114,12 @@ const Home: NextPageWithLayout = () => {
           <BanknotesIcon width={22} color="rgba(52.0, 199.0, 89.0, 0.7)" />
         </Card1>
       </div>
-      <div className="h-5 w-full bg-white" />
 
       <div className="w-full overscroll-y-auto">
         <TFlex className="bg-white bg-opacity-60 ">
           <button
-            className="flex h-8 items-center bg-white px-1
-           text-base text-gray-500 drop-shadow-sm"
+            className="flex h-7 items-center bg-white px-1
+           text-base text-gray-500 drop-shadow-lg"
           >
             <span>Monthly</span>
             <ChevronDownIcon width={20} />
@@ -128,25 +127,25 @@ const Home: NextPageWithLayout = () => {
         </TFlex>
 
         <div
-          className="grid grid-cols-2 md:flex gap-2 md:gap-3 mt-10 flex-col items-center justify-between
-         md:rounded-lg bg-white bg-opacity-60 p-2 md:p-3 md:flex-row"
+          className="flex flex-col gap-2 md:gap-3 mt-7 items-center justify-between
+         md:rounded-lg bg-white/40 p-2 md:flex-row md:mx-2"
         >
           <div className="h-full rounded-2xl bg-white p-3 w-full">
             <p className="text-center">Sales Statistics</p>
-            <div className="h-40 md:h-96 w-full md:w-96">
-              {data && <LineChart data={salesData} />}
+            <div className="h-52 md:h-96 w-full md:w-96">
+              {mockdata && <LineChart data={salesData} />}
             </div>
           </div>
           <div className="h-full rounded-2xl bg-white p-3 w-full">
             <p className="text-center">Items & Categories</p>
-            <div className="h-40 md:h-96 w-full md:w-96">
-              {data && <PieChart data={data} />}
+            <div className="h-52 md:h-96 w-full md:w-96">
+              {mockdata && <PieChart data={mockdata} />}
             </div>
           </div>
           <div className="h-full rounded-2xl bg-white p-3 w-full">
             <p className="text-center">Product Sales</p>
-            <div className="h-40 md:h-96 w-full md:w-96">
-              {data && <PieChart data={data} />}
+            <div className="h-52 md:h-96 w-full md:w-96">
+              {mockdata && <PieChart data={mockdata} />}
             </div>
           </div>
         </div>
@@ -159,5 +158,5 @@ const Home: NextPageWithLayout = () => {
 export default Home;
 
 Home.getLayout = function getLayout(page) {
-  return <Layout>{page}</Layout>;
+  return <Layout px={false}>{page}</Layout>;
 };

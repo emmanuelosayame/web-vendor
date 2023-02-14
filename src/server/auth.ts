@@ -30,14 +30,12 @@ declare module "next-auth" {
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    async jwt({ token, user }) {
-      // if (user) token = user;
-      console.log(token);
-      return token;
-    },
+    // signIn: async ({ user }) => {
+    //   return true;
+    // },
     session({ session, token, user }) {
-      if (session.user) {
-        // session.user.id = "user.id";
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
         // session.user.role = user.role; <-- put other properties on the session here
       }
       return session;

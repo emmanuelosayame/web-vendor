@@ -1,17 +1,20 @@
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
+import { getCookies } from "cookies-next";
 
 import { getServerAuthSession } from "./auth";
 import { prisma } from "./db";
 
 type CreateContextOptions = {
   session: Session | null;
+  sid: string | undefined;
 };
 
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    sid: opts.sid,
   };
 };
 
@@ -21,8 +24,12 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   // Get the session from the server using the getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
 
+  const cookies = getCookies({ req, res });
+  const sid = cookies?.sid;
+
   return createInnerTRPCContext({
     session,
+    sid,
   });
 };
 

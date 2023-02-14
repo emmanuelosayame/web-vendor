@@ -1,5 +1,12 @@
 import type { CSNames } from "types/shared";
 
+export const limitText = (sentence?: string | null, limit?: number) =>
+  limit
+    ? sentence && sentence.length > limit
+      ? sentence.slice(0, limit) + "..."
+      : sentence
+    : sentence;
+
 export const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url

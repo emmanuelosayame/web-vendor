@@ -61,15 +61,16 @@ model Product {
     thumbnail          String
     title              String
     sold               Int?
+    sid                String
 }
 
-enum MRole {
+enum VRole {
     owner
     admin
 }
 
 enum AuthRole {
-    merchant
+    vendor
     superAdmin
 }
 
@@ -79,22 +80,25 @@ enum MStatus {
     review
 }
 
-type Merchant {
+type StoreVendor {
     id     String
-    role   MRole
+    role   VRole
     status MStatus
+    email  String
 }
 
 model Store {
-    id        String     @id @default(auto()) @map("_id") @db.ObjectId
-    merchants Merchant[]
-    name      String
+    id      String        @id @default(auto()) @map("_id") @db.ObjectId
+    vendors StoreVendor[]
+    name    String
+    about   String
 }
 
-model Admin {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+model Vendor {
+    id        String   @id @map("_id") @db.ObjectId
     firstName String
     lastName  String
+    uid       String
     role      AuthRole
     email     String
     photoUrl  String?

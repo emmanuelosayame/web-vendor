@@ -38,6 +38,7 @@ const Product = () => {
   const { data } = api.product.one.useQuery(
     { id },
     {
+      enabled: !!(id && id !== "new"),
       placeholderData: {
         brand: "",
         category: [],
@@ -91,7 +92,7 @@ const Product = () => {
             </IconButton>
           </div>
 
-          <div className="grid grid-cols-7 grid-rows-4 gap-3 p-3">
+          <div className="grid grid-cols-7 grid-rows-4 gap-3 p-2 bg-white/40 rounded-lg">
             <div className="rounded-lg bg-white p-2 col-span-5 row-span-2 h-full space-y-1">
               <h3>Product Title and Description</h3>
               <TDivider />

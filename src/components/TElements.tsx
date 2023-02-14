@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { HTMLAttributes, ReactNode } from "react";
 import type {
   // AvatarProps,
@@ -98,3 +100,42 @@ export const IconButton = ({
     {children}
   </button>
 );
+
+interface LinkProps extends Omit<ButtonProps, "onClick"> {
+  href: string;
+}
+
+export const IconLink = ({
+  children,
+  className,
+  disabled,
+  href,
+}: LinkProps) => (
+  <Link
+    href={href}
+    className={`inline-flex gap-1 items-center rounded-md py-1 px-3 drop-shadow-md
+     hover:opacity-75 disabled:opacity-75 bg-white ${className}`}
+  >
+    {children}
+  </Link>
+);
+
+export const IconBack = ({
+  children,
+  onClick,
+  className,
+  disabled,
+}: ButtonProps) => {
+  const router = useRouter();
+
+  return (
+    <button
+      onClick={() => router.back()}
+      disabled={disabled}
+      className={`inline-flex gap-1 items-center rounded-md py-1 px-3 drop-shadow-md
+     hover:opacity-75 disabled:opacity-75 bg-white ${className}`}
+    >
+      {children}
+    </button>
+  );
+};

@@ -44,7 +44,7 @@ const Select = ({
             <RadixSelect.Item
               key={selectItem.value}
               value={selectItem.value}
-              className="py-1.5 px-5 hover:bg-white hover:text-black cursor-pointer text-base outline-none"
+              className="py-1.5 px-5 hover:text-blue-500 cursor-pointer text-base outline-none"
             >
               <RadixSelect.ItemText>{selectItem.item}</RadixSelect.ItemText>
               <RadixSelect.ItemIndicator />
