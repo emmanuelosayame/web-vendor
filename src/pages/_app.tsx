@@ -47,7 +47,7 @@ const MyApp = ({
         `}
       </style>
 
-      <main className={` ${spaceGrotesk.variable} font-spaceGrotesk`}>
+      <main className={` ${spaceGrotesk.variable} font-spaceGrotesk h-screen`}>
         <SessionProvider session={session}>
           <Auth page={getLayout(<Component {...pageProps} />)} />
         </SessionProvider>

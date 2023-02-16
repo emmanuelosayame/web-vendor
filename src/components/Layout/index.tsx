@@ -11,10 +11,10 @@ import SelectStore from "./SelectStore";
 
 const Layout = ({
   children,
-  nopx = false,
+  nopx = "sm",
 }: {
   children: ReactNode;
-  nopx?: boolean;
+  nopx?: "sm" | "lg" | "all";
 }) => {
   const { data: auth, status } = useSession();
   const colorScheme = useStore((state) => state.colorScheme);
@@ -28,14 +28,19 @@ const Layout = ({
 
   return (
     <>
-      <div className={`inset-0 h-full w-full bg-blue-600 `}>
-        <div
-          className={`flex relative w-full flex-col items-center overflow-y-auto
-       bg-white bg-opacity-25 pt-20 h-screen pb-4 ${nopx ? "md:px-3" : "px-3"}`}
-        >
-          <Header auth={auth} store={store} />
-          {children}
-        </div>
+      <Header auth={auth} store={store} />
+      <div
+        className={`h-full bg-blue-600 ${
+          nopx === "sm"
+            ? "md:px-3"
+            : nopx === "lg"
+            ? "px-3 md:px-0"
+            : nopx === "all"
+            ? ""
+            : "px-3"
+        }`}
+      >
+        <div className="pt-20 pb-4 h-full">{children}</div>
       </div>
     </>
   );

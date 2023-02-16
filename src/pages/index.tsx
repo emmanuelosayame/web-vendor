@@ -158,5 +158,5 @@ const Home: NextPageWithLayout = () => {
 export default Home;
 
 Home.getLayout = function getLayout(page) {
-  return <Layout px={false}>{page}</Layout>;
+  return <Layout nopx="all">{page}</Layout>;
 };

@@ -242,7 +242,7 @@ const Products = () => {
 };
 
 Products.getLayout = function getLayout(page: any) {
-  return <Layout nopx>{page}</Layout>;
+  return <Layout>{page}</Layout>;
 };
 
 export default Products;

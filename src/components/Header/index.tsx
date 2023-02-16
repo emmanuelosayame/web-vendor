@@ -19,12 +19,12 @@ interface Props {
 
 const Header = ({ auth, store }: Props) => {
   return (
-    <div className=" m-2 rounded-lg absolute inset-0 bg-white bg-opacity-40 h-16 p-2">
+    <div className=" m-2 rounded-lg fixed inset-0 bg-white bg-opacity-40 h-16 p-2 z-40">
       <div className="flex bg-white rounded-lg h-full justify-between px-4">
         <div className="hidden md:flex gap-2 items-center">
           <NavLink text="Dashboard" to="/" />
           <NavLink text="Products" to="/products" />
-          <NavLink text="Assets" to="/assets" />
+          <NavLink text="Sales" to="/sales" />
           <NavLink text="Notifications" to="/notifications" />
           <NavLink text="Settings" to="/settings" />
         </div>

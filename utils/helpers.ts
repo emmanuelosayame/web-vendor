@@ -29,3 +29,28 @@ export const csToStyle = (colorScheme: CSNames) => {
       return { bg: "bg-blue-500" };
   }
 };
+
+export const dateLocale = (date: Date | string) => {
+  const conv = new Date(date);
+  return conv.toLocaleDateString("en", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+};
+
+export const timeLocale = (date: Date | string) => {
+  const conv = new Date(date);
+  return conv.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" });
+};
+
+export const dateTimeLocale = (date: Date | string) => {
+  const conv = new Date(date);
+  return conv.toLocaleString("en", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};

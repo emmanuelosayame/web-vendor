@@ -105,3 +105,25 @@ model Vendor {
     phoneNo   String
     store     String[]
 }
+
+enum NType {
+    support
+    complaint
+    order
+}
+
+enum NStatus {
+    opened
+    sealed
+    pinned
+}
+
+model Notification {
+    id     String   @id @default(auto()) @map("_id") @db.ObjectId
+    on     DateTime @default(now())
+    read   DateTime @updatedAt()
+    status NStatus
+    title  String
+    body   String
+    type   NType
+}
