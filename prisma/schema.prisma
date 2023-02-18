@@ -54,7 +54,6 @@ model Product {
     price              Int
     promotion          String[]
     rating             Float
-    shortDescription   String
     status             String
     stock              Int
     tags               String[]
@@ -126,4 +125,81 @@ model Notification {
     title  String
     body   String
     type   NType
+}
+
+type OrdersItem {
+    id                 String  @map("_id")
+    brand              String?
+    description        String
+    discountPercentage Float?
+    price              Int
+    quantity           Int
+    shortDescription   String?
+    thumbnail          String?
+    title              String
+}
+
+type OrdersPayment {
+    method String
+    date   DateTime?
+}
+
+type OrdersShippingDetails {
+    address   String
+    email     String
+    firstName String
+    lastName  String
+    location  String
+    notes     String?
+    phone     String
+    state     String
+}
+
+type OrdersShippingInfo {
+    address   String
+    email     String
+    firstName String
+    lastName  String
+    location  String
+    notes     String
+    phone     String
+    state     String
+}
+
+type OrdersShippingOption {
+    price Int
+    type  String
+}
+
+enum OrderStatus {
+    pending
+    successful
+    failed
+    cancelled
+    closedPay
+}
+
+model Order {
+    id               String                @id @default(auto()) @map("_id") @db.ObjectId
+    customerId       String                @default("guest")
+    dateTime         DateTime              @default(now()) @db.Date
+    items            OrdersItem[]
+    orderId          String
+    payment          OrdersPayment
+    shipping_details OrdersShippingDetails
+    shipping_option  OrdersShippingOption
+    status           OrderStatus           @default(pending)
+    subTotal         Int
+    total            Int
+    txRef            String?
+}
+
+type SaleCustomer {
+    name String
+    id   String
+}
+
+model Sale {
+    id       String       @id @default(auto()) @map("_id") @db.ObjectId
+    customer SaleCustomer
 }

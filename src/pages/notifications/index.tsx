@@ -10,7 +10,7 @@ const orders = data.filter((not) => not.type === "order");
 const Notifications: NextPageWithLayout = () => {
   return (
     <>
-      <div className="flex items-center justify-between w-full px-2 md:px-0 md:h-[10%]">
+      <div className="flex items-center justify-between w-full px-2 md:px-0 md:h-[10%] my-2">
         <Select
           defaultSelected="all"
           contentStyles="bg-white"
@@ -38,7 +38,7 @@ const Notifications: NextPageWithLayout = () => {
         />
       </div>
 
-      <div className="h-full md:h-[90%] bg-white/40 p-2 w-full rounded-lg">
+      <div className="h-[90%] bg-white/40 p-2 w-full rounded-lg">
         <div className="flex flex-col md:flex-row gap-2 h-full">
           {/* orders */}
           <div className="w-full relative rounded-lg bg-white px-2 py-2 h-full max-h-96 md:max-h-full">
@@ -82,7 +82,7 @@ const Notifications: NextPageWithLayout = () => {
             </div>
           </div>
 
-          <div className="w-full relative rounded-lg bg-white px-2 py-2 max-h-96 md:max-h-full">
+          <div className="w-full relative rounded-lg bg-white px-2 h-full py-2 max-h-96 md:max-h-full">
             <h3 className="absolute inset-x-0 mx-2 bg-white text-center text-xl border-b border-b-neutral-300">
               Support/Complaints
             </h3>

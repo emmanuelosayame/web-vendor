@@ -1,6 +1,5 @@
 import InputTemp, { TextareaTemp } from "@components/InputTemp";
 import Layout from "@components/Layout";
-import Select from "@components/radix/Select";
 import {
   IconButton,
   TDivider,
@@ -13,15 +12,10 @@ import {
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  EllipsisHorizontalIcon,
-  MagnifyingGlassIcon,
-  PlusIcon,
-} from "@heroicons/react/24/solid";
+import { PlusIcon } from "@heroicons/react/24/solid";
 import { diff } from "deep-object-diff";
 import { Form, Formik } from "formik";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { api } from "utils/api";
@@ -30,10 +24,6 @@ const Product = () => {
   const router = useRouter();
   const id = router.query.product?.toString();
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const [sort, setSort] = useState<{ key?: string; value: string }>({
-    value: "A-Z",
-  });
 
   const { data } = api.product.one.useQuery(
     { id },
@@ -48,7 +38,6 @@ const Product = () => {
         price: 0,
         promotion: [],
         rating: 0,
-        shortDescription: "",
         status: "",
         stock: 0,
         tags: [],
@@ -57,7 +46,7 @@ const Product = () => {
     }
   );
 
-  const { ...rest } = data || {};
+  const { images, ...rest } = data || {};
 
   const { mutate } = api.product.update.useMutation();
 
@@ -66,11 +55,21 @@ const Product = () => {
     mutate({ id, data: updatedDetails });
   };
 
+  const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
+
+  const [imagesPrev, setIP] = useState(
+    imagesPH.map((imagePH) => {
+      const serverUrl =
+        images?.find((url, index) => imagePH.id === index.toString()) || "";
+      return { id: imagePH.id, url: serverUrl };
+    })
+  );
+
   return (
     <Formik initialValues={rest} onSubmit={save} enableReinitialize>
       {({ getFieldProps, dirty, errors }) => (
-        <Form className="w-full">
-          <div className="flex justify-between w-full px-3 py-2">
+        <Form className="w-full h-full">
+          <div className="flex justify-between w-full px-3 pt-1 absolute inset-x-0 top-20 z-30 bg-blue-600">
             <IconButton
               type="button"
               onClick={() => router.back()}
@@ -92,119 +91,182 @@ const Product = () => {
             </IconButton>
           </div>
 
-          <div className="grid grid-cols-7 grid-rows-4 gap-3 p-2 bg-white/40 rounded-lg">
-            <div className="rounded-lg bg-white p-2 col-span-5 row-span-2 h-full space-y-1">
-              <h3>Product Title and Description</h3>
-              <TDivider />
-              <InputTemp
-                type="text"
-                fieldProps={getFieldProps("title")}
-                style={{
-                  heading: { fontWeight: 500, mt: "2" },
-                  input: { bgColor: "blackAlpha.50" },
-                }}
-                heading="Product Title"
-                placeholder="title"
-              />
+          <div className="overflow-y-auto h-full pb-4">
+            <div className="flex flex-col md:grid md:grid-cols-7 md:grid-rows-5 gap-3 p-2 bg-white/40 rounded-lg">
+              <div className="rounded-lg bg-white p-2 col-span-5 row-span-2 h-full space-y-1">
+                <h3>Product Title and Description</h3>
+                <TDivider />
+                <TextareaTemp
+                  fieldProps={getFieldProps("title")}
+                  style={{}}
+                  heading="Product Title"
+                  placeholder="title"
+                  rows={2}
+                />
 
-              <TextareaTemp
-                heading="Short Description"
-                fieldProps={getFieldProps("shortDescription")}
-                placeholder="this description should act a as preview of the product"
-              />
+                <TextareaTemp
+                  fieldProps={getFieldProps("description")}
+                  heading="Product Description"
+                  rows={4}
+                  placeholder="description"
+                />
+              </div>
 
-              <TextareaTemp
-                fieldProps={getFieldProps("description")}
-                heading="Product Description"
-                rows={4}
-                placeholder="description"
-              />
-            </div>
-
-            <TStack className="rounded-lg p-2 col-span-2 row-span-3 bg-white">
-              <h3>Product Info</h3>
-              <TDivider />
-              <InputTemp
-                type="text"
-                fieldProps={getFieldProps("brand")}
-                style={{
-                  heading: { fontWeight: 500 },
-                  input: { bgColor: "blackAlpha.50" },
-                }}
-                heading="Brand"
-                placeholder="manufacturer / brand"
-              />
-
-              <InputTemp
-                type="text"
-                fieldProps={getFieldProps("category")}
-                style={{
-                  heading: { fontWeight: 500 },
-                  input: { bgColor: "blackAlpha.50" },
-                }}
-                heading="Category"
-                placeholder="category"
-              />
-
-              <THStack className="items-center p-2">
+              <TStack className="rounded-lg p-2 col-span-2 row-span-5 bg-white">
+                <h3>Product Info</h3>
+                <TDivider />
                 <InputTemp
-                  type="number"
-                  fieldProps={getFieldProps("price")}
-                  style={{
-                    heading: { fontWeight: 500 },
-                    input: { bgColor: "blackAlpha.50" },
-                  }}
-                  heading="Price"
+                  type="text"
+                  fieldProps={getFieldProps("brand")}
+                  style={{}}
+                  heading="Brand"
+                  placeholder="manufacturer / brand"
                 />
 
                 <InputTemp
-                  type="number"
-                  fieldProps={getFieldProps("stock")}
-                  style={{
-                    heading: { fontWeight: 500 },
-                    input: { bgColor: "blackAlpha.50" },
-                  }}
-                  heading="Stock"
+                  type="text"
+                  fieldProps={getFieldProps("category")}
+                  style={{}}
+                  heading="Category"
+                  placeholder="category"
                 />
-              </THStack>
 
-              <TextareaTemp
-                heading="Tags"
-                rows={4}
-                fieldProps={getFieldProps("tags")}
-                placeholder="enter tags sperated by spaces, tags written together would exists as a single word"
-              />
-            </TStack>
+                <THStack className="items-center p-2">
+                  <InputTemp
+                    type="number"
+                    fieldProps={getFieldProps("price")}
+                    style={{}}
+                    heading="Price"
+                  />
 
-            <div className="rounded-lg p-2 col-span-5 row-span-2 h-full bg-white">
-              <h3>Product Gallery</h3>
-              <TDivider />
-              <TStack className="relative flex-wrap justify-center">
-                <div>
-                  <TFlex className="py-2 items-center">
-                    <h3>Thumbnail</h3>
-                    <IconButton
-                      className="text-orange-500 rounded-full p-2 mx-2 bg-orange-200"
-                      // onClick={() => uploadThumbnailRef.current?.click()}
-                    >
-                      <PlusIcon width={25} />
-                    </IconButton>
-                    <button
-                      className="text-orange-500 rounded-full p-2 mx-2 bg-orange-200"
-                      // disabled={!thumbnail}
-                      onClick={() => {
-                        // thumbnailPrev && URL.revokeObjectURL(thumbnailPrev);
-                        // dispatch({
-                        //   type: "thumbnail-file",
-                        //   payload: null,
-                        // });
-                      }}
-                    >
-                      <ArchiveBoxXMarkIcon width={22} />
-                    </button>
-                  </TFlex>
+                  <InputTemp
+                    type="number"
+                    fieldProps={getFieldProps("stock")}
+                    style={{}}
+                    heading="Stock"
+                  />
+                </THStack>
+
+                <TextareaTemp
+                  heading="Package"
+                  rows={4}
+                  fieldProps={getFieldProps("package")}
+                  placeholder="enter contents sperated by semi-colon, contents written
+                 together would exists as a single word"
+                />
+                <TextareaTemp
+                  heading="Tags"
+                  rows={4}
+                  fieldProps={getFieldProps("tags")}
+                  placeholder="enter tags sperated by semi-colon, tags written together would exists as a single word"
+                />
+                <div className="">
+                  <h3 className="border-b border-b-neutral-200">
+                    Specifications
+                  </h3>
+
+                  <InputTemp
+                    type="text"
+                    fieldProps={getFieldProps("model")}
+                    style={{}}
+                    heading="Model"
+                  />
+
+                  <TextareaTemp
+                    heading="Other Specs"
+                    rows={4}
+                    fieldProps={getFieldProps("specs")}
+                    placeholder="enter tags sperated by semi-colon, tags written together would exists as a single word"
+                  />
                 </div>
               </TStack>
+
+              <div className="rounded-lg p-2 col-span-5 row-span-3 h-full bg-white">
+                <h3>Product Gallery</h3>
+                <TDivider />
+                <THStack className="relative flex-wrap justify-center gap-5 md:flex-nowrap md:gap-1">
+                  <div>
+                    <TFlex className="py-2 items-center gap-2">
+                      <h3>Thumbnail</h3>
+                      <button className="text-orange-500 rounded-full p-1.5 ml-2 bg-orange-200 drop-shadow-md">
+                        <PlusIcon width={20} />
+                      </button>
+                      <button className="text-orange-500 rounded-full p-1.5 bg-orange-200 drop-shadow-md">
+                        <ArchiveBoxXMarkIcon width={20} />
+                      </button>
+                    </TFlex>
+                    <div
+                      className="w-40 h-40 rounded-lg bg-black/60 flex justify-center items-center
+                   text-white"
+                    >
+                      <p>upload thumbnail</p>
+                    </div>
+                  </div>
+                  {imagesPrev.map((image) => (
+                    <div key={image.id}>
+                      <TFlex className="py-2 items-center gap-2 justify-center">
+                        <button className="text-orange-500 rounded-full p-1.5 ml-2 bg-orange-200 drop-shadow-md">
+                          <PlusIcon width={20} />
+                        </button>
+                        <button className="text-orange-500 rounded-full p-1.5 bg-orange-200 drop-shadow-md">
+                          <ArchiveBoxXMarkIcon width={20} />
+                        </button>
+                      </TFlex>
+                      {image.url ? (
+                        <Image
+                          alt=""
+                          src={image.url}
+                          width={200}
+                          height={200}
+                          className="w-40 h-40 rounded-md"
+                        />
+                      ) : (
+                        <div
+                          className="w-40 h-40 rounded-lg bg-black/60 flex justify-center items-center
+                   text-white"
+                        >
+                          <p>upload image</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </THStack>
+                <h3 className="mt-3">More Descriptions</h3>
+                <TDivider className="mb-4" />
+                <THStack className="flex-wrap justify-center gap-5 md:flex-nowrap md:gap-1">
+                  {imagesPH.slice(0, 2).map((image) => (
+                    <div
+                      key={image.id}
+                      className="flex flex-col md:flex-row gap-2"
+                    >
+                      <div>
+                        <TFlex className="pb-2 items-center gap-2 justify-center">
+                          <button className="text-orange-500 rounded-full p-1.5 ml-2 bg-orange-200 drop-shadow-md">
+                            <PlusIcon width={20} />
+                          </button>
+                          <button className="text-orange-500 rounded-full p-1.5 bg-orange-200 drop-shadow-md">
+                            <ArchiveBoxXMarkIcon width={20} />
+                          </button>
+                        </TFlex>
+                        <div
+                          className="w-40 h-40 rounded-lg bg-black/60 flex justify-center items-center
+                   text-white"
+                        >
+                          <p>upload image</p>
+                        </div>
+                      </div>
+                      <div className="w-40 md:w-full">
+                        <textarea
+                          className="bg-white rounded-lg ring-1 ring-neutral-300 w-full
+                         outline-none py-1 px-2 resize-none"
+                          placeholder="enter subject"
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </THStack>
+              </div>
             </div>
           </div>
         </Form>

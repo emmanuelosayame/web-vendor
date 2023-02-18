@@ -1,30 +1,19 @@
 import Layout from "@components/Layout";
-import Alert from "@components/radix/Alert";
 import Select from "@components/radix/Select";
-import { useToastTrigger } from "@components/radix/Toast";
-import {
-  IconButton,
-  TDivider,
-  TFlex,
-  THStack,
-  TStack,
-} from "@components/TElements";
+import { TDivider, TFlex, THStack } from "@components/TElements";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
-  MagnifyingGlassIcon,
-  PencilIcon,
   PencilSquareIcon,
   PlusIcon,
+  ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useRef, useState } from "react";
-import { type ProductSort } from "src/server/routers/product";
+import { useState } from "react";
 import { api } from "utils/api";
-import useMediaQuery from "utils/useMediaQuery";
 import { limitText } from "utils/helpers";
-import { LoadingBlur } from "@components/Loading";
+import useMediaQuery from "utils/useMediaQuery";
+import { type NextPageWithLayout } from "../_app";
 
 const selectList = [
   { item: "A - Z", value: "title-asc" },
@@ -38,22 +27,12 @@ const selectList = [
   { item: "Stock down", value: "stock-asc" },
 ];
 
-const Products = () => {
-  const router = useRouter();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { trigger } = useToastTrigger();
-
+const Sales: NextPageWithLayout = () => {
   const mq = useMediaQuery("(min-width: 800px)");
 
   const [pagn, setPagn] = useState(1);
 
-  const [sort, setSort] = useState<ProductSort>();
-
-  const { data: products, isLoading } = api.product.many.useQuery({
-    limit: 10,
-    sort,
-  });
-
+  const { data: products } = api.product.many.useQuery({ limit: 10 });
   const { data: count } = api.product.count.useQuery(
     {},
     { placeholderData: 0 }
@@ -64,32 +43,35 @@ const Products = () => {
       <div className="flex items-center justify-between w-full p-3 md:pt-1 md:pb-3">
         <Select
           defaultSelected="all"
-          contentStyles=""
-          triggerStyles="bg-white rounded-md"
-          selectList={[{ item: "AllProducts", value: "all" }]}
+          triggerStyles="bg-white rounded-md w-32"
+          contentStyles="bg-white"
+          selectList={[
+            { item: "All Sales", value: "all" },
+            { item: "Successful", value: "successful" },
+            { item: "Canceled", value: "cancelled" },
+            { item: "Failed", value: "failed" },
+          ]}
           onValueChange={() => {}}
         />
 
         <div className=" gap-2 hidden md:flex">
-          <Select
+          {/* <Select
             defaultSelected="title-asc"
             contentStyles="bg-white"
             triggerStyles="bg-white rounded-md"
             selectList={selectList}
-            onValueChange={(value) => setSort(value as ProductSort)}
-          />
-          {sort === "search" ? (
-            <div className="relative w-40">
-              <MagnifyingGlassIcon
-                className="absolute top-1/2 left-1 -translate-y-1/2"
-                width={25}
-              />
-              <input
-                className="outline-none py-1 pl-8 pr-2 rounded-md bg-white"
-                placeholder="search product"
-              />
-            </div>
-          ) : null}
+            onValueChange={(value) => {}}
+          /> */}
+          <div className="relative w-96 mx-auto mt-5">
+            <ShoppingCartIcon
+              width={25}
+              className="absolute top-1/2 -translate-y-1/2 left-2 text-red-400"
+            />
+            <input
+              placeholder="enter order id or txt ref"
+              className="w-full bg-white rounded-lg py-2 pl-10 outline-none"
+            />
+          </div>
         </div>
 
         <Link
@@ -101,10 +83,9 @@ const Products = () => {
         </Link>
       </div>
 
-      <div className=" bg-white/40 md:rounded-lg w-full p-2 h-full">
-        <div className="flex flex-col relative justify-between bg-white w-full rounded-lg p-2 h-full">
-          {isLoading && <LoadingBlur position="absolute" />}
-          <table className="w-full border-spacing-3 border-separate text-[14px] md:text-base">
+      <div className=" bg-white/40 md:rounded-lg w-full p-2">
+        <div className="flex flex-col justify-between bg-white w-full rounded-lg p-2 h-full">
+          <table className="w-full border-spacing-2 border-separate text-[14px] md:text-base">
             {/* <TableCaption>Showing 10 of many</TableCaption> */}
             <thead className="">
               {mq ? (
@@ -224,9 +205,7 @@ const Products = () => {
     </>
   );
 };
-
-Products.getLayout = function getLayout(page: any) {
+Sales.getLayout = function getLayout(page: any) {
   return <Layout>{page}</Layout>;
 };
-
-export default Products;
+export default Sales;

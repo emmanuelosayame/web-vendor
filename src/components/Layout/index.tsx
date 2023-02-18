@@ -27,10 +27,10 @@ const Layout = ({
   if (!store) return <SelectStore refetch={refetch} />;
 
   return (
-    <>
+    <div className="relative h-full">
       <Header auth={auth} store={store} />
       <div
-        className={`h-full bg-blue-600 ${
+        className={`h-full bg-blue-600 pt-32 ${
           nopx === "sm"
             ? "md:px-3"
             : nopx === "lg"
@@ -40,9 +40,9 @@ const Layout = ({
             : "px-3"
         }`}
       >
-        <div className="pt-20 pb-4 h-full">{children}</div>
+        {children}
       </div>
-    </>
+    </div>
   );
 };
 

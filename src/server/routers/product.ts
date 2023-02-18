@@ -33,34 +33,23 @@ export const productRouter = router({
     .input(
       z.object({
         limit: z.number().min(1).max(30).nullish(),
-        cursor: z.any(),
         sort: ProductSortEnum.optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { cursor, sort } = input;
+      const { sort } = input;
       const limit = input.limit ?? 10;
       const sid = ctx.sid;
       const orderBy = {
         [sort?.split("-")[0] || ""]: sort?.split("-")[1] || "",
       };
 
-      const dir = cursor?.direction;
-
-      console.log(dir);
-
       const result = await ctx.prisma.product.findMany({
         where: { sid },
-        take: dir === "asc" ? -(limit + 1) : limit + 1,
-        cursor: cursor ? { id: cursor?.id } : undefined,
+        take: limit,
         orderBy: sort && sort !== "search" ? orderBy : { title: "asc" },
       });
-
-      const hasNextMore = !(result.length < limit);
-      const nextCursor =
-        (hasNextMore && result[result.length - 1]?.id) || undefined;
-      const prevCursor = result[0]?.id || undefined;
-      return { products: result, cursor: { prevCursor, nextCursor } };
+      return result;
     }),
   update: protectedProcedure
     .input(z.object({ id: z.string().optional(), data: z.object({}) }))

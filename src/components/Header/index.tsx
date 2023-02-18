@@ -19,16 +19,17 @@ interface Props {
 
 const Header = ({ auth, store }: Props) => {
   return (
-    <div className=" m-2 rounded-lg fixed inset-0 bg-white bg-opacity-40 h-16 p-2 z-40">
-      <div className="flex bg-white rounded-lg h-full justify-between px-4">
-        <div className="hidden md:flex gap-2 items-center">
-          <NavLink text="Dashboard" to="/" />
-          <NavLink text="Products" to="/products" />
-          <NavLink text="Sales" to="/sales" />
-          <NavLink text="Notifications" to="/notifications" />
-          <NavLink text="Settings" to="/settings" />
-        </div>
-        {/* <div className="hidden md:flex items-center">
+    <div className="absolute inset-x-0 bg-blue-600 top-0 z-40">
+      <div className=" m-2 rounded-lg bg-white bg-opacity-40 h-16 p-2 ">
+        <div className="flex bg-white rounded-lg h-full justify-between px-4">
+          <div className="hidden md:flex gap-2 items-center">
+            <NavLink text="Dashboard" to="/" />
+            <NavLink text="Products" to="/products" />
+            <NavLink text="Sales" to="/sales" />
+            <NavLink text="Notifications" to="/notifications" />
+            <NavLink text="Settings" to="/settings" />
+          </div>
+          {/* <div className="hidden md:flex items-center">
           <div className="relative bg-neutral-200 pl-7 w-full rounded-md">
             <input className="w-full outline-none bg-transparent p-1" />
             <MagnifyingGlassIcon
@@ -38,24 +39,25 @@ const Header = ({ auth, store }: Props) => {
           </div>
         </div> */}
 
-        <div className="flex items-center gap-3">
-          <div className="bg-black/10 py-1 gap-2 text-center flex px-4 rounded-md leading-3">
-            <div className="">
-              <p className="leading-4">{store?.name}</p>
-              <p className="text-[12px] text-amber-600">{auth?.user.name}</p>
+          <div className="flex items-center gap-3">
+            <div className="bg-black/10 py-1 gap-2 text-center flex px-4 rounded-md leading-3">
+              <div className="">
+                <p className="leading-4">{store?.name}</p>
+                <p className="text-[12px] text-amber-600">{auth?.user.name}</p>
+              </div>
+              <ChevronDownIcon width={20} />
             </div>
-            <ChevronDownIcon width={20} />
-          </div>
 
-          <button>
-            <Avatar className="w-9 h-9 rounded-full" />
-          </button>
-          <button className="opacity-40">
-            <EnvelopeIcon width={25} />
-          </button>
-          <button className="opacity-40">
-            <BellAlertIcon width={25} />
-          </button>
+            <button>
+              <Avatar className="w-9 h-9 rounded-full" />
+            </button>
+            <button className="opacity-40">
+              <EnvelopeIcon width={25} />
+            </button>
+            <button className="opacity-40">
+              <BellAlertIcon width={25} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
