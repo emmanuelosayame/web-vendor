@@ -4,6 +4,7 @@ import Select from "@components/radix/Select";
 import { useToastTrigger } from "@components/radix/Toast";
 import {
   IconButton,
+  MenuFlex,
   TDivider,
   TFlex,
   THStack,
@@ -61,7 +62,7 @@ const Products = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between w-full p-3 md:pt-1 md:pb-3">
+      <MenuFlex>
         <Select
           defaultSelected="all"
           contentStyles=""
@@ -99,12 +100,12 @@ const Products = () => {
           <p>New Product</p>
           <PlusIcon width={20} />
         </Link>
-      </div>
+      </MenuFlex>
 
-      <div className=" bg-white/40 md:rounded-lg w-full p-2 h-full">
+      <div className="bg-white/40 md:rounded-lg w-full p-2 h-[90%]">
         <div className="flex flex-col relative justify-between bg-white w-full rounded-lg p-2 h-full">
           {isLoading && <LoadingBlur position="absolute" />}
-          <table className="w-full border-spacing-3 border-separate text-[14px] md:text-base">
+          <table className="w-full border-spacing-2 border-separate text-[14px] md:text-base">
             {/* <TableCaption>Showing 10 of many</TableCaption> */}
             <thead className="">
               {mq ? (

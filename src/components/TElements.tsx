@@ -139,3 +139,9 @@ export const IconBack = ({
     </button>
   );
 };
+
+export const MenuFlex = ({ children }: { children: ReactNode }) => (
+  <div className="flex justify-between w-full px-3 pt-1 absolute inset-x-0 top-20 z-30 bg-blue-600">
+    {children}
+  </div>
+);

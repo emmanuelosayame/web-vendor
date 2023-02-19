@@ -1,5 +1,6 @@
 import Layout from "@components/Layout";
 import Select from "@components/radix/Select";
+import { MenuFlex } from "@components/TElements";
 import { EnvelopeIcon, EnvelopeOpenIcon } from "@heroicons/react/24/solid";
 import { dateLocale, timeLocale } from "utils/helpers";
 import { data } from "utils/mock";
@@ -10,7 +11,7 @@ const orders = data.filter((not) => not.type === "order");
 const Notifications: NextPageWithLayout = () => {
   return (
     <>
-      <div className="flex items-center justify-between w-full px-2 md:px-0 md:h-[10%] my-2">
+      <MenuFlex>
         <Select
           defaultSelected="all"
           contentStyles="bg-white"
@@ -36,9 +37,9 @@ const Notifications: NextPageWithLayout = () => {
             { item: "Support", value: "support" },
           ]}
         />
-      </div>
+      </MenuFlex>
 
-      <div className="h-[90%] bg-white/40 p-2 w-full rounded-lg">
+      <div className="h-[95%] bg-white/40 p-2 w-full rounded-lg">
         <div className="flex flex-col md:flex-row gap-2 h-full">
           {/* orders */}
           <div className="w-full relative rounded-lg bg-white px-2 py-2 h-full max-h-96 md:max-h-full">

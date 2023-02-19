@@ -18,6 +18,7 @@ specifiers:
   '@trpc/next': ^10.9.0
   '@trpc/react-query': ^10.9.0
   '@trpc/server': ^10.9.0
+  '@types/lodash': ^4.14.191
   '@types/node': ^18.11.18
   '@types/prettier': ^2.7.2
   '@types/react': ^18.0.26
@@ -32,6 +33,7 @@ specifiers:
   eslint-config-next: 13.1.6
   firebase-admin: ^11.5.0
   formik: ^2.2.9
+  lodash: ^4.17.21
   next: 13.1.6
   next-auth: ^4.19.0
   nodemailer: ^6.9.1
@@ -48,6 +50,7 @@ specifiers:
   typescript: ^4.9.4
   yup: ^0.32.11
   zod: ^3.20.2
+  zustand: ^4.3.2
 
 dependencies:
   '@heroicons/react': 2.0.14_react@18.2.0
@@ -72,6 +75,7 @@ dependencies:
   deep-object-diff: 1.1.9
   firebase-admin: 11.5.0
   formik: 2.2.9_react@18.2.0
+  lodash: 4.17.21
   next: 13.1.6_biqbaboplfbrettd7655fr4n2y
   next-auth: 4.19.2_phzvn2nhb6zk7o4ds4z4gvqlei
   nodemailer: 6.9.1
@@ -82,8 +86,10 @@ dependencies:
   superjson: 1.9.1
   yup: 0.32.11
   zod: 3.20.2
+  zustand: 4.3.2_react@18.2.0
 
 devDependencies:
+  '@types/lodash': 4.14.191
   '@types/node': 18.11.19
   '@types/prettier': 2.7.2
   '@types/react': 18.0.27
@@ -1269,9 +1275,8 @@ packages:
     dev: false
     optional: true
 
-  /@types/lodash/4.14.186:
-    resolution: {integrity: sha512-eHcVlLXP0c2FlMPm56ITode2AgLMSa6aJ05JTTbYbI+7EMkCEE5qk2E41d5g2lCVTqRe0GnnRFurmlCsDODrPw==}
-    dev: false
+  /@types/lodash/4.14.191:
+    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
 
   /@types/long/4.0.2:
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
@@ -4891,7 +4896,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       '@babel/runtime': 7.20.13
-      '@types/lodash': 4.14.186
+      '@types/lodash': 4.14.191
       lodash: 4.17.21
       lodash-es: 4.17.21
       nanoclone: 0.2.1
@@ -4901,4 +4906,20 @@ packages:
 
   /zod/3.20.2:
     resolution: {integrity: sha512-1MzNQdAvO+54H+EaK5YpyEy0T+Ejo/7YLHS93G3RnYWh5gaotGHwGeN/ZO687qEDU2y4CdStQYXVHIgrUl5UVQ==}
+    dev: false
+
+  /zustand/4.3.2_react@18.2.0:
+    resolution: {integrity: sha512-rd4haDmlwMTVWVqwvgy00ny8rtti/klRoZjFbL/MAcDnmD5qSw/RZc+Vddstdv90M5Lv6RPgWvm1Hivyn0QgJw==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      immer: '>=9.0'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      immer:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
     dev: false

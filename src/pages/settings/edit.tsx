@@ -1,7 +1,12 @@
 import InputTemp, { TextareaTemp } from "@components/InputTemp";
 import Layout from "@components/Layout";
 import Avatar from "@components/radix/Avatar";
-import { IconBack, IconButton, TDivider } from "@components/TElements";
+import {
+  IconBack,
+  IconButton,
+  MenuFlex,
+  TDivider,
+} from "@components/TElements";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Form, Formik } from "formik";
 import { useSession } from "next-auth/react";
@@ -32,7 +37,7 @@ const Profile: NextPageWithLayout = () => {
     <Formik initialValues={initialValues} onSubmit={() => {}}>
       {({ dirty, getFieldProps, touched, errors }) => (
         <Form className="w-full">
-          <div className="flex justify-between mb-2">
+          <MenuFlex>
             <IconBack>
               <p>Cancel</p>
               <XMarkIcon width={25} />
@@ -42,7 +47,8 @@ const Profile: NextPageWithLayout = () => {
               <p>Save</p>
               <CheckIcon width={25} />
             </IconButton>
-          </div>
+          </MenuFlex>
+
           <div className="bg-white/40 backdrop-blur-md rounded-lg p-2">
             <div className="grid grid-cols-6 gap-2 h-full">
               <div className="bg-white rounded-lg p-3 col-span-2 flex flex-col items-center gap-2">

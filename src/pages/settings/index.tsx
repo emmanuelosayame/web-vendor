@@ -2,6 +2,7 @@ import Layout from "@components/Layout";
 import {
   IconButton,
   IconLink,
+  MenuFlex,
   TDivider,
   TFlex,
   THStack,
@@ -25,7 +26,7 @@ const Settings: NextPageWithLayout = () => {
 
   return (
     <>
-      <div className="flex justify-between mb-2 w-full">
+      <MenuFlex>
         <IconButton>
           <p>Back</p>
           <XMarkIcon width={25} />
@@ -35,9 +36,9 @@ const Settings: NextPageWithLayout = () => {
           <p>Edit</p>
           <PencilSquareIcon width={20} />
         </IconLink>
-      </div>
+      </MenuFlex>
 
-      <div className="bg-white/40 rounded-lg backdrop-blur-md p-2 w-full h-full">
+      <div className="bg-white/40 rounded-lg backdrop-blur-md p-2 w-full h-[95%]">
         <TStack className="bg-white rounded-lg overflow-hidden relative h-full">
           <div className="bg-neutral-800 w-full h-2/5 " />
           <div className="absolute top-1/2 inset-x-5 botton -translate-y-1/2">

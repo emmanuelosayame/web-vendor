@@ -1,6 +1,12 @@
 import Layout from "@components/Layout";
 import Select from "@components/radix/Select";
-import { TDivider, TFlex, THStack } from "@components/TElements";
+import {
+  IconButton,
+  MenuFlex,
+  TDivider,
+  TFlex,
+  THStack,
+} from "@components/TElements";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -8,15 +14,24 @@ import {
   PlusIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
+import {
+  Content,
+  Overlay,
+  Portal,
+  Root,
+  Trigger,
+} from "@radix-ui/react-dialog";
 import Link from "next/link";
 import { useState } from "react";
 import { api } from "utils/api";
 import { limitText } from "utils/helpers";
 import useMediaQuery from "utils/useMediaQuery";
+import debounce from "lodash/debounce";
 import { type NextPageWithLayout } from "../_app";
+import { useRouter } from "next/router";
 
 const selectList = [
-  { item: "A - Z", value: "title-asc" },
+  { item: "Latest", value: "latest" },
   { item: "Z - A", value: "title-desc" },
   { item: "Search", value: "search" },
   { item: "Price up", value: "price-desc" },
@@ -29,20 +44,31 @@ const selectList = [
 
 const Sales: NextPageWithLayout = () => {
   const mq = useMediaQuery("(min-width: 800px)");
+  const router = useRouter();
 
   const [pagn, setPagn] = useState(1);
 
-  const { data: products } = api.product.many.useQuery({ limit: 10 });
-  const { data: count } = api.product.count.useQuery(
-    {},
-    { placeholderData: 0 }
+  const { data: sales } = api.order.many.useQuery({ limit: 10 });
+  const { data: count } = api.order.count.useQuery({}, { placeholderData: 0 });
+
+  const [orderId, setOrderId] = useState("");
+
+  const { refetch, isFetching } = api.order.one.useQuery(
+    { orderId },
+    {
+      enabled: false,
+      onSuccess: (data) => {
+        if (!data) {
+        } else router.push(`/sales/${data.orderId}`);
+      },
+    }
   );
 
   return (
     <>
-      <div className="flex items-center justify-between w-full p-3 md:pt-1 md:pb-3">
+      <MenuFlex>
         <Select
-          defaultSelected="all"
+          defaultSelected="successful"
           triggerStyles="bg-white rounded-md w-32"
           contentStyles="bg-white"
           selectList={[
@@ -55,47 +81,73 @@ const Sales: NextPageWithLayout = () => {
         />
 
         <div className=" gap-2 hidden md:flex">
-          {/* <Select
-            defaultSelected="title-asc"
+          <Select
+            defaultSelected="latest"
             contentStyles="bg-white"
             triggerStyles="bg-white rounded-md"
             selectList={selectList}
             onValueChange={(value) => {}}
-          /> */}
-          <div className="relative w-96 mx-auto mt-5">
-            <ShoppingCartIcon
-              width={25}
-              className="absolute top-1/2 -translate-y-1/2 left-2 text-red-400"
-            />
-            <input
-              placeholder="enter order id or txt ref"
-              className="w-full bg-white rounded-lg py-2 pl-10 outline-none"
-            />
-          </div>
+          />
+          <Root>
+            <Trigger className="bg-white rounded-md py-1 px-3 hover:bg-opacity-70">
+              Load Order
+            </Trigger>
+            <Portal>
+              <Overlay className=" bg-gray-500 z-20 opacity-50 inset-0 fixed" />
+              <Content
+                className="fixed flex items-center gap-2 z-30 left-1/2 -translate-x-1/2 top-1/4 w-11/12 max-h-96 p-4
+                 overflow-auto rounded-lg border-t
+           border-gray-200 bg-white shadow-md shadow-gray-500 transition-all
+            sm:my-8 sm:w-full sm:max-w-sm"
+              >
+                <div className="relative w-full mx-auto">
+                  <ShoppingCartIcon
+                    width={25}
+                    className="absolute top-1/2 -translate-y-1/2 left-2 text-red-400"
+                  />
+                  <input
+                    placeholder="enter order id or txt ref"
+                    className="w-full bg-white rounded-md py-2 pl-10 outline-none
+                     ring-1 ring-neutral-300"
+                    onChange={debounce((e) => setOrderId(e.target.value), 600)}
+                  />
+                </div>
+                <button
+                  className="py-1 px-4 h-fit rounded-lg bg-green-400 hover:bg-green-500
+                 text-white drop-shadow-md"
+                  onClick={() => refetch()}
+                >
+                  Load
+                </button>
+              </Content>
+            </Portal>
+          </Root>
         </div>
 
         <Link
-          href={"/products/new"}
-          className="flex items-center bg-white rounded-lg px-3 py-1 hover:bg-opacity-75"
+          href={"/sales/new"}
+          className="flex items-center bg-white rounded-md px-3 py-1 hover:bg-opacity-75"
         >
-          <p>New Product</p>
+          <p>Add Sale</p>
           <PlusIcon width={20} />
         </Link>
-      </div>
+      </MenuFlex>
 
-      <div className=" bg-white/40 md:rounded-lg w-full p-2">
+      <div className="h-[95%] bg-white/40 md:rounded-lg w-full p-2">
         <div className="flex flex-col justify-between bg-white w-full rounded-lg p-2 h-full">
           <table className="w-full border-spacing-2 border-separate text-[14px] md:text-base">
             {/* <TableCaption>Showing 10 of many</TableCaption> */}
             <thead className="">
               {mq ? (
                 <tr className="text-center">
-                  <td>Product Details</td>
-                  <td>Category</td>
-                  <td>Sku</td>
-                  <td>Price</td>
-                  <td>Stock</td>
-                  <td>Sold</td>
+                  <td>Order Id</td>
+                  <td>Items</td>
+                  <td>Customer</td>
+                  <td>Location</td>
+                  <td>Status</td>
+                  <td>Shipping</td>
+                  <td>Total</td>
+                  <td>Pay</td>
                   <td>Option</td>
                 </tr>
               ) : (
@@ -111,37 +163,44 @@ const Sales: NextPageWithLayout = () => {
             </thead>
             <TDivider className="w-full" />
             <tbody>
-              {products &&
-                products.map((product) => (
-                  <tr key={product.id} className="text-center">
+              {sales &&
+                sales.map((sale) => (
+                  <tr key={sale.id} className="text-center">
                     {mq ? (
                       <>
-                        <td>{limitText(product.title, 20)}</td>
-                        <td>{product.category}</td>
-                        <td hidden={!mq}>{product.id.slice(19, 25)}</td>
-                        <td>{product.price}</td>
-                        <td>{product.stock}</td>
-                        <td>{product.sold || 0}</td>
+                        <td>{sale.orderId}</td>
+                        <td>{sale.items.length}</td>
+                        <td>{`${
+                          sale.shipping_details.firstName
+                        } - ${sale.shipping_details.email.slice(
+                          0,
+                          sale.shipping_details.email.length - 7
+                        )}...`}</td>
+                        <td>{`${sale.shipping_details.state} - ${sale.shipping_details.location}`}</td>
+                        <td>{sale.status}</td>
+                        <td>{`${sale.shipping_option.type} - ${sale.shipping_option.price}`}</td>
+                        <td>{sale.total}</td>
+                        <td>{sale.payment.method || 0}</td>
                         <td>
                           <Link
-                            href={`/products/${product.id}`}
+                            href={`/sales/${sale.orderId}`}
                             className="rounded-lg bg-blue-400 px-3 py-1 text-white hover:bg-blue-600"
                           >
-                            edit
+                            view
                           </Link>
                         </td>
                       </>
                     ) : (
                       <>
-                        <td>{limitText(product.title, 12)}</td>
-                        <td>{limitText(product.category, 10)}</td>
-                        <td hidden={!mq}>{product.id.slice(19, 25)}</td>
-                        <td>{product.price}</td>
-                        <td>{product.stock}</td>
-                        <td>{product.sold || 0}</td>
+                        <td>{limitText(sale.orderId, 12)}</td>
+                        <td>{sale.items.length}</td>
+                        <td>{sale.id.slice(19, 25)}</td>
+                        <td>{sale.shipping_option.type}</td>
+                        <td>{sale.total}</td>
+                        <td>{sale.payment.method || 0}</td>
                         <td className="flex items-center justify-center">
                           <Link
-                            href={`/products/${product.id}`}
+                            href={`/sales/${sale.id}`}
                             className="rounded-xl bg-neutral-100 p-1 drop-shadow-md
                             flex items-center justify-center w-fit text-blue-500 hover:bg-blue-600"
                           >
@@ -160,7 +219,7 @@ const Sales: NextPageWithLayout = () => {
             <TFlex className="justify-between p-2">
               <h3 className="px-2 text-neutral-700 text-lg">
                 <span>{(pagn - 1) * 10}</span> to{" "}
-                <span>{(pagn - 1) * 10 + (products?.length || 0)}</span> of{" "}
+                <span>{(pagn - 1) * 10 + (sales?.length || 0)}</span> of{" "}
                 <span>{count}</span>
               </h3>
 
@@ -205,6 +264,7 @@ const Sales: NextPageWithLayout = () => {
     </>
   );
 };
+
 Sales.getLayout = function getLayout(page: any) {
   return <Layout>{page}</Layout>;
 };
