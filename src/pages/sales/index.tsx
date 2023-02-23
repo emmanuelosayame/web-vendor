@@ -22,25 +22,16 @@ import {
   Trigger,
 } from "@radix-ui/react-dialog";
 import Link from "next/link";
-import { useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { api } from "utils/api";
 import { limitText } from "utils/helpers";
 import useMediaQuery from "utils/useMediaQuery";
 import debounce from "lodash/debounce";
 import { type NextPageWithLayout } from "../_app";
 import { useRouter } from "next/router";
-
-const selectList = [
-  { item: "Latest", value: "latest" },
-  { item: "Z - A", value: "title-desc" },
-  { item: "Search", value: "search" },
-  { item: "Price up", value: "price-desc" },
-  { item: "Price down", value: "price-asc" },
-  { item: "Sold up", value: "sold-desc" },
-  { item: "Sold down", value: "sold-asc" },
-  { item: "Stock up", value: "stock-desc" },
-  { item: "Stock down", value: "stock-asc" },
-];
+import { type Filter } from "src/server/routers/order";
+import { LoadingBlur } from "@components/Loading";
+import type { Order } from "@prisma/client";
 
 const Sales: NextPageWithLayout = () => {
   const mq = useMediaQuery("(min-width: 800px)");
@@ -48,12 +39,14 @@ const Sales: NextPageWithLayout = () => {
 
   const [pagn, setPagn] = useState(1);
 
-  const { data: sales } = api.order.many.useQuery({ limit: 10 });
+  const [filter, setFilter] = useState<Filter>();
+
+  const { data: sales } = api.order.many.useQuery({ limit: 10, filter });
   const { data: count } = api.order.count.useQuery({}, { placeholderData: 0 });
 
   const [orderId, setOrderId] = useState("");
 
-  const { refetch, isFetching } = api.order.one.useQuery(
+  const { refetch, isFetching, data } = api.order.one.useQuery(
     { orderId },
     {
       enabled: false,
@@ -66,8 +59,9 @@ const Sales: NextPageWithLayout = () => {
 
   return (
     <>
+      {isFetching && <LoadingBlur />}
       <MenuFlex>
-        <Select
+        <Select<Filter>
           defaultSelected="successful"
           triggerStyles="bg-white rounded-md w-32"
           contentStyles="bg-white"
@@ -77,51 +71,18 @@ const Sales: NextPageWithLayout = () => {
             { item: "Canceled", value: "cancelled" },
             { item: "Failed", value: "failed" },
           ]}
-          onValueChange={() => {}}
+          onValueChange={setFilter}
         />
 
         <div className=" gap-2 hidden md:flex">
-          <Select
+          <Select<any>
             defaultSelected="latest"
             contentStyles="bg-white"
             triggerStyles="bg-white rounded-md"
-            selectList={selectList}
+            selectList={[{ item: "Latest", value: "latest" }]}
             onValueChange={(value) => {}}
           />
-          <Root>
-            <Trigger className="bg-white rounded-md py-1 px-3 hover:bg-opacity-70">
-              Load Order
-            </Trigger>
-            <Portal>
-              <Overlay className=" bg-gray-500 z-20 opacity-50 inset-0 fixed" />
-              <Content
-                className="fixed flex items-center gap-2 z-30 left-1/2 -translate-x-1/2 top-1/4 w-11/12 max-h-96 p-4
-                 overflow-auto rounded-lg border-t
-           border-gray-200 bg-white shadow-md shadow-gray-500 transition-all
-            sm:my-8 sm:w-full sm:max-w-sm"
-              >
-                <div className="relative w-full mx-auto">
-                  <ShoppingCartIcon
-                    width={25}
-                    className="absolute top-1/2 -translate-y-1/2 left-2 text-red-400"
-                  />
-                  <input
-                    placeholder="enter order id or txt ref"
-                    className="w-full bg-white rounded-md py-2 pl-10 outline-none
-                     ring-1 ring-neutral-300"
-                    onChange={debounce((e) => setOrderId(e.target.value), 600)}
-                  />
-                </div>
-                <button
-                  className="py-1 px-4 h-fit rounded-lg bg-green-400 hover:bg-green-500
-                 text-white drop-shadow-md"
-                  onClick={() => refetch()}
-                >
-                  Load
-                </button>
-              </Content>
-            </Portal>
-          </Root>
+          <LoadOrder setOrderId={setOrderId} refetch={refetch} data={data} />
         </div>
 
         <Link
@@ -262,6 +223,60 @@ const Sales: NextPageWithLayout = () => {
         </div>
       </div>
     </>
+  );
+};
+
+const LoadOrder = ({
+  refetch,
+  setOrderId,
+  data,
+}: {
+  refetch: () => void;
+  setOrderId: Dispatch<SetStateAction<string>>;
+  data: Order | null | undefined;
+}) => {
+  return (
+    <Root>
+      <Trigger className="bg-white rounded-md py-1 px-3 hover:bg-opacity-70">
+        Load Order
+      </Trigger>
+      <Portal>
+        <Overlay className=" bg-gray-500 z-20 opacity-50 inset-0 fixed" />
+        <Content
+          className="fixed z-30 left-1/2 -translate-x-1/2 top-1/4 w-11/12 max-h-96 p-4
+                 overflow-auto rounded-lg border-t
+           border-gray-200 bg-white shadow-md shadow-gray-500 transition-all
+            sm:my-8 sm:w-full sm:max-w-sm"
+        >
+          <div className="flex items-center gap-2">
+            <div className="relative w-full mx-auto">
+              <ShoppingCartIcon
+                width={25}
+                className="absolute top-1/2 -translate-y-1/2 left-2 text-red-400"
+              />
+              <input
+                placeholder="enter order id or txt ref"
+                className="w-full bg-white rounded-md py-2 pl-10 outline-none
+                     ring-1 ring-neutral-300"
+                onChange={debounce((e) => setOrderId(e.target.value), 600)}
+              />
+            </div>
+            <button
+              className="py-1 px-4 h-fit rounded-lg bg-green-400 hover:bg-green-500
+                 text-white drop-shadow-md"
+              onClick={() => refetch()}
+            >
+              Load
+            </button>
+          </div>
+          {data === null && (
+            <p className="text-center pt-2 text-neutral-600">
+              No Order with that id
+            </p>
+          )}
+        </Content>
+      </Portal>
+    </Root>
   );
 };
 

@@ -8,6 +8,7 @@ interface ToastProps {
   title?: string;
   description?: string;
   duration?: number;
+  styles?: string;
 }
 
 export const useToastTrigger = (duration: number = 400) => {
@@ -32,20 +33,20 @@ export const Toast = ({
   title,
   description,
   duration = 5000,
+  styles,
 }: ToastProps) => {
   return (
     <ToastPrimitive.Provider duration={duration}>
       <ToastPrimitive.Root
         open={open}
         onOpenChange={setOpen}
-        className={
-          "radix-state-closed:animate-toast-hide radix-swipe-end:animate-toast-swipe-out translate-x-radix-toast-swipe-move-x radix-swipe-cancel:translate-x-0 radix-swipe-cancel:duration-200 radix-swipe-cancel:ease-[ease] fixed inset-x-4 bottom-4 z-50 mx-auto w-5/6 rounded-2xl bg-white shadow-lg focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 dark:bg-gray-800 md:bottom-4 md:right-4 md:left-auto md:top-auto md:w-full md:max-w-xs"
-        }
+        className={` fixed inset-x-4 bottom-4 z-50 mx-auto w-5/6 rounded-2xl bg-white/40 
+        backdrop-blur-md ring-2 ring-blue-500 shadow-lg focus-visible:ring-opacity-75 md:bottom-4 md:right-4 md:left-auto md:top-auto md:w-full md:max-w-xs ${styles}`}
       >
         <div className="flex">
           <div className="flex w-0 flex-1 items-center py-2 pl-5">
             <div className="radix w-full">
-              <ToastPrimitive.Title className="text-xl font-medium text-gray-900 dark:text-gray-100">
+              <ToastPrimitive.Title className="text-xl text-neutral-700 font-medium">
                 {title}
               </ToastPrimitive.Title>
               <ToastPrimitive.Description className="mt-1 text-sm text-gray-700 dark:text-gray-400">
@@ -65,8 +66,12 @@ export const Toast = ({
                   Review
                 </ToastPrimitive.Action>
               </div> */}
-              <div className="flex h-0 flex-1">
-                <ToastPrimitive.Close className="flex w-full items-center justify-center rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 dark:text-gray-100 dark:hover:bg-gray-900">
+              <div className="flex items-center flex-1">
+                <ToastPrimitive.Close
+                  className="flex w-full h-fit rounded-lg 
+                bg-white/60 border border-transparent px-3 py-2 text-sm text-gray-700
+                 hover:bg-white focus:z-10 dark:text-gray-100 dark:hover:bg-gray-900"
+                >
                   Dismiss
                 </ToastPrimitive.Close>
               </div>

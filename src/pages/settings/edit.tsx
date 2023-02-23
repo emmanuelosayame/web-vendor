@@ -36,7 +36,7 @@ const Profile: NextPageWithLayout = () => {
   return (
     <Formik initialValues={initialValues} onSubmit={() => {}}>
       {({ dirty, getFieldProps, touched, errors }) => (
-        <Form className="w-full">
+        <Form className="w-full h-full overflow-y-auto pb-2">
           <MenuFlex>
             <IconBack>
               <p>Cancel</p>
@@ -50,8 +50,8 @@ const Profile: NextPageWithLayout = () => {
           </MenuFlex>
 
           <div className="bg-white/40 backdrop-blur-md rounded-lg p-2">
-            <div className="grid grid-cols-6 gap-2 h-full">
-              <div className="bg-white rounded-lg p-3 col-span-2 flex flex-col items-center gap-2">
+            <div className="flex flex-col md;flex-row gap-2 h-full">
+              <div className="bg-white rounded-lg p-3 w-full md:w-1/3 flex flex-col items-center gap-2">
                 <h3 className="text-lg text-center border-b border-b-neutral-200 w-full">
                   Profile
                 </h3>
@@ -115,11 +115,11 @@ const Profile: NextPageWithLayout = () => {
                 </div>
               </div>
               {/* 2 */}
-              <div className="bg-white rounded-lg p-3 col-span-4 ">
+              <div className="bg-white rounded-lg p-3 w-full md:w-2/3">
                 <h3 className="text-lg text-center border-b border-b-neutral-200 w-full">
                   Store
                 </h3>
-                <div className="flex justify-between w-full gap-4 mt-2">
+                <div className="flex flex-col md:flex-row justify-between w-full gap-4 mt-2">
                   <div className="flex gap-3 flex-col w-full items-center">
                     <InputTemp
                       heading="Name"

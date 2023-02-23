@@ -1,18 +1,7 @@
-import { z } from "zod";
+import { string, z } from "zod";
+import { ProductSchema, ProductSortEnum, ProductUpdateSchema } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
-
-export const ProductSortEnum = z.enum([
-  "title-asc",
-  "title-desc",
-  "price-asc",
-  "price-desc",
-  "stock-asc",
-  "stock-desc",
-  "sold-asc",
-  "sold-desc",
-  "search",
-]);
 
 export type ProductSort = z.infer<typeof ProductSortEnum>;
 
@@ -27,7 +16,23 @@ export const productRouter = router({
     .input(z.object({ id: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const { id } = input;
-      return await ctx.prisma.product.findUnique({ where: { id } });
+      return await ctx.prisma.product.findUnique({
+        where: { id },
+        select: {
+          title: true,
+          brand: true,
+          category: true,
+          description: true,
+          thumbnail: true,
+          images: true,
+          price: true,
+          stock: true,
+          status: true,
+          tags: true,
+          package: true,
+          specs: true,
+        },
+      });
     }),
   many: protectedProcedure
     .input(
@@ -52,9 +57,17 @@ export const productRouter = router({
       return result;
     }),
   update: protectedProcedure
-    .input(z.object({ id: z.string().optional(), data: z.object({}) }))
+    .input(
+      z.object({
+        id: z.string().optional(),
+        data: ProductUpdateSchema,
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const { id, data } = input;
-      return await ctx.prisma.product.update({ where: { id }, data });
+      const { imageFiles, ...rest } = data;
+
+      const update = { ...rest };
+      return await ctx.prisma.product.update({ where: { id }, data: update });
     }),
 });

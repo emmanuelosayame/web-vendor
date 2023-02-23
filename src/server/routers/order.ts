@@ -1,7 +1,21 @@
-// import sum from "lodash/sum";
-// import { nanoid } from "nanoid";
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
+
+const OrderStatusSchema = z.enum([
+  "pending",
+  "successful",
+  "failed",
+  "cancelled",
+  "closedPay",
+]);
+
+const FilterSchema = z
+  .enum(["successful", "failed", "cancelled", "closedPay"])
+  .optional();
+
+export type OrderStatus = z.infer<typeof OrderStatusSchema>;
+
+export type Filter = z.infer<typeof FilterSchema>;
 
 export const orderRouter = router({
   one: protectedProcedure
@@ -11,11 +25,12 @@ export const orderRouter = router({
       return await ctx.prisma.order.findFirst({ where: { orderId } });
     }),
   many: protectedProcedure
-    .input(z.object({ customerId: z.string().optional(), limit: z.number() }))
+    .input(z.object({ limit: z.number(), filter: FilterSchema }))
     .query(async ({ input, ctx }) => {
-      const { customerId, limit } = input;
+      const sid = ctx.sid;
+      const { limit, filter } = input;
       return await ctx.prisma.order.findMany({
-        where: { customerId },
+        where: { sid, status: filter || "successful" },
         take: limit,
       });
     }),
@@ -23,19 +38,13 @@ export const orderRouter = router({
     .input(z.object({}))
     .query(async ({ ctx, input }) => {
       const sid = ctx.sid;
-      return await ctx.prisma.order.count();
+      return await ctx.prisma.order.count({ where: { sid } });
     }),
   update: protectedProcedure
     .input(
       z.object({
         orderId: z.string().optional(),
-        status: z.enum([
-          "pending",
-          "successful",
-          "failed",
-          "cancelled",
-          "closedPay",
-        ]),
+        status: OrderStatusSchema,
       })
     )
     .mutation(async ({ input, ctx }) => {

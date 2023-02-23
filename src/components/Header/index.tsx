@@ -1,5 +1,6 @@
 import Avatar from "@components/radix/Avatar";
 import {
+  Bars2Icon,
   BellAlertIcon,
   CheckBadgeIcon,
   ChevronDownIcon,
@@ -7,6 +8,7 @@ import {
   MagnifyingGlassCircleIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { Bars3BottomLeftIcon } from "@heroicons/react/24/solid";
 import type { Store } from "@prisma/client";
 import type { Session } from "next-auth";
 import Link from "next/link";
@@ -21,7 +23,7 @@ const Header = ({ auth, store }: Props) => {
   return (
     <div className="absolute inset-x-0 bg-blue-600 top-0 z-40">
       <div className=" m-2 rounded-lg bg-white bg-opacity-40 h-16 p-2 ">
-        <div className="flex bg-white rounded-lg h-full justify-between px-4">
+        <div className="flex bg-white rounded-lg h-full justify-between items-center px-4">
           <div className="hidden md:flex gap-2 items-center">
             <NavLink text="Dashboard" to="/" />
             <NavLink text="Products" to="/products" />
@@ -29,6 +31,9 @@ const Header = ({ auth, store }: Props) => {
             <NavLink text="Notifications" to="/notifications" />
             <NavLink text="Settings" to="/settings" />
           </div>
+          <button className="md:hidden drop-shadow-md rounded-lg bg-blue-100 h-fit">
+            <Bars2Icon width={30} />
+          </button>
           {/* <div className="hidden md:flex items-center">
           <div className="relative bg-neutral-200 pl-7 w-full rounded-md">
             <input className="w-full outline-none bg-transparent p-1" />
@@ -39,8 +44,8 @@ const Header = ({ auth, store }: Props) => {
           </div>
         </div> */}
 
-          <div className="flex items-center gap-3">
-            <div className="bg-black/10 py-1 gap-2 text-center flex px-4 rounded-md leading-3">
+          <div className="flex items-center flex-row-reverse md:flex-row gap-3">
+            <div className="hidden md:flex bg-black/10 py-1 gap-2 text-center px-4 rounded-md leading-3">
               <div className="">
                 <p className="leading-4">{store?.name}</p>
                 <p className="text-[12px] text-amber-600">{auth?.user.name}</p>
@@ -48,15 +53,12 @@ const Header = ({ auth, store }: Props) => {
               <ChevronDownIcon width={20} />
             </div>
 
-            <button>
+            <Link href={"/settings"}>
               <Avatar className="w-9 h-9 rounded-full" />
-            </button>
-            <button className="opacity-40">
-              <EnvelopeIcon width={25} />
-            </button>
-            <button className="opacity-40">
+            </Link>
+            <Link href={"/notifications"} className="opacity-40">
               <BellAlertIcon width={25} />
-            </button>
+            </Link>
           </div>
         </div>
       </div>

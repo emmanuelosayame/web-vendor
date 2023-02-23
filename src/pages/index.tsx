@@ -97,25 +97,25 @@ const salesData = {
 const Home: NextPageWithLayout = () => {
   return (
     <>
-      <div className="grid grid-cols-2 gap-2 p-4 md:flex">
-        <Card1 text="customers" value="5k">
-          <UserGroupIcon width={22} color="rgba(255.0, 204.0, 0.0, 0.7)" />
-        </Card1>
-        <Card1 text="visitors" value="8k">
-          <EyeIcon width={22} color="rgba(90.0, 200.0, 250.0, 0.75)" />
-        </Card1>
-        <Card1 text="weekly sales" value="22k">
-          <PresentationChartBarIcon
-            width={22}
-            color="rgba(175.0, 82.0, 222.0, 0.75)"
-          />
-        </Card1>
-        <Card1 text="weekly income" value="N500k">
-          <BanknotesIcon width={22} color="rgba(52.0, 199.0, 89.0, 0.7)" />
-        </Card1>
-      </div>
+      <div className="absolute inset-x-0 top-20 z-30 bg-blue-600">
+        <div className="gap-2 px-2 py-2 md:p-4 flex overflow-x-auto md:justify-center">
+          <Card1 text="customers" value="5k">
+            <UserGroupIcon width={22} color="rgba(255.0, 204.0, 0.0, 0.7)" />
+          </Card1>
+          <Card1 text="visitors" value="8k">
+            <EyeIcon width={22} color="rgba(90.0, 200.0, 250.0, 0.75)" />
+          </Card1>
+          <Card1 text="weekly sales" value="22k">
+            <PresentationChartBarIcon
+              width={22}
+              color="rgba(175.0, 82.0, 222.0, 0.75)"
+            />
+          </Card1>
+          <Card1 text="weekly income" value="N500k">
+            <BanknotesIcon width={22} color="rgba(52.0, 199.0, 89.0, 0.7)" />
+          </Card1>
+        </div>
 
-      <div className="w-full overscroll-y-auto">
         <TFlex className="bg-white bg-opacity-60 ">
           <button
             className="flex h-7 items-center bg-white px-1
@@ -125,7 +125,9 @@ const Home: NextPageWithLayout = () => {
             <ChevronDownIcon width={20} />
           </button>
         </TFlex>
+      </div>
 
+      <div className="w-full overflow-y-auto h-full pt-12 pb-2">
         <div
           className="flex flex-col gap-2 md:gap-3 mt-7 items-center justify-between
          md:rounded-lg bg-white/40 p-2 md:flex-row md:mx-2"
@@ -149,7 +151,6 @@ const Home: NextPageWithLayout = () => {
             </div>
           </div>
         </div>
-        {/* <Box bgColor='white' p={3} px={5} m={4} h={1000} rounded='2xl' /> */}
       </div>
     </>
   );

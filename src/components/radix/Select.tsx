@@ -1,28 +1,28 @@
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import * as RadixSelect from "@radix-ui/react-select";
 
-interface SelectProps {
+interface SelectProps<T> {
   triggerStyles?: string;
   contentStyles?: string;
   defaultSelected?: string;
-  onValueChange: (value: string) => void;
+  onValueChange: (value: T) => void;
   selectList: { value: string; item: string }[];
-  value?: string;
+  value?: T;
 }
 
-const Select = ({
+const Select = <T,>({
   defaultSelected,
   onValueChange,
   selectList,
   contentStyles,
   triggerStyles,
   value,
-}: SelectProps) => {
+}: SelectProps<T>) => {
   return (
     <RadixSelect.Root
-      value={value}
+      value={value as string}
       defaultValue={defaultSelected}
-      onValueChange={onValueChange}
+      onValueChange={(e) => onValueChange(e as T)}
     >
       <RadixSelect.Trigger
         className={`${triggerStyles} outline-none py-1 px-3 flex`}
@@ -39,7 +39,7 @@ const Select = ({
       <RadixSelect.Content
         className={` ${contentStyles} shadow-lg z-50 overflow-hidden rounded-2xl`}
       >
-        <RadixSelect.Viewport className="">
+        <RadixSelect.Viewport className="z-50">
           {selectList.map((selectItem) => (
             <RadixSelect.Item
               key={selectItem.value}

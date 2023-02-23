@@ -1,4 +1,4 @@
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { TStack } from "./TElements";
 import github from "public/github.svg";
@@ -28,6 +28,34 @@ const Login = () => {
             >
               login
             </button>
+            {/* <Formik initialValues={{ id: "", password: "" }} onSubmit={login}>
+              {({ dirty, getFieldProps }) => (
+                <Form className="w-full space-y-2">
+                  <InputTemp
+                    heading="Vendor Id"
+                    fieldProps={getFieldProps("id")}
+                    placeholder="Enter id"
+                  />
+                  <InputTemp
+                    heading="Password"
+                    fieldProps={getFieldProps("password")}
+                    placeholder="Enter password"
+                  />
+                  <div className="pt-3">
+                    <button
+                      disabled={!dirty}
+                      type="submit"
+                      className="w-full disabled:opacity-50 bg-blue-600
+                     hover:bg-blue-700 rounded-lg p-1
+             text-white drop-shadow-md"
+                      onClick={() => signIn("github")}
+                    >
+                      login
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik> */}
           </div>
         </div>
       </div>

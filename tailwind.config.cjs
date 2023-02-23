@@ -2,6 +2,12 @@
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    data: {
+      closed: 'state~="closed"',
+      checked: 'state~="checked"',
+      unchecked: 'state~="unchecked"',
+      cancel: 'state~="cancel"',
+    },
     fontFamily: {
       spaceGrotesk: ["var(--font-spaceGrotesk)"],
     },

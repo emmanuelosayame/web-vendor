@@ -1,5 +1,6 @@
 import Layout from "@components/Layout";
 import {
+  IconBack,
   IconButton,
   IconLink,
   MenuFlex,
@@ -27,10 +28,10 @@ const Settings: NextPageWithLayout = () => {
   return (
     <>
       <MenuFlex>
-        <IconButton>
+        <IconBack>
           <p>Back</p>
           <XMarkIcon width={25} />
-        </IconButton>
+        </IconBack>
 
         <IconLink href="/settings/edit">
           <p>Edit</p>
@@ -38,33 +39,41 @@ const Settings: NextPageWithLayout = () => {
         </IconLink>
       </MenuFlex>
 
-      <div className="bg-white/40 rounded-lg backdrop-blur-md p-2 w-full h-[95%]">
+      <div className="bg-white/40 rounded-lg backdrop-blur-md p-2 w-full h-[99%] md:h-[95%]">
         <TStack className="bg-white rounded-lg overflow-hidden relative h-full">
           <div className="bg-neutral-800 w-full h-2/5 " />
-          <div className="absolute top-1/2 inset-x-5 botton -translate-y-1/2">
-            <TFlex className="items-center gap-5">
-              <div className="bg-black w-52 h-52 rounded-xl" />
-              <div>
-                <h3 className="text-5xl font-semibold text-blue-500 inline-flex items-center gap-1">
-                  {store?.name}{" "}
-                  <span>
-                    <CheckBadgeIcon width={20} />
-                  </span>
-                </h3>
-                <p className="text-base text-neutral-500 ml-3">
-                  {store?.about}
-                </p>
-              </div>
-              <THStack className="flex-1">
-                <button aria-label="copy-link" className="mx-2 drop-shadow-md">
-                  <LinkIcon width={25} />
-                </button>
-                <button aria-label="copy-link" className="mx-2 drop-shadow-md">
-                  <GlobeAltIcon width={25} />
-                </button>
-              </THStack>
+          <div className="absolute top-64 md:top-1/2 inset-x-5 botton -translate-y-1/2">
+            <TStack className="md:flex-row items-center gap-5">
+              <div className="bg-black w-40 h-40 md:w-52 md:h-52 rounded-xl" />
+              <TFlex>
+                <div>
+                  <h3 className="text-3xl md:text-5xl font-semibold text-blue-500 inline-flex items-center gap-1">
+                    {store?.name}{" "}
+                    <span>
+                      <CheckBadgeIcon width={20} />
+                    </span>
+                  </h3>
+                  <p className="text-base text-neutral-500 md:ml-3">
+                    {store?.about}
+                  </p>
+                </div>
+                <THStack>
+                  <button
+                    aria-label="copy-link"
+                    className="mx-2 drop-shadow-md"
+                  >
+                    <LinkIcon width={25} />
+                  </button>
+                  <button
+                    aria-label="copy-link"
+                    className="mx-2 drop-shadow-md"
+                  >
+                    <GlobeAltIcon width={25} />
+                  </button>
+                </THStack>
+              </TFlex>
 
-              <div className=" w-1/3 text-lg border border-neutral-300 rounded-lg p-2 h-full">
+              <div className="w-full md:w-1/3 text-base md:text-lg border border-neutral-300 rounded-lg p-2 h-full">
                 <h3 className=" text-center">Team</h3>
                 <TDivider />
                 <div>
@@ -80,7 +89,7 @@ const Settings: NextPageWithLayout = () => {
                   </p>
                 </div>
               </div>
-            </TFlex>
+            </TStack>
           </div>
           <div className="absolute bottom-3 inset-x-3 flex justify-center">
             <button

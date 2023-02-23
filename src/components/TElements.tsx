@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { HTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import type {
   // AvatarProps,
   ButtonProps,
@@ -90,12 +90,14 @@ export const IconButton = ({
   onClick,
   className,
   disabled,
+  type,
 }: ButtonProps) => (
   <button
     onClick={onClick}
     disabled={disabled}
     className={`inline-flex gap-1 items-center rounded-md py-1 px-3 drop-shadow-md
      hover:opacity-75 disabled:opacity-75 bg-white ${className}`}
+    type={type}
   >
     {children}
   </button>

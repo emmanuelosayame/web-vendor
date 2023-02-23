@@ -44,6 +44,11 @@ datasource db {
 //     @@unique([identifier, token])
 // }
 
+type Specs {
+    model  String
+    others String
+}
+
 model Product {
     id                 String   @id @default(auto()) @map("_id") @db.ObjectId
     brand              String
@@ -61,6 +66,8 @@ model Product {
     title              String
     sold               Int?
     sid                String
+    package            String
+    specs              Specs
 }
 
 enum VRole {
@@ -192,6 +199,7 @@ model Order {
     subTotal         Int
     total            Int
     txRef            String?
+    sid              String
 }
 
 type SaleCustomer {

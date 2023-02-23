@@ -61,7 +61,7 @@ const MyApp = ({
 const Auth = ({ page }: { page: ReactNode }) => {
   const status = useSession()?.status;
   if (status === "loading") return <LoadingBlur />;
-  return <>{status !== "authenticated" ? <Login /> : <>{page}</>}</>;
+  return <>{status === "authenticated" ? <Login /> : <>{page}</>}</>;
 };
 
 export default api.withTRPC(MyApp);
