@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { TDivider } from "@components/TElements";
 import { setCookie } from "cookies-next";
 import SelectStore from "./SelectStore";
+import Login from "@components/Login";
 
 const Layout = ({
   children,
@@ -20,8 +21,13 @@ const Layout = ({
   const colorScheme = useStore((state) => state.colorScheme);
   const bg = csToStyle(colorScheme).bg;
 
-  const { data: store, isLoading, refetch } = api.store.one.useQuery({});
+  const {
+    data: store,
+    isLoading,
+    refetch,
+  } = api.store.one.useQuery({}, { enabled: !!auth?.user });
 
+  if (status === "unauthenticated") return <Login />;
   if (status === "loading" || isLoading) return <Loading />;
 
   if (!store) return <SelectStore refetch={refetch} />;

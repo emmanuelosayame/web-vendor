@@ -51,17 +51,17 @@ const MyApp = ({
         className={` ${spaceGrotesk.variable} font-spaceGrotesk fixed inset-0`}
       >
         <SessionProvider session={session}>
-          <Auth page={getLayout(<Component {...pageProps} />)} />
+          {getLayout(<Component {...pageProps} />)}
         </SessionProvider>
       </main>
     </>
   );
 };
 
-const Auth = ({ page }: { page: ReactNode }) => {
+const Auth = ({ children }: { children: ReactNode }) => {
   const status = useSession()?.status;
   if (status === "loading") return <LoadingBlur />;
-  return <>{status === "authenticated" ? <Login /> : <>{page}</>}</>;
+  return <>{status !== "authenticated" ? <Login /> : { children }}</>;
 };
 
 export default api.withTRPC(MyApp);

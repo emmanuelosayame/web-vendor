@@ -5,6 +5,7 @@ import {
   type DefaultSession,
 } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
+import { prisma } from "./db";
 
 /**
  * Module augmentation for `next-auth` types.
@@ -30,9 +31,12 @@ declare module "next-auth" {
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    // signIn: async ({ user }) => {
-    //   return true;
-    // },
+    signIn: async ({ user }) => {
+      const email = user.email || "";
+      const vendor = await prisma.vendor.findFirst({ where: { email } });
+      if (vendor && vendor.email === email) return true;
+      else return false;
+    },
     session({ session, token, user }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
@@ -47,6 +51,9 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
     }),
   ],
+  pages: {
+    error: "/auth/error",
+  },
 };
 
 /**
