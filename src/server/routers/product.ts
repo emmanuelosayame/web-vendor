@@ -68,6 +68,6 @@ export const productRouter = router({
       const { imageFiles, ...rest } = data;
 
       const update = { ...rest };
-      return await ctx.prisma.product.update({ where: { id }, data: update });
+      return await ctx.prisma.product.update({ where: { id }, data: {} });
     }),
 });
