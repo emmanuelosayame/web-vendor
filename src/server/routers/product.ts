@@ -1,5 +1,5 @@
-import { string, z } from "zod";
-import { ProductSchema, ProductSortEnum, ProductUpdateSchema } from "../schema";
+import { z } from "zod";
+import { ProductSortEnum, ProductUpdateSchema } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
 
