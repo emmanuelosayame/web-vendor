@@ -15,7 +15,7 @@ interface Props {
 
 const HeaderA = ({ auth }: Props) => {
   return (
-    <div className="absolute inset-x-0 bg-blue-600 top-0 z-40">
+    <div className="absolute inset-x-0 bg-blue-600 top-0 z-30">
       <div className=" m-2 rounded-lg bg-white bg-opacity-40 h-16 p-2 ">
         <div className="flex bg-white rounded-lg h-full justify-between items-center px-4">
           <div className="hidden md:flex gap-2 items-center">
@@ -42,15 +42,19 @@ const HeaderA = ({ auth }: Props) => {
 
           <div className="flex items-center flex-row-reverse md:flex-row gap-3">
             <div className="hidden md:flex bg-black/10 py-1 gap-2 text-center px-4 rounded-md leading-3">
-              <div className="">
-                <p className="leading-4">delorand</p>
+              <div className="w-32">
+                <p className="leading-4">admin</p>
                 <p className="text-[12px] text-amber-600">{auth?.user.name}</p>
               </div>
               <ChevronDownIcon width={20} />
             </div>
 
             <Link href={"/settings"}>
-              <Avatar className="w-9 h-9 rounded-full" />
+              <Avatar
+                className="w-9 h-9 rounded-full"
+                alt="profile"
+                src={auth?.user.image}
+              />
             </Link>
             <Link href={"/notifications"} className="opacity-40">
               <BellAlertIcon width={25} />

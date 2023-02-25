@@ -49,6 +49,12 @@ type Specs {
     others String
 }
 
+enum PStatus {
+    active
+    disabled
+    review
+}
+
 model Product {
     id                 String   @id @default(auto()) @map("_id") @db.ObjectId
     brand              String
@@ -59,7 +65,7 @@ model Product {
     price              Int
     promotion          String[]
     rating             Float
-    status             String
+    status             PStatus
     stock              Int
     tags               String[]
     thumbnail          String
@@ -118,6 +124,19 @@ model Vendor {
     location  String       @default("")
     address   String       @default("")
     status    VendorStatus @default(active)
+}
+
+model Customer {
+    id         String @id @default(auto()) @map("_id") @db.ObjectId
+    customerId String
+    // cartId          String?
+    email      String
+    firstName  String
+    lastName   String
+    phone      String
+    //   shippingDetails UsersShippingDetails[]
+    type       String
+    //   preferences     UserPreferences
 }
 
 enum NType {

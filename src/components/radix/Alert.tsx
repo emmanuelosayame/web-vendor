@@ -34,7 +34,9 @@ const AlertDialog = ({
 }: Props) => {
   return (
     <Root>
-      <Trigger className={triggerStyles}>{trigger}</Trigger>
+      <Trigger type="button" className={triggerStyles}>
+        {trigger}
+      </Trigger>
       <Portal>
         <Overlay className="fixed inset-0 z-20 bg-black/50" />
         <Content

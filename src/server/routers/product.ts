@@ -3,8 +3,6 @@ import { ProductSortEnum, ProductUpdateSchema } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
 
-export type ProductSort = z.infer<typeof ProductSortEnum>;
-
 export const productRouter = router({
   count: protectedProcedure
     .input(z.object({}))

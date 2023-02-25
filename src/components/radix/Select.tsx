@@ -14,8 +14,8 @@ const Select = <T,>({
   defaultSelected,
   onValueChange,
   selectList,
-  contentStyles,
-  triggerStyles = "bg-white rounded-md w-24 justify-between",
+  contentStyles = "bg-white",
+  triggerStyles = "bg-white rounded-md w-24",
   value,
 }: SelectProps<T>) => {
   return (
@@ -25,7 +25,7 @@ const Select = <T,>({
       onValueChange={(e) => onValueChange(e as T)}
     >
       <RadixSelect.Trigger
-        className={`${triggerStyles} outline-none py-1 px-3 flex`}
+        className={`${triggerStyles} outline-none py-1 px-3 flex  justify-between`}
         aria-label="Sort"
       >
         <div className="">

@@ -16,7 +16,7 @@ interface Props {
 
 const Header = ({ auth, store }: Props) => {
   return (
-    <div className="absolute inset-x-0 bg-blue-600 top-0 z-40">
+    <div className="absolute inset-x-0 bg-blue-600 top-0 z-30">
       <div className=" m-2 rounded-lg bg-white bg-opacity-40 h-16 p-2 ">
         <div className="flex bg-white rounded-lg h-full justify-between items-center px-4">
           <div className="hidden md:flex gap-2 items-center">

@@ -134,8 +134,8 @@ export const IconBack = ({
     <button
       onClick={() => router.back()}
       disabled={disabled}
-      className={`inline-flex gap-1 items-center rounded-md py-1 px-3 drop-shadow-md
-     hover:opacity-75 disabled:opacity-75 bg-white ${className}`}
+      className={`inline-flex gap-1 items-center justify-center rounded-md py-1 drop-shadow-md
+     hover:opacity-75 disabled:opacity-75 w-24 text-center bg-white ${className}`}
     >
       {children}
     </button>

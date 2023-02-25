@@ -1,6 +1,7 @@
 import InputTemp, { TextareaTemp } from "@components/InputTemp";
 import Layout from "@components/Layout";
 import { LoadingBlur } from "@components/Loading";
+import AlertDialog from "@components/radix/Alert";
 import Toast, { useToastTrigger } from "@components/radix/Toast";
 import {
   IconButton,
@@ -123,9 +124,10 @@ const Product = () => {
       specs: { model, others: otherSpecs },
     };
     const updatedDetails = diff(initialData, updatedData);
-    console.log(updatedDetails);
     mutate({ id, data: updatedDetails as any });
   };
+
+  console.log(status, error);
 
   if (error) return <p>{error.message}</p>;
 
@@ -257,13 +259,31 @@ const Product = () => {
                     />
                   </div>
 
-                  <button
-                    type="button"
-                    className="py-1 w-11/12 mx-auto rounded-lg
+                  <AlertDialog
+                    action={status === "active" ? "Disable" : "Enable"}
+                    title={`Are you sure you want to ${
+                      status === "active" ? "disable" : "enable"
+                    } this product?`}
+                    trigger={status === "active" ? "disable" : "enable"}
+                    triggerStyles="py-1 w-11/12 mx-auto rounded-lg
+                   bg-amber-400 hover:bg-amber-500 text-white"
+                    onClickConfirm={() =>
+                      mutate({
+                        id,
+                        data: {
+                          status: status === "active" ? "disabled" : "active",
+                        },
+                      })
+                    }
+                  />
+
+                  <AlertDialog
+                    action="Delete"
+                    title="Are you sure you want to delete this product?"
+                    trigger="delete"
+                    triggerStyles="py-1 w-11/12 mx-auto rounded-lg
                    bg-red-500 hover:bg-red-600 text-white"
-                  >
-                    disable
-                  </button>
+                  />
                 </TStack>
 
                 <div className="rounded-lg p-2 col-span-5 row-span-3 h-full bg-white">

@@ -29,6 +29,7 @@ export const ProductSchema = z
     thumbnail: z.string(),
     // images: z.array(z.string()),
     moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
+    status: z.enum(["active", "disabled"]),
   })
   .partial();
 
@@ -50,3 +51,5 @@ export const VendorData = z.object({
 });
 
 export type ProductUpdate = z.infer<typeof ProductUpdateSchema>;
+
+export type ProductSort = z.infer<typeof ProductSortEnum>;

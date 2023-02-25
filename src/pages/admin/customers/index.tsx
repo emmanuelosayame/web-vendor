@@ -1,4 +1,4 @@
-import Layout from "@components/Layout";
+import LayoutA from "@components/Layout/Admin";
 import Alert from "@components/radix/Alert";
 import Select from "@components/radix/Select";
 import { useToastTrigger } from "@components/radix/Toast";
@@ -13,15 +13,14 @@ import {
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
+  ChevronRightIcon,
   MagnifyingGlassIcon,
-  PencilIcon,
-  PencilSquareIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
-import { type ProductSort } from "src/server/schema";
+import { type ProductSort } from "src/server/routers/product";
 import { api } from "utils/api";
 import useMediaQuery from "utils/useMediaQuery";
 import { limitText } from "utils/helpers";
@@ -31,15 +30,13 @@ const selectList = [
   { item: "A - Z", value: "title-asc" },
   { item: "Z - A", value: "title-desc" },
   { item: "Search", value: "search" },
-  { item: "Price up", value: "price-desc" },
-  { item: "Price down", value: "price-asc" },
-  { item: "Sold up", value: "sold-desc" },
-  { item: "Sold down", value: "sold-asc" },
-  { item: "Stock up", value: "stock-desc" },
-  { item: "Stock down", value: "stock-asc" },
+  { item: "Orders up", value: "orders-desc" },
+  { item: "Orders down", value: "orders-asc" },
+  { item: "Active Today", value: "active-t" },
+  { item: "Active", value: "active-s" },
 ];
 
-const Products = () => {
+const Customers = () => {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const { trigger } = useToastTrigger();
@@ -50,12 +47,11 @@ const Products = () => {
 
   const [sort, setSort] = useState<ProductSort>();
 
-  const { data: products, isLoading } = api.product.many.useQuery({
+  const { data: customers, isLoading } = api.customer.many.useQuery({
     limit: 10,
-    sort,
   });
 
-  const { data: count } = api.product.count.useQuery(
+  const { data: count } = api.customer.count.useQuery(
     {},
     { placeholderData: 0 }
   );
@@ -65,9 +61,11 @@ const Products = () => {
       <MenuFlex>
         <Select
           defaultSelected="all"
-          contentStyles=""
-          triggerStyles="bg-white rounded-md"
-          selectList={[{ item: "AllProducts", value: "all" }]}
+          triggerStyles="bg-white rounded-lg min-w-[100px]"
+          selectList={[
+            { item: "All", value: "all" },
+            { item: "Purchased", value: "purchased" },
+          ]}
           onValueChange={() => {}}
         />
 
@@ -87,17 +85,17 @@ const Products = () => {
               />
               <input
                 className="outline-none py-1 pl-8 pr-2 rounded-md bg-white"
-                placeholder="search product"
+                placeholder="search customer"
               />
             </div>
           ) : null}
         </div>
 
         <Link
-          href={"/products/new"}
+          href={"/admin/customers/new"}
           className="flex items-center bg-white rounded-lg px-3 py-1 hover:bg-opacity-75"
         >
-          <p>New Product</p>
+          <p>New Customer</p>
           <PlusIcon width={20} />
         </Link>
       </MenuFlex>
@@ -110,41 +108,41 @@ const Products = () => {
             <thead className="">
               {mq ? (
                 <tr className="text-center">
-                  <td>Product Details</td>
-                  <td>Category</td>
-                  <td>Sku</td>
-                  <td>Price</td>
-                  <td>Stock</td>
-                  <td>Sold</td>
+                  <td>Customer Name</td>
+                  <td>Email</td>
+                  <td>Phone No.</td>
+                  <td>Type</td>
+                  <td>Purchases</td>
                   <td>Option</td>
                 </tr>
               ) : (
                 <tr className="text-center">
-                  <td>Details</td>
-                  <td>Cat.</td>
-                  <td>Price</td>
-                  <td>Stk</td>
-                  <td>Sold</td>
-                  <td>Opt.</td>
+                  <td>Name</td>
+                  <td>Email</td>
+                  <td>Opt</td>
                 </tr>
               )}
             </thead>
             <TDivider className="w-full" />
             <tbody>
-              {products &&
-                products.map((product) => (
-                  <tr key={product.id} className="text-center">
+              {customers &&
+                customers.map((customer) => (
+                  <tr key={customer.id} className="text-center">
                     {mq ? (
                       <>
-                        <td>{limitText(product.title, 20)}</td>
-                        <td>{product.category}</td>
-                        <td hidden={!mq}>{product.id.slice(19, 25)}</td>
-                        <td>{product.price}</td>
-                        <td>{product.stock}</td>
-                        <td>{product.sold || 0}</td>
+                        <td>
+                          {limitText(
+                            `${customer.firstName} ${customer.lastName}`,
+                            20
+                          )}
+                        </td>
+                        <td>{customer.email}</td>
+                        <td>{customer.phone}</td>
+                        <td>{customer.type}</td>
+                        <td>{10}</td>
                         <td>
                           <Link
-                            href={`/products/${product.id}`}
+                            href={`/admin/customers/${customer.id}`}
                             className="rounded-lg bg-blue-400 px-3 py-1 text-white hover:bg-blue-600"
                           >
                             view
@@ -153,19 +151,20 @@ const Products = () => {
                       </>
                     ) : (
                       <>
-                        <td>{limitText(product.title, 12)}</td>
-                        <td>{limitText(product.category, 10)}</td>
-                        <td hidden={!mq}>{product.id.slice(19, 25)}</td>
-                        <td>{product.price}</td>
-                        <td>{product.stock}</td>
-                        <td>{product.sold || 0}</td>
+                        <td>
+                          {limitText(
+                            `${customer.firstName} ${customer.lastName}`,
+                            8
+                          )}
+                        </td>
+                        <td>{limitText(customer.email, 18)}</td>
                         <td className="flex items-center justify-center">
                           <Link
-                            href={`/products/${product.id}`}
-                            className="rounded-xl bg-neutral-100 p-1 drop-shadow-md
-                            flex items-center justify-center w-fit text-blue-500 hover:bg-blue-600"
+                            href={`/admin/customers/${customer.id}`}
+                            className="rounded-md bg-neutral-50 p-1 drop-shadow-sm
+                            flex items-center justify-center w-fit text-black hover:text-white hover:bg-blue-300"
                           >
-                            <PencilSquareIcon width={20} />
+                            <ChevronRightIcon width={20} />
                           </Link>
                         </td>
                       </>
@@ -180,7 +179,7 @@ const Products = () => {
             <TFlex className="justify-between p-2">
               <h3 className="px-2 text-neutral-700 text-lg">
                 <span>{(pagn - 1) * 10}</span> to{" "}
-                <span>{(pagn - 1) * 10 + (products?.length || 0)}</span> of{" "}
+                <span>{(pagn - 1) * 10 + (customers?.length || 0)}</span> of{" "}
                 <span>{count}</span>
               </h3>
 
@@ -226,8 +225,8 @@ const Products = () => {
   );
 };
 
-Products.getLayout = function getLayout(page: any) {
-  return <Layout>{page}</Layout>;
+Customers.getLayout = function getLayout(page: any) {
+  return <LayoutA>{page}</LayoutA>;
 };
 
-export default Products;
+export default Customers;

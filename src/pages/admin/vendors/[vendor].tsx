@@ -9,6 +9,7 @@ import { useState } from "react";
 import { api } from "utils/api";
 import { type NextPageWithLayout } from "../../_app";
 import AlertDialog from "@components/radix/Alert";
+import { vendorVs } from "utils/validation";
 
 const Vendor: NextPageWithLayout = () => {
   const router = useRouter();
@@ -67,8 +68,8 @@ const Vendor: NextPageWithLayout = () => {
         <button
           type="button"
           className={`${
-            edit ? "bg-green-400 text-white ring-2 ring-white" : "bg-white"
-          } rounded-lg py-1 w-28`}
+            edit ? "bg-green-400 text-white" : "bg-white"
+          } rounded-lg py-1 w-24`}
           onClick={() => setedit((state) => !state)}
         >
           Edit
@@ -79,13 +80,14 @@ const Vendor: NextPageWithLayout = () => {
         <div className="p-2 bg-white/40 rounded-lg flex flex-col md:flex-row gap-2 h-[98%]">
           <Formik
             initialValues={formIV}
+            validationSchema={vendorVs}
             onSubmit={(values) => {
               if (vendorId === "new") {
                 create({ data: values });
               } else mutate({ vid: vendorId, data: values });
             }}
           >
-            {({ dirty, errors, getFieldProps }) => (
+            {({ dirty, touched, errors, getFieldProps }) => (
               <Form className="bg-white rounded-lg p-4 space-y-3 w-full h-full flex flex-col">
                 <h3 className="w-full text-center text-xl border-b border-b-neutral-300">
                   Vendor Info
@@ -96,12 +98,16 @@ const Vendor: NextPageWithLayout = () => {
                     fieldProps={getFieldProps("firstName")}
                     heading="First Name"
                     placeholder="Enter First Name"
+                    touched={touched.firstName}
+                    error={errors.firstName}
                   />
                   <InputTemp
                     disabled={!edit}
                     fieldProps={getFieldProps("lastName")}
                     heading="Last Name"
                     placeholder="Enter Last Name"
+                    touched={touched.lastName}
+                    error={errors.lastName}
                   />
                 </THStack>
                 <InputTemp
@@ -109,17 +115,24 @@ const Vendor: NextPageWithLayout = () => {
                   fieldProps={getFieldProps("email")}
                   heading="Email"
                   placeholder="Enter email"
+                  touched={touched.email}
+                  error={errors.email}
                 />
                 <InputTemp
                   disabled={!edit}
                   fieldProps={getFieldProps("phoneNo")}
                   heading="Phone No."
                   placeholder="Enter phone number"
+                  touched={touched.phoneNo}
+                  error={errors.phoneNo}
+                  type="tel"
                 />
                 <InputTemp
                   disabled={!edit}
                   fieldProps={getFieldProps("location")}
                   placeholder="Enter Location"
+                  touched={touched.location}
+                  error={errors.location}
                   heading="Location"
                 />
                 <TextareaTemp
@@ -127,6 +140,8 @@ const Vendor: NextPageWithLayout = () => {
                   fieldProps={getFieldProps("address")}
                   placeholder="Enter Address"
                   heading="Address"
+                  touched={touched.address}
+                  error={errors.address}
                 />
                 <button
                   disabled={!edit || !dirty}
@@ -151,7 +166,7 @@ const Vendor: NextPageWithLayout = () => {
               } `}
             />
             <h3 className=" rounded-lg p-2 text-lg bg-neutral-100">
-              Status: active
+              Status : {vendor?.status || "..."}
             </h3>
 
             <div className="flex items-center justify-between">

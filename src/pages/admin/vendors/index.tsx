@@ -5,10 +5,14 @@ import { IconLink, MenuFlex } from "@components/TElements";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { api } from "utils/api";
+import { limitText } from "utils/helpers";
+import useMediaQuery from "utils/useMediaQuery";
 import { type NextPageWithLayout } from "../../_app";
 
 const Vendors: NextPageWithLayout = () => {
   const { data: vendors } = api.vendor.many.useQuery({ limit: 10 });
+
+  const mq = useMediaQuery("(min-width: 800px)");
 
   return (
     <>
@@ -16,7 +20,11 @@ const Vendors: NextPageWithLayout = () => {
         <Select
           onValueChange={() => {}}
           defaultSelected="all"
-          selectList={[{ item: "All", value: "all" }]}
+          selectList={[
+            { item: "All", value: "all" },
+            { item: "Admin", value: "admin" },
+            { item: "Vendor", value: "vendor" },
+          ]}
         />
 
         <IconLink href="/admin/vendors/new">
@@ -27,25 +35,30 @@ const Vendors: NextPageWithLayout = () => {
 
       <div className="p-2 bg-white/40 rounded-lg h-[98%]">
         <div className="p-4 bg-white rounded-lg h-full overflow-y-auto">
-          <div className="flex flex-colsm:grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pt-4">
+          <div className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pt-4">
             {vendors?.map((vendor) => (
               <Link
                 href={`/admin/vendors/${vendor.id}`}
                 key={vendor.id}
-                className="p-4 rounded-lg bg-neutral-100 col-span-1
-                 flex flex-col cursor-pointer hover:bg-neutral-200"
+                className="p-4 rounded-lg ring-1 ring-neutral-300 col-span-1
+                 flex flex-col cursor-pointer w-full
+                  hover:ring-2"
               >
-                <p>{vendor.email}</p>
-                <div className="flex justify-between">
+                <p>{!mq ? limitText(vendor.email, 12) : vendor.email}</p>
+                <div className="flex justify-between flex-wrap">
                   <div>
-                    <p>{`${vendor.firstName} ${vendor.lastName}`}</p>
+                    <p className="text-sm md:text-base">
+                      {limitText(`${vendor.firstName} ${vendor.lastName}`, 18)}
+                    </p>
                     <p>{vendor.phoneNo}</p>
                   </div>
-                  <Avatar
-                    alt="profile"
-                    className="w-16 h-16 rounded-full mx-auto"
-                    src={vendor.photoUrl || undefined}
-                  />
+                  <div>
+                    <Avatar
+                      alt="profile"
+                      className="w-16 h-16 rounded-full mx-auto"
+                      src={vendor.photoUrl || undefined}
+                    />
+                  </div>
                 </div>
                 <p>{(vendor?.role || "vendor").toUpperCase()}</p>
               </Link>

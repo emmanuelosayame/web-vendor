@@ -2,7 +2,7 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import * as RadixAvatar from "@radix-ui/react-avatar";
 
 interface AvatarProps {
-  src?: string;
+  src?: string | null;
   alt?: string;
   className?: string;
   fallback?: string;
@@ -15,15 +15,17 @@ const Avatar = ({ src, alt, className, fallback }: AvatarProps) => {
     .join(" ");
   return (
     <RadixAvatar.Root
-      className={`inline-flex items-center select-none overflow-hidden shadow-md ${className}`}>
+      className={`inline-flex items-center select-none overflow-hidden shadow-md ${className}`}
+    >
       <RadixAvatar.Image
-        className='AvatarImage w-full h-full object-cover'
-        src={src}
+        className="AvatarImage w-full h-full object-cover"
+        src={src || undefined}
         alt={alt}
       />
       <RadixAvatar.Fallback
-        className='w-full h-full bg-gray-500 p-1 flex text-[whitesmoke] items-center justify-center'
-        delayMs={200}>
+        className="w-full h-full bg-gray-500 p-1 flex text-[whitesmoke] items-center justify-center"
+        delayMs={200}
+      >
         {!fallback ? <UserIcon width={"100%"} /> : <p>{fallbackInitials}</p>}
       </RadixAvatar.Fallback>
     </RadixAvatar.Root>
