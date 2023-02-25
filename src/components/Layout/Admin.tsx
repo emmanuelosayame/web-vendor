@@ -1,14 +1,13 @@
-import Header from "@components/Header";
+import Header from "@components/Header/Admin";
 import type { ReactNode } from "react";
 import { api } from "utils/api";
 import { useStore } from "store";
 import { csToStyle } from "utils/helpers";
 import { Loading } from "@components/Loading";
 import { useSession } from "next-auth/react";
-import SelectStore from "../SelectStore";
 import Login from "@components/Login";
 
-const Layout = ({
+const LayoutA = ({
   children,
   nopx = "sm",
 }: {
@@ -19,20 +18,22 @@ const Layout = ({
   const colorScheme = useStore((state) => state.colorScheme);
   const bg = csToStyle(colorScheme).bg;
 
-  const {
-    data: store,
-    isLoading,
-    refetch,
-  } = api.store.one.useQuery({}, { enabled: !!auth?.user });
-
   if (status === "unauthenticated") return <Login />;
-  if (status === "loading" || isLoading) return <Loading />;
+  if (status === "loading") return <Loading />;
 
-  if (!store) return <SelectStore refetch={refetch} />;
+  if (auth?.user.role !== "admin")
+    return (
+      <div className="bg-blue-400 h-screen w-screen flex justify-center items-center">
+        <div className="p-3 rounded-lg bg-neutral-100 text-neutral-500 text-center">
+          <h3>Access Denied !</h3>
+          <p className="text-sm">{"you probably aren't an admin"}</p>
+        </div>
+      </div>
+    );
 
   return (
     <div className="relative h-full">
-      <Header auth={auth} store={store} />
+      <Header auth={auth} />
       <div
         className={`h-full bg-blue-600 pt-32 ${
           nopx === "sm"
@@ -50,4 +51,4 @@ const Layout = ({
   );
 };
 
-export default Layout;
+export default LayoutA;

@@ -11,6 +11,7 @@ interface Props {
   Ibg?: string;
   style?: { heading?: any; input?: any };
   className?: string;
+  disabled?: boolean;
 }
 
 interface TextareaProps extends Omit<Props, "type"> {
@@ -27,6 +28,7 @@ const InputTemp = ({
   Ibg = "",
   style = { heading: { fontWeight: 600 } },
   className,
+  disabled,
 }: Props) => {
   //TODO switch ibg to inputprops
   return (
@@ -43,6 +45,7 @@ const InputTemp = ({
         {...fieldProps}
         placeholder={placeholder}
         {...style.input}
+        disabled={disabled}
       />
     </div>
   );
@@ -58,6 +61,7 @@ export const TextareaTemp = ({
   style = { heading: { fontWeight: 600 } },
   rows,
   className,
+  disabled,
 }: TextareaProps) => {
   //TODO switch ibg to inputprops
   return (
@@ -74,6 +78,7 @@ export const TextareaTemp = ({
         {...fieldProps}
         placeholder={placeholder}
         {...style.input}
+        disabled={disabled}
       />
     </div>
   );

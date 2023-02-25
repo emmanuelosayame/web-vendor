@@ -1,14 +1,13 @@
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import { TStack } from "./TElements";
 import github from "public/github.svg";
 
 const Login = () => {
   return (
     <div className="w-screen h-screen bg-black">
-      <div className="inset-3 fixed bg-login rounded-xl z-30">
+      <div className="inset-0 md:inset-2 fixed bg-blue-500  bg-login-1 md:bg-login-1 rounded-none md:rounded-xl z-30">
         <div
-          className="w-screen h-screen fixed inset-0 bg-white/5 backdrop-blur-[2px] flex justify-center
+          className="w-screen h-screen fixed inset-0 md:backdrop-blur-[2px] flex justify-center
          md:justify-end items-center"
         >
           <div

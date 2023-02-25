@@ -15,7 +15,7 @@ const Select = <T,>({
   onValueChange,
   selectList,
   contentStyles,
-  triggerStyles,
+  triggerStyles = "bg-white rounded-md w-24 justify-between",
   value,
 }: SelectProps<T>) => {
   return (

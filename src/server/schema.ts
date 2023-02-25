@@ -38,4 +38,15 @@ export const ProductUpdateSchema = ProductSchema.extend({
     .optional(),
 });
 
+export const VendorData = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string(),
+  phoneNo: z.string(),
+  location: z.string(),
+  address: z.string(),
+  role: z.enum(["admin", "vendor"]),
+  status: z.enum(["active", "disabled"]),
+});
+
 export type ProductUpdate = z.infer<typeof ProductUpdateSchema>;

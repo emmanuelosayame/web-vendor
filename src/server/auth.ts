@@ -14,33 +14,47 @@ import { prisma } from "./db";
  *
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  **/
+
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      role: "vendor" | "admin";
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    // ...other properties
+    role: "vendor" | "admin";
+  }
 }
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    jwt: async ({ token, user }) => {
+      if (user?.role === "admin") {
+        token.role = "admin";
+      }
+      return token;
+    },
     signIn: async ({ user }) => {
       const email = user.email || "";
       const vendor = await prisma.vendor.findFirst({ where: { email } });
-      if (vendor && vendor.email === email) return true;
-      else return false;
+      if (vendor && vendor.email === email) {
+        if (vendor.role == "admin") user.role = "admin";
+        if (!vendor.uid)
+          await prisma.vendor.update({
+            where: { email },
+            data: { uid: user.id },
+          });
+        return true;
+      } else return false;
     },
-    session({ session, token, user }) {
+    session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
-        // session.user.role = user.role; <-- put other properties on the session here
+        if (token.role === "admin") session.user.role = token.role;
       }
       return session;
     },
