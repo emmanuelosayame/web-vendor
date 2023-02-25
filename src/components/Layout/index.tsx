@@ -34,7 +34,7 @@ const Layout = ({
     <div className="relative h-full">
       <Header auth={auth} store={store} />
       <div
-        className={`h-full bg-blue-600 pt-32 ${
+        className={`h-full bg-blue-600 pt-28 md:pt-32 ${
           nopx === "sm"
             ? "md:px-3"
             : nopx === "lg"

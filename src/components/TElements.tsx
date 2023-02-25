@@ -143,7 +143,10 @@ export const IconBack = ({
 };
 
 export const MenuFlex = ({ children }: { children: ReactNode }) => (
-  <div className="flex justify-between w-full px-3 pt-1 absolute inset-x-0 top-20 z-30 bg-blue-600">
+  <div
+    className="flex justify-between w-full px-2 md:px-3 pt-1 absolute inset-x-0 
+  top-16 md:top-20 z-20 bg-blue-600"
+  >
     {children}
   </div>
 );

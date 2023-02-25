@@ -34,8 +34,8 @@ const Vendors: NextPageWithLayout = () => {
       </MenuFlex>
 
       <div className="p-2 bg-white/40 rounded-lg h-[98%]">
-        <div className="p-4 bg-white rounded-lg h-full overflow-y-auto">
-          <div className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pt-4">
+        <div className="p-3 bg-white rounded-lg h-full overflow-y-auto">
+          <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {vendors?.map((vendor) => (
               <Link
                 href={`/admin/vendors/${vendor.id}`}

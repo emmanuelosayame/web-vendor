@@ -67,7 +67,7 @@ const Products = () => {
           defaultSelected="all"
           contentStyles=""
           triggerStyles="bg-white rounded-md"
-          selectList={[{ item: "AllProducts", value: "all" }]}
+          selectList={[{ item: mq ? "All Products" : "All", value: "all" }]}
           onValueChange={() => {}}
         />
 
@@ -97,7 +97,7 @@ const Products = () => {
           href={"/products/new"}
           className="flex items-center bg-white rounded-lg px-3 py-1 hover:bg-opacity-75"
         >
-          <p>New Product</p>
+          <p>{mq ? "New Product" : "New"}</p>
           <PlusIcon width={20} />
         </Link>
       </MenuFlex>
@@ -122,7 +122,6 @@ const Products = () => {
                 <tr className="text-center">
                   <td>Details</td>
                   <td>Cat.</td>
-                  <td>Price</td>
                   <td>Stk</td>
                   <td>Sold</td>
                   <td>Opt.</td>
@@ -156,7 +155,6 @@ const Products = () => {
                         <td>{limitText(product.title, 12)}</td>
                         <td>{limitText(product.category, 10)}</td>
                         <td hidden={!mq}>{product.id.slice(19, 25)}</td>
-                        <td>{product.price}</td>
                         <td>{product.stock}</td>
                         <td>{product.sold || 0}</td>
                         <td className="flex items-center justify-center">
