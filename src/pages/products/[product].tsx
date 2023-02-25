@@ -24,6 +24,7 @@ import { useRef, useState } from "react";
 import { type ProductUpdate } from "src/server/schema";
 import { api } from "utils/api";
 import { productplaceholder } from "utils/assets";
+import { type NextPageWithLayout } from "../_app";
 
 interface RawPU
   extends Omit<ProductUpdate, "imageFiles" | "specifications" | "tags"> {
@@ -35,7 +36,7 @@ interface RawPU
 
 const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
 
-const Product = () => {
+const Product: NextPageWithLayout = () => {
   const router = useRouter();
   const id = router.query.product?.toString();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -53,7 +54,7 @@ const Product = () => {
               data?.images?.find(
                 (url, index) => imagePH.id === index.toString()
               ) || "";
-            return { id: imagePH.id, url: serverUrl };
+            return { id: imagePH.id, url: "" };
           })
         ),
     }
@@ -102,7 +103,7 @@ const Product = () => {
     ...rest,
     imageFiles: [],
     moreDescr: [],
-    specs,
+    specs: { model: specs?.model || "", others: specs?.others || "" },
   };
 
   const qc = api.useContext();
@@ -283,6 +284,9 @@ const Product = () => {
                     trigger="delete"
                     triggerStyles="py-1 w-11/12 mx-auto rounded-lg
                    bg-red-500 hover:bg-red-600 text-white"
+                    onClickConfirm={() => {
+                      setTimeout(() => router.replace("/products"), 300);
+                    }}
                   />
                 </TStack>
 

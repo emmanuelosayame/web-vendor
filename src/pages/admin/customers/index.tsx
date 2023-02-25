@@ -20,7 +20,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
-import { type ProductSort } from "src/server/routers/product";
+import { type ProductSort } from "src/server/schema";
 import { api } from "utils/api";
 import useMediaQuery from "utils/useMediaQuery";
 import { limitText } from "utils/helpers";

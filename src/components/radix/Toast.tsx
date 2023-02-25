@@ -40,8 +40,10 @@ export const Toast = ({
       <ToastPrimitive.Root
         open={open}
         onOpenChange={setOpen}
-        className={` fixed inset-x-4 bottom-4 z-50 mx-auto w-5/6 rounded-2xl bg-white/40 
-        backdrop-blur-md ring-2 ring-blue-500 shadow-lg focus-visible:ring-opacity-75 md:bottom-4 md:right-4 md:left-auto md:top-auto md:w-full md:max-w-xs ${styles}`}
+        className={` fixed inset-x-4 bottom-4 z-50 mx-auto w-5/6 rounded-2xl bg-white
+         ring-1 ring-neutral-400 shadow-lg
+          focus-visible:ring-opacity-75 md:bottom-4
+           md:right-4 md:left-auto md:top-auto md:w-full md:max-w-xs ${styles}`}
       >
         <div className="flex">
           <div className="flex w-0 flex-1 items-center py-2 pl-5">
@@ -69,8 +71,8 @@ export const Toast = ({
               <div className="flex items-center flex-1">
                 <ToastPrimitive.Close
                   className="flex w-full h-fit rounded-lg 
-                bg-white/60 border border-transparent px-3 py-2 text-sm text-gray-700
-                 hover:bg-white focus:z-10 dark:text-gray-100 dark:hover:bg-gray-900"
+                bg-white ring-1 ring-neutral-200 px-3 py-2 text-sm text-gray-700
+                 hover:bg-neutral-100 focus:z-10 dark:text-gray-100 dark:hover:bg-gray-900"
                 >
                   Dismiss
                 </ToastPrimitive.Close>

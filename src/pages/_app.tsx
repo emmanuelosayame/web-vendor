@@ -2,7 +2,7 @@ import type { AppProps } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider, useSession } from "next-auth/react";
 import { api } from "../../utils/api";
-import font from "@next/font/local";
+import font from "next/font/local";
 
 import "../styles/globals.css";
 import type { ReactElement, ReactNode } from "react";

@@ -12,8 +12,6 @@
   "dependencies": {
     "@heroicons/react": "^2.0.14",
     "@next-auth/prisma-adapter": "^1.0.5",
-    "@next/codemod": "13.2.1",
-    "@next/font": "^13.1.6",
     "@prisma/client": "^4.9.0",
     "@radix-ui/react-alert-dialog": "^1.0.2",
     "@radix-ui/react-avatar": "^1.0.1",

@@ -31,13 +31,11 @@ export const ProductSchema = z
     moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
     status: z.enum(["active", "disabled"]),
   })
-  .partial();
+  .deepPartial();
 
 export const ProductUpdateSchema = ProductSchema.extend({
-  imageFiles: z
-    .array(z.object({ name: z.string(), size: z.number() }))
-    .optional(),
-});
+  imageFiles: z.array(z.object({ name: z.string(), size: z.number() })),
+}).partial();
 
 export const VendorData = z.object({
   firstName: z.string(),

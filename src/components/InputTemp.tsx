@@ -40,7 +40,7 @@ const InputTemp = ({
         )}
       </div>
       <input
-        className={`rounded-md w-full py-1 px-2 ring-1 ring-neutral-300 outline-none ${className}`}
+        className={`rounded-md w-full py-1 px-2 border border-neutral-300 outline-none ${className}`}
         type={type}
         {...fieldProps}
         placeholder={placeholder}
@@ -73,7 +73,7 @@ export const TextareaTemp = ({
         )}
       </div>
       <textarea
-        className={`rounded-md w-full py-1 px-2 ring-1 ring-neutral-300 outline-none resize-none ${className}`}
+        className={`rounded-md w-full py-1 px-2 border border-neutral-300 outline-none resize-none ${className}`}
         rows={rows}
         {...fieldProps}
         placeholder={placeholder}

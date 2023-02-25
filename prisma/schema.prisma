@@ -45,8 +45,8 @@ datasource db {
 // }
 
 type Specs {
-    model  String
-    others String
+    model  String? @default("")
+    others String? @default("")
 }
 
 enum PStatus {
