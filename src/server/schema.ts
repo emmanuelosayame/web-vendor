@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const Status = z.enum(["active", "disabled"]);
+
 export const ProductSortEnum = z.enum([
   "title-asc",
   "title-desc",
@@ -29,7 +31,7 @@ export const ProductSchema = z
     thumbnail: z.string(),
     // images: z.array(z.string()),
     moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
-    status: z.enum(["active", "disabled"]),
+    status: Status,
   })
   .deepPartial();
 
@@ -46,6 +48,23 @@ export const VendorData = z.object({
   address: z.string(),
   role: z.enum(["admin", "vendor"]),
   status: z.enum(["active", "disabled"]),
+});
+
+const StoreVendors = z.array(
+  z.object({
+    id: z.string(),
+    role: z.enum(["member", "owner"]),
+    status: Status,
+    email: z.string(),
+  })
+);
+
+export const StoreSchema = z.object({
+  name: z.string(),
+  about: z.string(),
+  photoUrl: z.string(),
+  status: Status,
+  vendors: StoreVendors,
 });
 
 export type ProductUpdate = z.infer<typeof ProductUpdateSchema>;

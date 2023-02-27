@@ -30,6 +30,8 @@ const HeaderA = ({ auth }: Props) => {
             <NavLink text="Products" to="/admin/products" />
             <NavLink text="Sales" to="/admin/sales" />
             <NavLink text="Notifications" to="/admin/notifications" />
+            <NavLink text="Assets" to="/admin/assets" />
+            <NavLink text="Stores" to="/admin/stores" />
             <NavLink text="Vendors" to="/admin/vendors" />
             <NavLink text="Customers" to="/admin/customers" />
             <NavLink text="Settings" to="/admin/settings" />
@@ -43,15 +45,6 @@ const HeaderA = ({ auth }: Props) => {
               <Bars2Icon width={30} />
             </button>
           )}
-          {/* <div className="hidden md:flex items-center">
-          <div className="relative bg-neutral-200 pl-7 w-full rounded-md">
-            <input className="w-full outline-none bg-transparent p-1" />
-            <MagnifyingGlassIcon
-              className="absolute text-red-500 left-1 top-1/2 -translate-y-1/2"
-              width={25}
-            />
-          </div>
-        </div> */}
 
           <div className="flex items-center flex-row-reverse md:flex-row gap-3">
             <div className="hidden md:flex bg-black/10 py-1 gap-2 text-center px-4 rounded-md leading-3">
@@ -78,7 +71,7 @@ const HeaderA = ({ auth }: Props) => {
 
       {!mq && (
         <Root open={open} onOpenChange={setOpen}>
-          <Content className="fixed top-12 inset-x-0 bottom-0 bg-white h-full z-50">
+          <Content className="fixed top-[46px] inset-x-0 bottom-0 bg-white h-full z-50">
             <div className="flex w-full justify-between bg-black/10 py-1 gap-2 text-center px-4 ">
               <div className="">
                 <p className="leading-4 text-lg">admin</p>
@@ -177,12 +170,10 @@ const NavLink = ({
     : (router.asPath === to || `/admin/${router.route.split("/")[1]}` === to) &&
       router.asPath !== "/mypages/landing");
 
-  // const colorScheme = useStore((state) => state.colorScheme);
-
   return (
     <Link
       href={to}
-      className={`font-semibold text-lg hover:text-blue-700 text-neutral-500 ${
+      className={`font-semibold hover:text-blue-700 text-neutral-500 ${
         active ? "text-blue-500" : ""
       }`}
     >

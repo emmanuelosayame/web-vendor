@@ -8,6 +8,7 @@ interface RadioGroupProps<Type> {
   orientation?: "vertical" | "horizontal";
   itemStyles?: string;
   labelStyles?: string;
+  disabled?: boolean;
 }
 
 const RadioGroup = <Type,>({
@@ -18,6 +19,7 @@ const RadioGroup = <Type,>({
   orientation,
   itemStyles = "w-9 h-9",
   labelStyles,
+  disabled,
 }: RadioGroupProps<Type>) => {
   return (
     <RadixRadioGroup.Root
@@ -28,6 +30,7 @@ const RadioGroup = <Type,>({
       } gap-2 py-2`}
       defaultValue={defaultValue}
       aria-label="View density"
+      disabled={disabled}
     >
       {items?.map((item) => (
         <div key={item.value} className="flex items-center">

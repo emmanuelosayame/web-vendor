@@ -78,7 +78,7 @@ model Product {
 
 enum VRole {
     owner
-    admin
+    member
 }
 
 enum AuthRole {
@@ -86,44 +86,46 @@ enum AuthRole {
     admin
 }
 
-enum MStatus {
+enum SVStatus {
     disabled
     active
-    review
+    // review
 }
 
 type StoreVendor {
     id     String
     role   VRole
-    status MStatus
+    status SVStatus
     email  String
 }
 
 model Store {
-    id      String        @id @default(auto()) @map("_id") @db.ObjectId
-    vendors StoreVendor[]
-    name    String
-    about   String
+    id       String        @id @default(auto()) @map("_id") @db.ObjectId
+    vendors  StoreVendor[]
+    name     String
+    about    String
+    photoUrl String        @default("")
+    status   Status        @default(active)
 }
 
-enum VendorStatus {
+enum Status {
     active
     disabled
 }
 
 model Vendor {
-    id        String       @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
     firstName String
     lastName  String
     uid       String?
-    role      AuthRole     @default(vendor)
-    email     String       @unique()
+    role      AuthRole @default(vendor)
+    email     String   @unique()
     photoUrl  String?
     phoneNo   String
     store     String[]
-    location  String       @default("")
-    address   String       @default("")
-    status    VendorStatus @default(active)
+    location  String   @default("")
+    address   String   @default("")
+    status    Status   @default(active)
 }
 
 model Customer {

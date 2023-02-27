@@ -40,3 +40,12 @@ export const vendorVs = Yup.object().shape({
   location: Yup.string().max(20, "too long"),
   address: Yup.string().max(100, "too long"),
 });
+
+export const storeVs = Yup.object().shape({
+  name: Yup.string().min(3).max(15, "too long").required("Name required"),
+  about: Yup.string().max(100, "too long"),
+});
+
+export const emailV = Yup.string()
+  .email("Enter a valid email")
+  .required("Enter email");

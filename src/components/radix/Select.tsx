@@ -8,6 +8,7 @@ interface SelectProps<T> {
   onValueChange: (value: T) => void;
   selectList: { value: string; item: string }[];
   value?: T;
+  disabled?: boolean;
 }
 
 const Select = <T,>({
@@ -17,12 +18,14 @@ const Select = <T,>({
   contentStyles = "bg-white",
   triggerStyles = "bg-white rounded-md w-24",
   value,
+  disabled,
 }: SelectProps<T>) => {
   return (
     <RadixSelect.Root
       value={value as string}
       defaultValue={defaultSelected}
       onValueChange={(e) => onValueChange(e as T)}
+      disabled={disabled}
     >
       <RadixSelect.Trigger
         className={`${triggerStyles} outline-none py-1 px-3 flex  justify-between`}
