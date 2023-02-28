@@ -16,9 +16,8 @@ const SelectStore = ({ refetch }: Props) => {
   if (isLoading) return <Loading />;
   return (
     <div
-      className="h-fit max-h-96 p-3 rounded-lg border-t flex flex-col
-           border-neutral-200 bg-white shadow-md shadow-gray-500 transition-all
-           sm:max-w-sm outline-none"
+      className="h-fit max-h-96 p-3 rounded-lg border-t flex flex-col w-11/12 md:w-2/6
+           border-neutral-200 bg-white shadow-md shadow-gray-500 transition-all outline-none"
     >
       <h3 className="text-2xl text-blue-500 font-medium mb-2">select store</h3>
       <TDivider />

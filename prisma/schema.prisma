@@ -111,15 +111,16 @@ type StoreSupport {
 }
 
 model Store {
-    id       String        @id @default(auto()) @map("_id") @db.ObjectId
-    vendors  StoreVendor[]
-    name     String
-    about    String
-    photoUrl String        @default("")
-    status   Status        @default(active)
-    email    String        @unique()
-    account  StoreAccount
-    support  StoreSupport
+    id        String        @id @default(auto()) @map("_id") @db.ObjectId
+    vendors   StoreVendor[]
+    name      String        @unique()
+    about     String
+    photoUrl  String        @default("")
+    bannerUrl String        @default("")
+    status    Status        @default(disabled)
+    email     String        @unique() @default("")
+    account   StoreAccount
+    support   StoreSupport
 }
 
 enum Status {

@@ -50,21 +50,37 @@ export const VendorData = z.object({
   status: z.enum(["active", "disabled"]),
 });
 
-const StoreVendors = z.array(
-  z.object({
-    id: z.string(),
-    role: z.enum(["member", "owner"]),
-    status: Status,
-    email: z.string(),
-  })
-);
+const StoreVendors = z
+  .array(
+    z.object({
+      id: z.string(),
+      role: z.enum(["member", "owner"]),
+      status: Status,
+      email: z.string(),
+    })
+  )
+  .max(4);
+
+const StoreAccount = z.object({
+  name: z.string(),
+  number: z.string(),
+  bank: z.string(),
+});
+
+const StoreSupport = z.object({
+  mobile: z.string(),
+  whatsapp: z.string(),
+});
 
 export const StoreSchema = z.object({
   name: z.string(),
   about: z.string(),
+  email: z.string(),
   photoUrl: z.string(),
   status: Status,
   vendors: StoreVendors,
+  account: StoreAccount,
+  support: StoreSupport,
 });
 
 export type ProductUpdate = z.infer<typeof ProductUpdateSchema>;

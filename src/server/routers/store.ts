@@ -5,28 +5,27 @@ import { router, protectedProcedure } from "../trpc";
 import { isAdmin } from "./utils";
 
 export const storeRouter = router({
-  one: protectedProcedure
+  one: protectedProcedure.input(z.object({})).query(async ({ ctx, input }) => {
+    const { prisma, session, sid } = ctx;
+
+    const id = sid;
+    const uid = session && session.user.id;
+    if (!id) return null;
+    const merchant = await ctx.prisma.vendor.findFirst({
+      where: { uid },
+    });
+    return await ctx.prisma.store.findFirst({
+      where: {
+        AND: [{ vendors: { some: { id: { equals: merchant?.id } } } }, { id }],
+      },
+    });
+  }),
+  oneA: protectedProcedure
     .input(z.object({ id: z.string().optional() }))
     .query(async ({ ctx, input }) => {
-      const { prisma, admin, session, sid } = isAdmin(ctx);
-      if (admin) {
-        return await prisma.store.findFirst({
-          where: { id: input.id },
-        });
-      }
-      const id = sid;
-      const uid = session && session.user.id;
-      if (!id) return null;
-      const merchant = await ctx.prisma.vendor.findFirst({
-        where: { uid },
-      });
-      return await ctx.prisma.store.findFirst({
-        where: {
-          AND: [
-            { vendors: { some: { id: { equals: merchant?.id } } } },
-            { id },
-          ],
-        },
+      const { prisma } = isAdmin(ctx);
+      return await prisma.store.findFirst({
+        where: { id: input.id },
       });
     }),
   many: protectedProcedure
@@ -51,12 +50,17 @@ export const storeRouter = router({
   new: protectedProcedure
     .input(
       z.object({
-        data: StoreSchema.partial({ photoUrl: true }),
+        data: StoreSchema.partial({
+          vendors: true,
+          email: true,
+          photoUrl: true,
+          status: true,
+        }),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { prisma } = isAdmin(ctx, true);
       const { data } = input;
-      return await prisma.store.create({ data: data });
+      return await prisma.store.create({ data });
     }),
 });

@@ -46,7 +46,7 @@ const Profile: NextPageWithLayout = () => {
       </MenuFlex>
 
       <div className="w-full h-full overflow-y-auto pb-2">
-        <StoreComponent edit={true} store={data} />
+        <StoreComponent edit={true} store={data} id="fetch" isAdmin={false} />
       </div>
     </>
   );
