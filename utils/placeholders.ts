@@ -10,4 +10,5 @@ export const initialSD: Store = {
   status: "disabled",
   support: { mobile: "", whatsapp: "" },
   vendors: [],
+  bannerUrl: "",
 };
