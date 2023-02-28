@@ -21,7 +21,7 @@ const SelectStore = ({ refetch }: Props) => {
     >
       <h3 className="text-2xl text-blue-500 font-medium mb-2">select store</h3>
       <TDivider />
-      <div className="w-full rounded-lg my-2 gap-2">
+      <div className="w-full rounded-lg my-2 space-y-3">
         {accounts?.map((account) => (
           <button
             className="w-full text-black/90 p-3 drop-shadow-sm ring-1 ring-black/10 bg-white rounded-lg

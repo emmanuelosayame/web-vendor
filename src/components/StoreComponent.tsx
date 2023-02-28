@@ -54,7 +54,7 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
   );
 
   const vendorList: StoreVendor[] | undefined =
-    !isAdmin && currentVendor
+    !isAdmin && id === "new" && currentVendor
       ? [
           {
             email: currentVendor.email,
