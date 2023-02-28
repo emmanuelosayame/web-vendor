@@ -92,7 +92,12 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
     },
   };
 
-  type FormIV = Omit<Store, "vendors" | "photoUrl" | "id" | "status">;
+  // type FormIV = Omit<
+  //   Store,
+  //   "vendors" | "photoUrl" | "bannerUrl" | "id" | "status"
+  // >;
+
+  type FormIV = typeof formIV;
 
   const onSubmit = async (values: FormIV) => {
     if (id !== "new" && !!store) {
