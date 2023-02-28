@@ -13,6 +13,7 @@ import {
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
+  ChevronRightIcon,
   MagnifyingGlassIcon,
   PencilIcon,
   PencilSquareIcon,
@@ -160,10 +161,10 @@ const Products = () => {
                         <td className="flex items-center justify-center">
                           <Link
                             href={`/products/${product.id}`}
-                            className="rounded-xl bg-neutral-100 p-1 drop-shadow-md
-                            flex items-center justify-center w-fit text-blue-500 hover:bg-blue-600"
+                            className=" drop-shadow-md
+                            flex items-center justify-center w-fit"
                           >
-                            <PencilSquareIcon width={20} />
+                            <ChevronRightIcon width={25} />
                           </Link>
                         </td>
                       </>

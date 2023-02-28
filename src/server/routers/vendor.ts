@@ -2,6 +2,7 @@ import { z } from "zod";
 import { VendorData } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
+import { isAdmin } from "./utils";
 
 export const vendorRouter = router({
   accounts: protectedProcedure.input(z.object({})).query(async ({ ctx }) => {
@@ -35,8 +36,22 @@ export const vendorRouter = router({
   update: protectedProcedure
     .input(z.object({ vid: z.string().optional(), data: VendorData.partial() }))
     .mutation(async ({ ctx, input }) => {
+      const { prisma } = isAdmin(ctx);
       const { vid, data } = input;
-      return await ctx.prisma.vendor.update({ where: { id: vid }, data });
+      if (data.email) {
+        await prisma.store.updateMany({
+          where: { vendors: { some: { id: vid } } },
+          data: {
+            vendors: {
+              updateMany: {
+                where: { id: vid },
+                data: { email: data.email },
+              },
+            },
+          },
+        });
+      }
+      return await prisma.vendor.update({ where: { id: vid }, data });
     }),
   new: protectedProcedure
     .input(

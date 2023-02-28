@@ -48,9 +48,9 @@ const Stores: NextPageWithLayout = () => {
                   {!mq ? limitText(store.name, 12) : store.name}
                 </h3>
                 <p>#122344</p>
-                <div className="border border-neutral-200 h-16 py-1 px-2 w-full rounded-lg">
+                <div className="border border-neutral-200 h-[75px] py-1 px-2 w-full rounded-lg">
                   {store.vendors.map((vendor) => (
-                    <p key={vendor.id}>
+                    <p key={vendor.id} className="leading-4">
                       {!mq ? limitText(vendor.email, 10) : vendor.email}
                     </p>
                   ))}

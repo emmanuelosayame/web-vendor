@@ -28,11 +28,16 @@ const Layout = ({
   if (status === "unauthenticated") return <Login />;
   if (status === "loading" || isLoading) return <Loading />;
 
-  if (!store) return <SelectStore refetch={refetch} />;
+  if (!store)
+    return (
+      <div className="fixed inset-0 flex justify-center items-center bg-blue-300">
+        <SelectStore refetch={refetch} />
+      </div>
+    );
 
   return (
     <div className="relative h-full">
-      <Header auth={auth} store={store} />
+      <Header auth={auth} store={store} refetch={refetch} />
       <div
         className={`h-full bg-blue-600 pt-28 md:pt-32 ${
           nopx === "sm"

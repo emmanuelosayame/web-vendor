@@ -1,3 +1,4 @@
+import { Store } from "@prisma/client";
 import type { CSNames } from "types/shared";
 
 export const limitText = (sentence?: string | null, limit?: number) =>

@@ -11,13 +11,18 @@ import { useRouter } from "next/router";
 import { Content, Root, Trigger } from "@radix-ui/react-dialog";
 import useMediaQuery from "utils/useMediaQuery";
 import { useState } from "react";
+import { type User } from "next-auth";
+import { api } from "utils/api";
+import { setCookie } from "cookies-next";
+import SelectStore from "@components/SelectStore";
 
 interface Props {
   auth: Session | null;
   store?: Store | null;
+  refetch: () => void;
 }
 
-const Header = ({ auth, store }: Props) => {
+const Header = ({ auth, store, refetch }: Props) => {
   const mq = useMediaQuery("(min-width: 800px)");
 
   const [open, setOpen] = useState(false);
@@ -42,25 +47,34 @@ const Header = ({ auth, store }: Props) => {
               <Bars2Icon width={30} />
             </button>
           )}
-
-          {/* <div className="hidden md:flex items-center">
-          <div className="relative bg-neutral-200 pl-7 w-full rounded-md">
-            <input className="w-full outline-none bg-transparent p-1" />
-            <MagnifyingGlassIcon
-              className="absolute text-red-500 left-1 top-1/2 -translate-y-1/2"
-              width={25}
-            />
-          </div>
-        </div> */}
+          {/* 
+          <Image
+            alt="logo"
+            src="/logo5.png"
+            width={440}
+            height={380}
+            className="ml-5 w-32 md:w-24 drop-shadow-lg"
+          /> */}
 
           <div className="flex items-center flex-row-reverse md:flex-row gap-3">
-            <div className="hidden md:flex bg-black/10 py-1 gap-2 text-center px-4 rounded-md leading-3">
-              <div className="">
-                <p className="leading-4">{store?.name}</p>
-                <p className="text-[12px] text-amber-600">{auth?.user.name}</p>
-              </div>
-              <ChevronDownIcon width={20} />
-            </div>
+            <Root>
+              <Trigger className="hidden md:flex bg-black/10 py-1 gap-2 text-center px-4 rounded-md leading-3">
+                <div className="">
+                  <p className="leading-4">{store?.name}</p>
+                  <p className="text-[12px] text-amber-600">
+                    {auth?.user.name}
+                  </p>
+                </div>
+                <ChevronDownIcon width={20} />
+              </Trigger>
+              <Content
+                className="fixed z-30 top-1/4 left-1/2 md:left-auto
+                 md:-translate-x-0 -translate-x-1/2 md:right-40 w-11/12 max-h-96
+                  transition-all sm:my-8 sm:w-full sm:max-w-sm"
+              >
+                <SelectStore refetch={refetch} />
+              </Content>
+            </Root>
 
             <Link href={"/settings"}>
               <Avatar className="w-9 h-9 rounded-full" />

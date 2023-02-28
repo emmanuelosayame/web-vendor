@@ -99,6 +99,17 @@ type StoreVendor {
     email  String
 }
 
+type StoreAccount {
+    number String
+    name   String
+    bank   String
+}
+
+type StoreSupport {
+    mobile   String
+    whatsapp String
+}
+
 model Store {
     id       String        @id @default(auto()) @map("_id") @db.ObjectId
     vendors  StoreVendor[]
@@ -106,6 +117,9 @@ model Store {
     about    String
     photoUrl String        @default("")
     status   Status        @default(active)
+    email    String        @unique()
+    account  StoreAccount
+    support  StoreSupport
 }
 
 enum Status {
