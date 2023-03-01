@@ -23,14 +23,8 @@ export const authVs = Yup.object().shape({
 });
 
 export const vendorVs = Yup.object().shape({
-  firstName: Yup.string()
-    .min(3)
-    .max(20, "too long")
-    .required("Firstname required"),
-  lastName: Yup.string()
-    .min(3)
-    .max(20, "too long")
-    .required("Lastname required"),
+  firstName: Yup.string().min(3).max(20, "too long").required("required"),
+  lastName: Yup.string().min(3).max(20, "too long").required("required"),
   email: Yup.string()
     .email("enter a valid email address")
     .required("Email required"),

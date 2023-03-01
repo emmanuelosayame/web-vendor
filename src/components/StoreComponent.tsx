@@ -72,10 +72,15 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
 
   const { mutate, isLoading: mutating } = api.store.update.useMutation({
     onSuccess: () => {
-      qc.store.one.refetch();
+      qc.store.oneA.refetch();
       setVid(undefined);
     },
   });
+
+  const { mutate: deleteStore, isLoading: deleting } =
+    api.store.delete.useMutation({
+      onSuccess: () => router.replace(`/admin/stores`),
+    });
 
   const formIV = {
     name: store?.name || "",
@@ -336,37 +341,53 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
               <button
                 disabled={!store || (store && store?.vendors.length > 3)}
                 type="submit"
-                className="p-2 w-full md:w-10/12 mx-auto bg-green-400 text-white rounded-lg 
+                className="p-2 w-full bg-green-400 text-white rounded-lg 
                   disabled:opacity-75 hover:bg-green-500"
                 onClick={() => setVid("new")}
               >
                 Add Team
               </button>
 
-              {id !== "new" && isAdmin ? (
-                <AlertDialog
-                  trigger={store?.status === "active" ? "Disable" : "Activate"}
-                  triggerStyles={`p-2 w-full md:w-10/12 mx-auto text-white rounded-lg
+              <div className="flex gap-2 items-center">
+                {id !== "new" && isAdmin ? (
+                  <AlertDialog
+                    trigger={
+                      store?.status === "active" ? "Disable" : "Activate"
+                    }
+                    triggerStyles={`p-2 w-full text-white rounded-lg
             disabled:opacity-75 ${
               store?.status !== "active"
                 ? "hover:bg-blue-600  bg-blue-500"
-                : "hover:bg-red-600  bg-red-500"
+                : "hover:bg-amber-600  bg-amber-500"
             }`}
-                  action={store?.status === "active" ? "Disable" : "Activate"}
-                  title={`Are you sure you want to ${
-                    store?.status === "active" ? "disable" : "activate"
-                  } this store?`}
-                  onClickConfirm={() => {
-                    // mutate({
-                    //   id,
-                    //   data: {
-                    //     status:
-                    //       store?.status === "active" ? "disabled" : "active",
-                    //   },
-                    // });
-                  }}
-                />
-              ) : null}
+                    action={store?.status === "active" ? "Disable" : "Activate"}
+                    title={`Are you sure you want to ${
+                      store?.status === "active" ? "disable" : "activate"
+                    } this store?`}
+                    onClickConfirm={() => {
+                      mutate({
+                        id: store?.id,
+                        data: {
+                          status:
+                            store?.status === "active" ? "disabled" : "active",
+                        },
+                      });
+                    }}
+                  />
+                ) : null}
+                {id !== "new" && isAdmin ? (
+                  <AlertDialog
+                    trigger={"Delete"}
+                    triggerStyles={`p-2 w-full text-white rounded-lg
+            disabled:opacity-75 hover:bg-red-600  bg-red-500`}
+                    action="delete"
+                    title={`Are you sure you want to delete this store?`}
+                    onClickConfirm={() => {
+                      deleteStore({ id: store?.id });
+                    }}
+                  />
+                ) : null}
+              </div>
             </>
           )}
         </div>

@@ -23,7 +23,7 @@ export const storeRouter = router({
   oneA: protectedProcedure
     .input(z.object({ id: z.string().optional() }))
     .query(async ({ ctx, input }) => {
-      const { prisma } = isAdmin(ctx);
+      const { prisma } = isAdmin(ctx, true);
       return await prisma.store.findFirst({
         where: { id: input.id },
       });
@@ -31,7 +31,7 @@ export const storeRouter = router({
   many: protectedProcedure
     .input(z.object({ limit: z.number() }))
     .query(async ({ ctx, input }) => {
-      const prisma = isAdmin(ctx, true).prisma;
+      const { prisma } = isAdmin(ctx, true);
       const { limit } = input;
       return await prisma.store.findMany({ take: limit });
     }),
@@ -62,5 +62,13 @@ export const storeRouter = router({
       const { prisma } = isAdmin(ctx, true);
       const { data } = input;
       return await prisma.store.create({ data });
+    }),
+  delete: protectedProcedure
+    .input(z.object({ id: z.string().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const { prisma } = isAdmin(ctx, true);
+      return await prisma.store.delete({
+        where: { id: input.id },
+      });
     }),
 });

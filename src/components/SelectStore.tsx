@@ -43,7 +43,10 @@ const SelectStore = ({ refetch }: Props) => {
       </div>
       <TDivider className="my-3" />
       <button
-        disabled={router.pathname === "/create-store"}
+        disabled={
+          router.pathname === "/create-store" ||
+          (accounts && accounts?.length > 1)
+        }
         onClick={() => router.push("/create-store")}
         className="w-full text-center p-2 bg-blue-600 disabled:opacity-50
          hover:bg-blue-700 drop-shadow-md text-white rounded-lg"

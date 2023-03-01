@@ -36,7 +36,9 @@ const InputTemp = ({
       <div className="flex justify-between">
         <p {...style.heading}>{heading}</p>
         {touched && error && (
-          <p className="text-neutral-500 text-center italic text-sm">{error}</p>
+          <p className="text-neutral-500 text-center italic text-[13px]">
+            {error}
+          </p>
         )}
       </div>
       <input
