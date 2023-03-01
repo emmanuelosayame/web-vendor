@@ -77,7 +77,7 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
     },
   });
 
-  const { mutate: deleteStore, isLoading: deleting } =
+  const { mutate: deleteStore, isLoading: delting } =
     api.store.delete.useMutation({
       onSuccess: () => router.replace(`/admin/stores`),
     });

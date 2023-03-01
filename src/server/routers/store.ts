@@ -31,7 +31,7 @@ export const storeRouter = router({
   many: protectedProcedure
     .input(z.object({ limit: z.number() }))
     .query(async ({ ctx, input }) => {
-      const { prisma } = isAdmin(ctx, true);
+      const { prisma } = isAdmin(ctx);
       const { limit } = input;
       return await prisma.store.findMany({ take: limit });
     }),
@@ -43,7 +43,7 @@ export const storeRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { prisma } = isAdmin(ctx, true);
+      const { prisma } = isAdmin(ctx);
       const { id, data } = input;
       return await prisma.store.update({ where: { id }, data: data });
     }),
@@ -59,7 +59,7 @@ export const storeRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { prisma } = isAdmin(ctx, true);
+      const { prisma } = isAdmin(ctx);
       const { data } = input;
       return await prisma.store.create({ data });
     }),
