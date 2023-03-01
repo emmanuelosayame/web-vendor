@@ -31,7 +31,7 @@ const Header = ({ auth, store, refetch }: Props) => {
   return (
     <>
       <Root open={sOpen} onOpenChange={setSOpen}>
-        <Content className="fixed outline-none z-30 top-1/4 inset-x-0 p-2 md:left-auto md:right-40 w-full md:w-96 h-72">
+        <Content className="fixed outline-none z-40 top-1/4 inset-x-0 p-2 md:left-auto md:right-40 w-full md:w-96 h-72">
           <SelectStore refetch={refetch} />
         </Content>
       </Root>

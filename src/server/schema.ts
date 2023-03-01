@@ -68,8 +68,8 @@ const StoreAccount = z.object({
 });
 
 const StoreSupport = z.object({
-  mobile: z.string().length(11),
-  whatsapp: z.string().length(11),
+  mobile: z.string(),
+  whatsapp: z.string(),
 });
 
 export const StoreSchema = z.object({
