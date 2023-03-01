@@ -45,8 +45,8 @@ datasource db {
 // }
 
 type Specs {
-    model  String? @default("")
-    others String? @default("")
+    model  String @default("")
+    others String @default("")
 }
 
 enum PStatus {
@@ -55,25 +55,31 @@ enum PStatus {
     review
 }
 
+type MoreDescr {
+    id  String
+    url String
+}
+
 model Product {
-    id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+    id                 String      @id @default(auto()) @map("_id") @db.ObjectId
     brand              String
     category           String
     description        String
-    discountPercentage Float
+    discountPercentage Float       @default(0.0)
     images             String[]
     price              Int
     promotion          String[]
-    rating             Float
+    rating             Float       @default(0.0)
     status             PStatus
     stock              Int
     tags               String[]
-    thumbnail          String
+    thumbnail          String      @default("")
     title              String
     sold               Int?
-    sid                String
+    sid                String      @default("delorand")
     package            String
     specs              Specs
+    moreDescr          MoreDescr[]
 }
 
 enum VRole {

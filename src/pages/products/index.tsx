@@ -154,14 +154,14 @@ const Products = () => {
                     ) : (
                       <>
                         <td>{limitText(product.title, 12)}</td>
-                        <td>{limitText(product.category, 10)}</td>
+                        <td>{limitText(product.category, 8)}</td>
                         <td hidden={!mq}>{product.id.slice(19, 25)}</td>
                         <td>{product.stock}</td>
                         <td>{product.sold || 0}</td>
                         <td className="flex items-center justify-center">
                           <Link
                             href={`/products/${product.id}`}
-                            className=" drop-shadow-md
+                            className="drop-shadow-md
                             flex items-center justify-center w-fit"
                           >
                             <ChevronRightIcon width={25} />

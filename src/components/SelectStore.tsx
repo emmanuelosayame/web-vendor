@@ -13,15 +13,17 @@ const SelectStore = ({ refetch }: Props) => {
   const router = useRouter();
   const { data: accounts, isLoading } = api.vendor.accounts.useQuery({});
 
+  const qc = api.useContext();
+
   if (isLoading) return <Loading />;
   return (
     <div
-      className="h-fit max-h-96 p-3 rounded-lg border-t flex flex-col w-full md:w-96
+      className=" p-3 rounded-lg border flex flex-col w-full h-full
            border-neutral-200 bg-white shadow-md shadow-gray-500 transition-all outline-none"
     >
       <h3 className="text-2xl text-blue-500 font-medium mb-2">select store</h3>
       <TDivider />
-      <div className="w-full rounded-lg my-2 space-y-3">
+      <div className="w-full rounded-lg my-2 space-y-2 flex-1">
         {accounts?.map((account) => (
           <button
             className="w-full text-black/90 p-3 drop-shadow-sm ring-1 ring-black/10 bg-white rounded-lg
@@ -32,7 +34,7 @@ const SelectStore = ({ refetch }: Props) => {
                 sameSite: true,
                 secure: true,
               });
-              refetch();
+              router.reload();
             }}
           >
             {account.name}

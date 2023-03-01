@@ -2,6 +2,8 @@ import { z } from "zod";
 
 const Status = z.enum(["active", "disabled"]);
 
+const PStatus = z.enum(["active", "disabled", "review"]);
+
 export const ProductSortEnum = z.enum([
   "title-asc",
   "title-desc",
@@ -14,35 +16,33 @@ export const ProductSortEnum = z.enum([
   "search",
 ]);
 
-export const ProductSchema = z
-  .object({
-    title: z.string(),
-    description: z.string(),
-    brand: z.string(),
-    category: z.string(),
-    price: z.number(),
-    stock: z.number(),
-    package: z.string(),
-    tags: z.array(z.string()),
-    specs: z.object({
-      model: z.string(),
-      others: z.string().optional(),
-    }),
-    thumbnail: z.string(),
-    // images: z.array(z.string()),
-    moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
-    status: Status,
-  })
-  .deepPartial();
+export const ProductSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  brand: z.string(),
+  category: z.string(),
+  price: z.number(),
+  stock: z.number(),
+  package: z.string(),
+  tags: z.array(z.string()),
+  specs: z.object({
+    model: z.string(),
+    others: z.string().optional(),
+  }),
+  // thumbnail: z.string(),
+  // images: z.array(z.string()),
+  moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
+  status: PStatus,
+});
 
 export const ProductUpdateSchema = ProductSchema.extend({
   imageFiles: z.array(z.object({ name: z.string(), size: z.number() })),
-}).partial();
+});
 
 export const VendorData = z.object({
   firstName: z.string(),
   lastName: z.string(),
-  email: z.string(),
+  email: z.string().email(),
   phoneNo: z.string(),
   location: z.string(),
   address: z.string(),
@@ -56,7 +56,7 @@ const StoreVendors = z
       id: z.string(),
       role: z.enum(["member", "owner"]),
       status: Status,
-      email: z.string(),
+      email: z.string().email(),
     })
   )
   .max(4);
@@ -68,8 +68,8 @@ const StoreAccount = z.object({
 });
 
 const StoreSupport = z.object({
-  mobile: z.string(),
-  whatsapp: z.string(),
+  mobile: z.string().length(11),
+  whatsapp: z.string().length(11),
 });
 
 export const StoreSchema = z.object({
