@@ -254,8 +254,7 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
                 <button
                   disabled={!edit || !dirty}
                   type="submit"
-                  className="p-2 w-full bg-green-400 text-white rounded-lg 
-                  disabled:opacity-75 hover:bg-green-500"
+                  className="btn-green"
                 >
                   Save
                 </button>

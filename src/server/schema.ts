@@ -29,15 +29,17 @@ export const ProductSchema = z.object({
     model: z.string(),
     others: z.string().optional(),
   }),
-  // thumbnail: z.string(),
-  // images: z.array(z.string()),
+  // thumbnailFile: z.string(),
+  images: z.array(z.string()),
   moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
   status: PStatus,
+  discountPercentage: z.number(),
+  promotion: z.array(z.string()),
 });
 
-export const ProductUpdateSchema = ProductSchema.extend({
-  imageFiles: z.array(z.object({ name: z.string(), size: z.number() })),
-});
+// export const ProductUpdateSchema = ProductSchema.extend({
+//   imageFiles: z.array(z.object({ name: z.string(), size: z.number() })),
+// });
 
 export const VendorData = z.object({
   firstName: z.string(),
@@ -83,6 +85,6 @@ export const StoreSchema = z.object({
   support: StoreSupport,
 });
 
-export type ProductUpdate = z.infer<typeof ProductUpdateSchema>;
+export type ProductPayload = z.infer<typeof ProductSchema>;
 
 export type ProductSort = z.infer<typeof ProductSortEnum>;

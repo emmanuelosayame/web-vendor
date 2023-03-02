@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .btn-green {
+    @apply p-2 w-full bg-green-400 text-white rounded-lg text-center disabled:opacity-75 hover:bg-green-500;
+  }
+  .btn-red {
+    @apply p-2 w-full bg-red-400 text-white rounded-lg text-center disabled:opacity-75 hover:bg-red-500;
+  }
+  .btn-amber {
+    @apply p-2 w-full bg-amber-400 text-white rounded-lg text-center disabled:opacity-75 hover:bg-amber-500;
+  }
+}
+
 .CollapsibleContent[data-state="open"] {
   animation: slideDown 250ms ease-in-out;
 }

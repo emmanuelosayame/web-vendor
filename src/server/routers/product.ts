@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ProductSortEnum, ProductSchema, ProductUpdateSchema } from "../schema";
+import { ProductSortEnum, ProductSchema } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
 
@@ -16,20 +16,6 @@ export const productRouter = router({
       const { id } = input;
       return await ctx.prisma.product.findUnique({
         where: { id },
-        select: {
-          title: true,
-          brand: true,
-          category: true,
-          description: true,
-          thumbnail: true,
-          images: true,
-          price: true,
-          stock: true,
-          status: true,
-          tags: true,
-          package: true,
-          specs: true,
-        },
       });
     }),
   many: protectedProcedure
@@ -57,27 +43,25 @@ export const productRouter = router({
   create: protectedProcedure
     .input(
       z.object({
-        data: ProductUpdateSchema.partial({ imageFiles: true }),
+        data: ProductSchema,
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { prisma, sid } = ctx;
       const { data } = input;
-      const { imageFiles, moreDescr, ...rest } = data;
-
-      const payload = { ...rest };
-      return await prisma.product.create({ data: { ...payload, sid } });
+      const { moreDescr, ...rest } = data;
+      return await prisma.product.create({ data: { ...rest, sid } });
     }),
   update: protectedProcedure
     .input(
       z.object({
         id: z.string().optional(),
-        data: ProductUpdateSchema.partial(),
+        data: ProductSchema.partial(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { id, data } = input;
-      const { imageFiles, moreDescr, ...rest } = data;
+      const { moreDescr, ...rest } = data;
 
       const update = { ...rest };
       return await ctx.prisma.product.update({ where: { id }, data: update });
