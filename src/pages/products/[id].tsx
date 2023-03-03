@@ -20,15 +20,20 @@ import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { type ProductPayload } from "src/server/schema";
 import { api } from "utils/api";
-import { getFormIV, productPLD, type FormValues } from "utils/placeholders";
+import {
+  getFormIV,
+  getProductInitialPayload,
+  productPLD,
+  type FormValues,
+} from "utils/placeholders";
 import { productVs } from "utils/validation";
 import { type NextPageWithLayout } from "../_app";
 import Gallery from "@components/product/Gallery";
 import { Form1, Form2 } from "@components/product/Forms";
 
-interface ProductUpdate extends ProductPayload {
-  imageFiles: { id: string; file: File }[];
-}
+// interface ProductUpdate extends ProductPayload {
+//   imageFiles: { id: string; file: File }[];
+// }
 
 const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
 
@@ -57,13 +62,7 @@ const ProductPage: NextPageWithLayout = () => {
   );
 
   const formIV = getFormIV(data);
-
-  const initialData: ProductUpdate = {
-    ...formIV,
-    tags: formIV.tags.split(" ; "),
-    images: data?.images || [],
-    promotion: formIV.promotion.split(" ; "),
-  };
+  const initialData = getProductInitialPayload(data);
 
   const qc = api.useContext();
 
@@ -100,29 +99,31 @@ const ProductPage: NextPageWithLayout = () => {
   };
 
   const onSubmit = async (values: FormValues) => {
-    const { imageFiles, tags, promotion, ...rest } = values;
+    const { imageFiles, tags, promotion, images, ...rest } = values;
 
-    let urls: string[] = data ? [...data?.images] : [];
+    // let urls: string[] = data ? [...data?.images] : [];
 
-    if (imageFiles.length > 0) {
-      setUploading(true);
-      for await (const image of imageFiles) {
-        const url = await uploadImage(image.file, `producdt${image.id}`);
-        urls.push(url);
-      }
-      setUploading(false);
-    }
+    // if (imageFiles.length > 0) {
+    //   setUploading(true);
+    //   for await (const image of imageFiles) {
+    //     const url = await uploadImage(image.file, `producdt${image.id}`);
+    //     urls.push(url);
+    //   }
+    //   setUploading(false);
+    // }
 
     const payload: ProductPayload = {
       ...rest,
       tags: tags.split(" ; "),
-      images: urls,
+      images: [...images],
       promotion: promotion.split(" ; "),
+      imageFiles: [],
     };
 
     if (pid !== "new") {
       const updatedDetails = diff(initialData, payload);
-      mutate({ id: pid, data: updatedDetails as Partial<ProductPayload> });
+      console.log(updatedDetails);
+      // mutate({ id: pid, data: updatedDetails as Partial<ProductPayload> });
     } else {
       create({ data: payload });
     }

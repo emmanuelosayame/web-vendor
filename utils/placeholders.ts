@@ -2,7 +2,10 @@ import type { Product, Store } from "@prisma/client";
 import type { ProductPayload } from "src/server/schema";
 
 export interface FormValues
-  extends Omit<ProductPayload, "tags" | "category" | "promotion" | "images"> {
+  extends Omit<
+    ProductPayload,
+    "tags" | "category" | "promotion" | "imageFiles"
+  > {
   imageFiles: { id: string; file: File }[];
   thumbnailFile: File | null;
   tags: string;
@@ -45,6 +48,30 @@ export const productPLD: Omit<Product, ""> = {
   thumbnail: "",
 };
 
+export const getProductInitialPayload: (
+  product?: Product | null
+) => ProductPayload = (product) => ({
+  title: product?.title || "",
+  brand: product?.brand || "",
+  description: product?.description || "",
+  package: product?.package || "",
+  price: product?.price || 0,
+  stock: product?.stock || 0,
+  category: product?.category || "",
+  moreDescr: [],
+  specs: {
+    model: product?.specs?.model || "",
+    others: product?.specs?.others || "",
+  },
+  tags: product?.tags || [],
+  status: product?.status || "review",
+  discountPercentage: product?.discountPercentage || 0,
+  promotion: product?.promotion || [],
+  thumbnailFile: null,
+  images: product?.images || [],
+  imageFiles: [],
+});
+
 export const getFormIV: (product?: Product | null) => FormValues = (
   product
 ) => ({
@@ -54,7 +81,6 @@ export const getFormIV: (product?: Product | null) => FormValues = (
   package: product?.package || "",
   price: product?.price || 0,
   stock: product?.stock || 0,
-  imageFiles: [],
   category: product?.category || "",
   moreDescr: [],
   specs: {
@@ -66,4 +92,6 @@ export const getFormIV: (product?: Product | null) => FormValues = (
   discountPercentage: product?.discountPercentage || 0,
   promotion: product?.promotion.join(",").replace(",", " ; ") || "",
   thumbnailFile: null,
+  imageFiles: [],
+  images: product?.images || [],
 });

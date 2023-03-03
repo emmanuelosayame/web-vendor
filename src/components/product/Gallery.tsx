@@ -4,11 +4,12 @@ import { ArchiveBoxXMarkIcon } from "@heroicons/react/24/solid";
 import type { Product } from "@prisma/client";
 import { Content, Root } from "@radix-ui/react-dialog";
 import Image from "next/image";
-import { useRef, useState } from "react";
-import ReactCrop, { type PixelCrop } from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
+import { type ChangeEvent, useCallback, useRef, useState } from "react";
+import ReactCrop, { type Area } from "react-easy-crop";
+import "react-easy-crop/react-easy-crop.css";
 import { type FormValues } from "utils/placeholders";
-import image from "public/logo3.png";
+import image from "public/placeholder.png";
+import getCroppedImg from "./helper";
 
 interface Props {
   data?: Product | null;
@@ -22,33 +23,50 @@ interface Props {
 }
 
 const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
-  const thumbnailRef = useRef<HTMLInputElement>(null);
-  const galleryRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
   const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
 
-  const [open, setOpen] = useState(false);
-  const [thumbnailPrev, setTNP] = useState(image.src);
-  const [crop, setCrop] = useState<PixelCrop>();
-  const handleThumbnail = (file: File) => {
-    if (thumbnailPrev && thumbnailPrev.slice(0, 5) === "blob:")
-      URL.revokeObjectURL(thumbnailPrev);
-    setTNP(URL.createObjectURL(file));
-  };
-
-  const images = data?.images;
-
-  const [currentG, setCG] = useState<string | undefined>();
-
-  const [imagesPrev, setIP] = useState<{ id: string; url: string }[]>(
+  const [croppedTN, setCTN] = useState<string | undefined>();
+  const [croppedGP, setCGP] = useState<{ id: string; url: string }[]>(
     imagesPH.map((imagePH) => {
       return { id: imagePH.id, url: "" };
     })
   );
 
-  const handleGC = (id: string, file: File) => {
+  const [open, setOpen] = useState<string | "thumbnail" | null>(null);
+  const [thumbnailPrev, setTNP] = useState<string | undefined>();
+  const [imagesPrev, setIP] = useState<{ id: string; url: string }[]>(
+    imagesPH.map((imagePH) => {
+      return { id: imagePH.id, url: "" };
+    })
+  );
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+
+  const images = data?.images;
+
+  const openPrev = () => {
+    switch (open) {
+      case "thumbnail":
+        return { id: "thumbnail", url: thumbnailPrev };
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+        return imagesPrev.find((file) => open === file.id);
+      default:
+        return undefined;
+    }
+  };
+
+  const preview = openPrev();
+
+  const handleGP = (id: string, file: File) => {
     const currentPrev = imagesPrev.find((prev) => prev.id === id);
-    if (currentPrev && currentPrev.url.slice(0, 5) === "blob:")
+    if (currentPrev && currentPrev.url.slice(0, 5) === "blob:") {
       URL.revokeObjectURL(currentPrev.url);
+    }
     const updatedIP = { id, url: URL.createObjectURL(file) };
     setIP((state) => [...state.filter((prev) => prev.id !== id), updatedIP]);
   };
@@ -65,50 +83,122 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
     ]);
   };
 
+  const onCropComplete = useCallback(
+    (croppedArea: Area, croppedAreaPixels: Area) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    []
+  );
+
+  const handlePreview = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    switch (open) {
+      case "thumbnail":
+        if (thumbnailPrev && thumbnailPrev.slice(0, 5) === "blob:")
+          URL.revokeObjectURL(thumbnailPrev);
+        setTNP(URL.createObjectURL(file));
+        break;
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+        handleGP(open, file);
+        break;
+      default:
+        return;
+    }
+  };
+
+  const handleCGP = (id: string, file: Blob) => {
+    const currentPrev = croppedGP.find((prev) => prev.id === id);
+    if (currentPrev && currentPrev.url.slice(0, 5) === "blob:") {
+      URL.revokeObjectURL(currentPrev.url);
+    }
+    const updatedIP = { id, url: URL.createObjectURL(file) };
+    setCGP((state) => [...state.filter((prev) => prev.id !== id), updatedIP]);
+  };
+
+  const handleSetImage = async () => {
+    if (!preview?.url) return;
+    const croppedImage = await getCroppedImg(preview.url, croppedAreaPixels);
+    if (!croppedImage) return;
+    switch (open) {
+      case "thumbnail":
+        setCTN(URL.createObjectURL(croppedImage));
+        setFieldValue("thumbnailFile", croppedImage);
+        break;
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+        handleCGP(open, croppedImage);
+        setFieldValue("imageFiles", [
+          ...formikValues.imageFiles.filter((img) => img.id !== open),
+          { id: open, croppedImage },
+        ]);
+    }
+    setOpen(null);
+  };
+
   return (
     <>
-      <Root open={open} onOpenChange={setOpen}>
+      <Root open={!!open} onOpenChange={(state) => setOpen(null)}>
         <Content
-          className="fixed outline-none z-40 bg-white md:w-[450px] h-full md:h-[500px]
-           top-1/2 -translate-y-1/2 inset-x-2 rounded-lg drop-shadow-md border border-neutral-200
-         p-2 md:left-1/2 md:-translate-x-1/2 flex flex-col justify-between items-center"
+          className="fixed outline-none z-40 top-1/2 -translate-y-1/2
+          left-1/2 -translate-x-1/2 w-auto  
+        rounded-lg drop-shadow-md flex flex-col gap-3 justify-center items-center
+         bg-white border border-neutral-300 p-3"
         >
-          <h3 className="text-center">crop image</h3>
-          <ReactCrop
-            aspect={1}
-            crop={crop}
-            onChange={(c) => setCrop(c)}
-            className="rounded-md flex"
-            disabled={!formikValues.thumbnailFile}
+          <div
+            className="relative flex flex-col h-[358px] md:h-[500px] 
+          w-[358px] md:w-[500px] rounded-md overflow-hidden"
           >
-            <Image
-              alt=""
-              src={thumbnailPrev}
-              className=""
-              width={1000}
-              height={1000}
-            />
-          </ReactCrop>
-
-          <div className="flex gap-2 items-center p-1 w-3/5">
+            {!!preview?.url ? (
+              <ReactCrop
+                image={preview?.url}
+                aspect={1}
+                crop={crop}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+                // objectFit=""
+                classes={{
+                  containerClassName: "bg-black/40",
+                  cropAreaClassName:
+                    "border border-red-500 rounded-md outline-none",
+                }}
+              />
+            ) : (
+              <Image
+                alt="placeholder"
+                src={image}
+                className="m-auto rounded-md opacity-70"
+              />
+            )}
+          </div>
+          <div className="flex gap-2 items-center w-full">
             <button
               type="button"
-              className={formikValues.thumbnailFile ? "btn-amber" : "btn-green"}
+              className={!!preview?.url ? "btn-amber" : "btn-green"}
               onClick={() => {
-                thumbnailRef.current?.click();
+                imageRef.current?.click();
               }}
             >
-              {formikValues.thumbnailFile ? "Change" : "Choose image"}
+              {!!preview?.url ? "Change" : "Choose image"}
             </button>
             <button
+              disabled={!preview}
               type="button"
-              className={formikValues.thumbnailFile ? "btn-green" : "hidden"}
+              className={!!preview?.url ? "btn-green" : "hidden"}
+              onClick={handleSetImage}
             >
               Select
             </button>
           </div>
         </Content>
       </Root>
+
       <div className="rounded-lg p-2 col-span-5 row-span-3 h-full bg-white">
         <h3>Product Gallery</h3>
         <TDivider />
@@ -119,7 +209,7 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
               <button
                 type="button"
                 className="text-orange-500 rounded-full p-1.5 ml-2 bg-orange-200 drop-shadow-md"
-                onClick={() => setOpen(true)}
+                onClick={() => setOpen("thumbnail")}
               >
                 <PlusIcon width={20} />
               </button>
@@ -130,39 +220,26 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
                 <ArchiveBoxXMarkIcon width={20} />
               </button>
             </TFlex>
-            <div
-              className="w-40 h-40 rounded-lg bg-black/60 flex justify-center items-center
+            {croppedTN ? (
+              <Image
+                alt=""
+                src={croppedTN}
+                width={200}
+                height={200}
+                className="w-40 h-40 rounded-md"
+              />
+            ) : (
+              <div
+                className="w-40 h-40 rounded-lg bg-black/60 flex justify-center items-center
                    text-white"
-            >
-              <p>upload thumbnail</p>
-            </div>
+              >
+                <p>upload thumbnail</p>
+              </div>
+            )}
           </div>
           {/* thumbnal end */}
-          <input
-            hidden
-            ref={thumbnailRef}
-            type="file"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              setFieldValue("thumbnailFile", file);
-              handleThumbnail(file);
-            }}
-          />
-          <input
-            hidden
-            ref={galleryRef}
-            type="file"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (!file || !currentG) return;
-              setFieldValue("imageFiles", [
-                ...formikValues.imageFiles.filter((img) => img.id !== currentG),
-                { id: currentG, file },
-              ]);
-              handleGC(currentG, file);
-            }}
-          />
+          <input hidden ref={imageRef} type="file" onChange={handlePreview} />
+
           {imagesPrev
             .sort((a, b) => Number(a.id) - Number(b.id))
             .map((image) => (
@@ -173,8 +250,7 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
                     className="text-orange-500 rounded-full p-1.5 ml-2
                          bg-orange-200 drop-shadow-md"
                     onClick={() => {
-                      setCG(image.id);
-                      galleryRef.current?.click();
+                      setOpen(image.id);
                     }}
                   >
                     <PlusIcon width={20} />

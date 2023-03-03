@@ -49,7 +49,7 @@ specifiers:
   react: 18.2.0
   react-chartjs-2: ^5.2.0
   react-dom: 18.2.0
-  react-image-crop: ^10.0.9
+  react-easy-crop: ^4.7.3
   react-spinners: ^0.13.6
   sharp: ^0.31.3
   superjson: 1.9.1
@@ -92,7 +92,7 @@ dependencies:
   react: 18.2.0
   react-chartjs-2: 5.2.0_uxqdnqzacoapcp4mwytn5yclyu
   react-dom: 18.2.0_react@18.2.0
-  react-image-crop: 10.0.9_react@18.2.0
+  react-easy-crop: 4.7.3_biqbaboplfbrettd7655fr4n2y
   react-spinners: 0.13.6_biqbaboplfbrettd7655fr4n2y
   sharp: 0.31.3
   superjson: 1.9.1
@@ -1880,11 +1880,6 @@ packages:
       wrap-ansi: 7.0.0
     dev: false
     optional: true
-
-  /clsx/1.2.1:
-    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
-    engines: {node: '>=6'}
-    dev: false
 
   /color-convert/2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
@@ -3858,6 +3853,10 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  /normalize-wheel/1.0.1:
+    resolution: {integrity: sha512-1OnlAPZ3zgrk8B91HyRj+eVv+kS5u+Z0SCsak6Xil/kmgEia50ga7zfkumayonZrImffAxPU/5WcyGhzetHNPA==}
+    dev: false
+
   /oauth/0.9.15:
     resolution: {integrity: sha512-a5ERWK1kh38ExDEfoO6qUHJb32rd7aYmPHuyCu3Fta/cnICvYmgd2uhuKXvPD+PXB+gCEYYEaQdIRAjCOwAKNA==}
     dev: false
@@ -4374,17 +4373,20 @@ packages:
       scheduler: 0.23.0
     dev: false
 
-  /react-fast-compare/2.0.4:
-    resolution: {integrity: sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==}
+  /react-easy-crop/4.7.3_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-+LUQyKKAo10a28Q7whEDKs+mrGMctTDYDCT29++VYk3KKPivp/hPWWfZDrFebBOiezhGljFoi+bApH7DsVk2rg==}
+    peerDependencies:
+      react: '>=16.4.0'
+      react-dom: '>=16.4.0'
+    dependencies:
+      normalize-wheel: 1.0.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      tslib: 2.0.1
     dev: false
 
-  /react-image-crop/10.0.9_react@18.2.0:
-    resolution: {integrity: sha512-fqn6a811cx/sE7jtu8txL4lBTwgZYuEVNvy7UPKMNMWeRcZa6v0ja11+Gd9nZQiBfaxDal3PBcKhGBLQ956UNg==}
-    peerDependencies:
-      react: '>=16.13.1'
-    dependencies:
-      clsx: 1.2.1
-      react: 18.2.0
+  /react-fast-compare/2.0.4:
+    resolution: {integrity: sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==}
     dev: false
 
   /react-is/16.13.1:
@@ -4963,6 +4965,10 @@ packages:
 
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
+
+  /tslib/2.0.1:
+    resolution: {integrity: sha512-SgIkNheinmEBgx1IUNirK0TUD4X9yjjBRTqqjggWCU3pUEqIk3/Uwl3yRixYKT6WjQuGiwDv4NomL3wqRCj+CQ==}
+    dev: false
 
   /tslib/2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}

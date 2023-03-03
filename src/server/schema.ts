@@ -30,6 +30,7 @@ export const ProductSchema = z.object({
     others: z.string().optional(),
   }),
   // thumbnailFile: z.string(),
+  imageFiles: z.array(z.object({ id: z.string(), url: z.string() })),
   images: z.array(z.string()),
   moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
   status: PStatus,
