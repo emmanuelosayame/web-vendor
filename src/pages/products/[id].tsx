@@ -70,49 +70,26 @@ const ProductPage: NextPageWithLayout = () => {
     },
   });
 
-  const uploadImage = async (file: File, name: string) => {
-    const form = new FormData();
-    form.append("image", file);
-
-    const { data } = await axios.post<{ url: string }>(
-      `/api/upload/productdd`,
-      form,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-        params: { name },
-      }
-    );
-    return data.url;
-  };
-
   const onSubmit = async (values: FormValues) => {
     const { imageFiles, tags, promotion, images, ...rest } = values;
 
-    // let urls: string[] = data ? [...data?.images] : [];
-
-    // if (imageFiles.length > 0) {
-    //   setUploading(true);
-    //   for await (const image of imageFiles) {
-    //     const url = await uploadImage(image.file, `producdt${image.id}`);
-    //     urls.push(url);
-    //   }
-    //   setUploading(false);
-    // }
-
-    const payload: ProductPayload = {
+    const payload: Omit<ProductPayload, "imageFiles"> = {
       ...rest,
       tags: tags.split(" ; "),
       images: [...images],
       promotion: promotion.split(" ; "),
-      imageFiles: [],
     };
 
     if (pid !== "new") {
-      const updatedDetails = diff(initialData, payload);
-      console.log(updatedDetails);
-      // mutate({ id: pid, data: updatedDetails as Partial<ProductPayload> });
+      const updatedDetails = diff(initialData, payload) as Partial<
+        Omit<ProductPayload, "imageFiles">
+      >;
+      mutate({
+        id: pid,
+        data: imageFiles ? { imageFiles, ...rest } : updatedDetails,
+      });
     } else {
-      create({ data: payload });
+      create({ data: imageFiles ? { imageFiles, ...payload } : payload });
     }
   };
 
@@ -120,7 +97,7 @@ const ProductPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {(isLoading || mutating || creating || uploading) && <LoadingBlur />}
+      {(isFetching || mutating || creating) && <LoadingBlur />}
 
       <Toast
         open={open}
@@ -136,7 +113,15 @@ const ProductPage: NextPageWithLayout = () => {
         onSubmit={onSubmit}
         enableReinitialize
       >
-        {({ getFieldProps, dirty, touched, errors, values, setFieldValue }) => (
+        {({
+          getFieldProps,
+          dirty,
+          touched,
+          errors,
+          values,
+          setFieldValue,
+          setValues,
+        }) => (
           <Form className="w-full h-full">
             <MenuFlex>
               <IconButton
@@ -178,12 +163,14 @@ const ProductPage: NextPageWithLayout = () => {
                   mutate={mutate}
                 />
 
-                <Gallery
-                  formikValues={values}
-                  setFieldValue={setFieldValue}
-                  data={data}
-                  pid={pid}
-                />
+                {!isFetching && (
+                  <Gallery
+                    formikValues={values}
+                    setFieldValue={setFieldValue}
+                    data={data}
+                    pid={pid}
+                  />
+                )}
               </div>
             </div>
           </Form>

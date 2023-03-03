@@ -5,7 +5,11 @@ const config = {
   reactStrictMode: true,
 
   images: {
-    domains: ["dummyjson.com"],
+    domains: [
+      "dummyjson.com",
+      "storage.googleapis.com",
+      "firebasestorage.googleapis.com",
+    ],
   },
 
   /**

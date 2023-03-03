@@ -10,7 +10,7 @@ const app = !apps.length
       credential: credential.cert(
         JSON.parse(process.env.FIREBASE_ADMIN_CONFIG || "{}")
       ),
-      storageBucket: "delorand-apps.appspot.com",
+      storageBucket: process.env.FIREBASE_BUCKET,
     })
   : apps[0];
 
