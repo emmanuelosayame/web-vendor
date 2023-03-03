@@ -102,6 +102,16 @@ const HeaderA = ({ auth }: Props) => {
               />
               <NavLinkSm
                 onclick={() => setOpen(false)}
+                text="Assets"
+                to="/admin/assets"
+              />
+              <NavLinkSm
+                onclick={() => setOpen(false)}
+                text="Stores"
+                to="/admin/stores"
+              />
+              <NavLinkSm
+                onclick={() => setOpen(false)}
                 text="Vendors"
                 to="/admin/vendors"
               />

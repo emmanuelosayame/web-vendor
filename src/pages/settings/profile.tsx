@@ -1,5 +1,6 @@
 import InputTemp, { TextareaTemp } from "@components/InputTemp";
 import Layout from "@components/Layout";
+import { Loading, LoadingBlur } from "@components/Loading";
 import Avatar from "@components/radix/Avatar";
 import {
   IconBack,
@@ -12,42 +13,51 @@ import {
   PencilSquareIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { diff } from "deep-object-diff";
 import { Form, Formik } from "formik";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
 import { useStore } from "store";
 import { api } from "utils/api";
+import { vendorVs } from "utils/validation";
 import { type NextPageWithLayout } from "../_app";
 
 const Profile: NextPageWithLayout = () => {
   const router = useRouter();
+  const qc = api.useContext();
   const saveRef = useRef<HTMLButtonElement | null>(null);
   const colorScheme = useStore((state) => state.colorScheme);
   const changeCS = useStore((state) => state.setColorScheme);
 
-  const { data } = api.vendor.one.useQuery({});
+  const { data, isLoading } = api.vendor.one.useQuery({});
+
+  const { mutate, isLoading: mutating } = api.vendor.update.useMutation({
+    onSuccess: () => {
+      qc.vendor.one.refetch();
+    },
+  });
 
   const profileIV = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNo: "",
-    location: "",
-    address: "",
+    firstName: data?.firstName || "",
+    lastName: data?.lastName || "",
+    email: data?.email || "",
+    phoneNo: data?.phoneNo || "",
+    location: data?.location || "",
+    address: data?.address || "",
+  };
+  type ProfileIV = typeof profileIV;
+
+  const onSubmit = (values: ProfileIV) => {
+    const payload = diff(profileIV, values) as ProfileIV;
+    mutate({ vid: data?.id, data: payload });
   };
 
-  const storeIV = {
-    name: "",
-    about: "",
-    email: "",
-    // phoneNo: "",
-    // location: "",
-    // address: "",
-  };
+  if (isLoading) return <Loading />;
 
   return (
     <>
+      {mutating && <LoadingBlur />}
       <MenuFlex>
         <IconBack>
           <p>Cancel</p>
@@ -61,9 +71,13 @@ const Profile: NextPageWithLayout = () => {
       </MenuFlex>
 
       <div className="w-full h-full overflow-y-auto pb-2">
-        <div className="bg-white/40 backdrop-blur-md rounded-lg p-2 flex flex-col md:flex-row gap-2 h-full">
+        <div className="bg-white/40 backdrop-blur-md rounded-lg p-2 flex flex-col md:flex-row gap-2 md:h-full">
           <div className="bg-white rounded-lg p-3 w-full md:w-1/3"></div>
-          <Formik initialValues={profileIV} onSubmit={() => {}}>
+          <Formik
+            initialValues={profileIV}
+            validationSchema={vendorVs}
+            onSubmit={onSubmit}
+          >
             {({ dirty, getFieldProps, touched, errors }) => (
               <Form className="bg-white rounded-lg p-3 w-full md:w-1/3 flex flex-col items-center gap-2">
                 <h3 className="text-lg text-center border-b border-b-neutral-200 w-full">
@@ -82,7 +96,7 @@ const Profile: NextPageWithLayout = () => {
                   <InputTemp
                     heading="Lastname"
                     type="text"
-                    fieldProps={getFieldProps("laststName")}
+                    fieldProps={getFieldProps("lastName")}
                     touched={touched.lastName}
                     error={errors.lastName}
                   />
@@ -127,8 +141,9 @@ const Profile: NextPageWithLayout = () => {
                   </h3>
                 </div> */}
                 <button
+                  disabled={!dirty}
                   type="submit"
-                  className="p-1 text-white rounded-lg bg-green-500 w-full"
+                  className="p-2 text-white rounded-lg disabled:opacity-50 bg-green-500 w-full"
                 >
                   Save
                 </button>

@@ -5,6 +5,7 @@ import AlertDialog from "@components/radix/Alert";
 import Toast, { useToastTrigger } from "@components/radix/Toast";
 import {
   IconButton,
+  MenuFlex,
   TDivider,
   TFlex,
   THStack,
@@ -16,6 +17,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/solid";
+import { Product } from "@prisma/client";
 import { diff } from "deep-object-diff";
 import { Form, Formik } from "formik";
 import Image from "next/image";
@@ -23,22 +25,22 @@ import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { type ProductUpdate } from "src/server/schema";
 import { api } from "utils/api";
-import { productplaceholder } from "utils/assets";
+import { productPLD } from "utils/placeholders";
+import { productVs } from "utils/validation";
 import { type NextPageWithLayout } from "../_app";
 
 interface RawPU
-  extends Omit<ProductUpdate, "imageFiles" | "specifications" | "tags"> {
+  extends Omit<ProductUpdate, "tags" | "category" | "imageFiles"> {
   imageFiles: { id: string; file: File }[];
-  model: string;
-  otherSpecs: string;
   tags: string;
+  category: string;
 }
 
 const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
 
-const Product: NextPageWithLayout = () => {
+const ProductPage: NextPageWithLayout = () => {
   const router = useRouter();
-  const id = router.query.product?.toString();
+  const id = router.query.id?.toString();
   const inputRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
@@ -46,7 +48,7 @@ const Product: NextPageWithLayout = () => {
     { id },
     {
       enabled: !!id && id !== "new",
-      placeholderData: productplaceholder,
+      placeholderData: productPLD,
       onSuccess: (data) =>
         setIP(
           imagesPH.map((imagePH) => {
@@ -90,51 +92,66 @@ const Product: NextPageWithLayout = () => {
     ]);
   };
 
-  const initialValues: RawPU = {
-    ...rest,
+  const formIV: RawPU = {
+    title: data?.title || "",
+    brand: data?.brand || "",
+    description: data?.description || "",
+    package: data?.package || "",
+    price: data?.price || 0,
+    stock: data?.stock || 0,
     imageFiles: [],
-    moreDescr: [],
-    model: specs?.model || "",
-    otherSpecs: specs?.others || "",
-    tags: tags?.join(" ; ") || "",
-  };
-
-  const initialData: ProductUpdate = {
-    ...rest,
-    imageFiles: [],
+    category: data?.category || "",
     moreDescr: [],
     specs: { model: specs?.model || "", others: specs?.others || "" },
+    tags: tags?.join(" ; ") || "",
+    status: data?.status || "review",
+  };
+
+  const initialValues: Partial<ProductUpdate> = {
+    ...formIV,
+    imageFiles: [],
+    tags: formIV.tags.split(" ; "),
   };
 
   const qc = api.useContext();
 
   const { open, setOpen, trigger } = useToastTrigger();
 
-  const { mutate } = api.product.update.useMutation({
+  const { mutate: create, isLoading: creating } =
+    api.product.create.useMutation({
+      onSuccess: (data) => {
+        // qc.product.one.refetch();
+        trigger();
+        router.replace(`/products/${data.id}`);
+      },
+    });
+  const { mutate, isLoading: mutating } = api.product.update.useMutation({
     onSettled: () => {
       qc.product.one.refetch();
       trigger();
     },
   });
   const save = (values: RawPU) => {
-    const { imageFiles, model, otherSpecs, tags, ...rest } = values;
-    const updatedData: ProductUpdate = {
+    const { imageFiles, tags, ...rest } = values;
+    const payload: ProductUpdate = {
       ...rest,
       imageFiles: imageFiles.map((img) => img.file),
       tags: tags.split(" ; "),
-      specs: { model, others: otherSpecs },
     };
-    const updatedDetails = diff(initialData, updatedData);
-    mutate({ id, data: updatedDetails as any });
+    if (id !== "new") {
+      const updatedDetails = diff(initialValues, payload);
+      // console.log(updatedDetails);
+      mutate({ id, data: updatedDetails as Partial<ProductUpdate> });
+    } else {
+      create({ data: payload });
+    }
   };
-
-  console.log(status, error);
 
   if (error) return <p>{error.message}</p>;
 
   return (
     <>
-      {isLoading && <LoadingBlur />}
+      {(isLoading || mutating || creating) && <LoadingBlur />}
 
       <Toast
         open={open}
@@ -144,10 +161,15 @@ const Product: NextPageWithLayout = () => {
         styles=""
       />
 
-      <Formik initialValues={initialValues} onSubmit={save} enableReinitialize>
-        {({ getFieldProps, dirty, errors, values, setFieldValue }) => (
+      <Formik
+        initialValues={formIV}
+        validationSchema={productVs}
+        onSubmit={save}
+        enableReinitialize
+      >
+        {({ getFieldProps, dirty, touched, errors, values, setFieldValue }) => (
           <Form className="w-full h-full">
-            <div className="flex justify-between w-full px-3 pt-1 absolute inset-x-0 top-20 z-30 bg-blue-600">
+            <MenuFlex>
               <IconButton
                 type="button"
                 onClick={() => router.back()}
@@ -169,7 +191,7 @@ const Product: NextPageWithLayout = () => {
                 <p>Save</p>
                 <CheckIcon width={20} />
               </IconButton>
-            </div>
+            </MenuFlex>
 
             <div className="overflow-y-auto h-full pb-4">
               <div className="flex flex-col md:grid md:grid-cols-7 md:grid-rows-5 gap-3 p-2 bg-white/40 rounded-lg">
@@ -182,6 +204,8 @@ const Product: NextPageWithLayout = () => {
                     heading="Product Title"
                     placeholder="Enter Product Title"
                     rows={2}
+                    touched={touched.title}
+                    error={errors.title}
                   />
 
                   <TextareaTemp
@@ -189,6 +213,8 @@ const Product: NextPageWithLayout = () => {
                     heading="Product Description"
                     rows={4}
                     placeholder="Enter Product Description"
+                    touched={touched.description}
+                    error={errors.description}
                   />
                 </div>
 
@@ -201,6 +227,8 @@ const Product: NextPageWithLayout = () => {
                     style={{}}
                     heading="Brand"
                     placeholder="Manufacturer / Brand"
+                    touched={touched.brand}
+                    error={errors.brand}
                   />
 
                   <InputTemp
@@ -209,6 +237,8 @@ const Product: NextPageWithLayout = () => {
                     style={{}}
                     heading="Category"
                     placeholder="Product Category"
+                    touched={touched.category}
+                    error={errors.category}
                   />
 
                   <THStack className="items-center p-2">
@@ -217,6 +247,8 @@ const Product: NextPageWithLayout = () => {
                       fieldProps={getFieldProps("price")}
                       style={{}}
                       heading="Price"
+                      touched={touched.price}
+                      error={errors.price}
                     />
 
                     <InputTemp
@@ -224,6 +256,8 @@ const Product: NextPageWithLayout = () => {
                       fieldProps={getFieldProps("stock")}
                       style={{}}
                       heading="Stock"
+                      touched={touched.stock}
+                      error={errors.stock}
                     />
                   </THStack>
 
@@ -233,12 +267,16 @@ const Product: NextPageWithLayout = () => {
                     fieldProps={getFieldProps("package")}
                     placeholder="Enter contents sperated by semi-colon, contents written
                  together would exists as a single word"
+                    touched={touched.package}
+                    error={errors.package}
                   />
                   <TextareaTemp
                     heading="Tags"
                     rows={4}
                     fieldProps={getFieldProps("tags")}
                     placeholder="Enter tags sperated by semi-colon, tags written together would exists as a single word"
+                    touched={touched.tags}
+                    error={errors.tags}
                   />
                   <div className="">
                     <h3 className="border-b border-b-neutral-200">
@@ -246,48 +284,55 @@ const Product: NextPageWithLayout = () => {
                     </h3>
 
                     <InputTemp
-                      type="text"
-                      fieldProps={getFieldProps("model")}
+                      fieldProps={getFieldProps("specs.model")}
                       style={{}}
                       heading="Model"
+                      touched={touched.specs?.model}
+                      error={errors.specs?.model}
                     />
 
                     <TextareaTemp
                       heading="Other Specs"
                       rows={4}
-                      fieldProps={getFieldProps("otherSpecs")}
+                      fieldProps={getFieldProps("specs.others")}
                       placeholder="Enter tags sperated by semi-colon, tags written together would exists as a single word"
+                      touched={touched.specs?.others}
+                      error={errors.specs?.others}
                     />
                   </div>
 
-                  <AlertDialog
-                    action={status === "active" ? "Disable" : "Enable"}
-                    title={`Are you sure you want to ${
-                      status === "active" ? "disable" : "enable"
-                    } this product?`}
-                    trigger={status === "active" ? "disable" : "enable"}
-                    triggerStyles="py-1 w-11/12 mx-auto rounded-lg
+                  {id !== "new" ? (
+                    <>
+                      <AlertDialog
+                        action={status === "active" ? "Disable" : "Enable"}
+                        title={`Are you sure you want to ${
+                          status === "active" ? "disable" : "enable"
+                        } this product?`}
+                        trigger={status === "active" ? "disable" : "enable"}
+                        triggerStyles="py-1 w-11/12 mx-auto rounded-lg
                    bg-amber-400 hover:bg-amber-500 text-white"
-                    onClickConfirm={() =>
-                      mutate({
-                        id,
-                        data: {
-                          status: status === "active" ? "disabled" : "active",
-                        },
-                      })
-                    }
-                  />
-
-                  <AlertDialog
-                    action="Delete"
-                    title="Are you sure you want to delete this product?"
-                    trigger="delete"
-                    triggerStyles="py-1 w-11/12 mx-auto rounded-lg
+                        onClickConfirm={() =>
+                          mutate({
+                            id,
+                            data: {
+                              status:
+                                status === "active" ? "disabled" : "active",
+                            },
+                          })
+                        }
+                      />
+                      <AlertDialog
+                        action="Delete"
+                        title="Are you sure you want to delete this product?"
+                        trigger="delete"
+                        triggerStyles="py-1 w-11/12 mx-auto rounded-lg
                    bg-red-500 hover:bg-red-600 text-white"
-                    onClickConfirm={() => {
-                      setTimeout(() => router.replace("/products"), 300);
-                    }}
-                  />
+                        onClickConfirm={() => {
+                          setTimeout(() => router.replace("/products"), 300);
+                        }}
+                      />
+                    </>
+                  ) : null}
                 </TStack>
 
                 <div className="rounded-lg p-2 col-span-5 row-span-3 h-full bg-white">
@@ -435,8 +480,8 @@ const Product: NextPageWithLayout = () => {
   );
 };
 
-Product.getLayout = function getLayout(page: any) {
+ProductPage.getLayout = function getLayout(page: any) {
   return <Layout>{page}</Layout>;
 };
 
-export default Product;
+export default ProductPage;

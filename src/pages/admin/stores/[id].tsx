@@ -30,7 +30,7 @@ const StorePage: NextPageWithLayout = () => {
     data: store,
     isLoading,
     isFetching,
-  } = api.store.one.useQuery(
+  } = api.store.oneA.useQuery(
     { id },
     {
       enabled: !!id && id !== "new",
@@ -66,8 +66,9 @@ const StorePage: NextPageWithLayout = () => {
       <div className="h-full overflow-y-auto">
         <StoreComponent
           edit={edit}
-          store={store || initialSD}
+          store={store}
           id={id === "new" ? id : "fetch"}
+          isAdmin
         />
       </div>
     </>

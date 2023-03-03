@@ -10,4 +10,20 @@ export const initialSD: Store = {
   status: "disabled",
   support: { mobile: "", whatsapp: "" },
   vendors: [],
+  bannerUrl: "",
+};
+
+export const productPLD = {
+  brand: "",
+  category: "",
+  description: "",
+  discountPercentage: 0,
+  id: "",
+  price: 0,
+  promotion: [],
+  rating: 0,
+  status: "",
+  stock: 0,
+  tags: [],
+  title: "",
 };

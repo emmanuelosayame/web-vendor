@@ -54,16 +54,30 @@ export const productRouter = router({
       });
       return result;
     }),
+  create: protectedProcedure
+    .input(
+      z.object({
+        data: ProductUpdateSchema.partial({ imageFiles: true }),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { prisma, sid } = ctx;
+      const { data } = input;
+      const { imageFiles, moreDescr, ...rest } = data;
+
+      const payload = { ...rest };
+      return await prisma.product.create({ data: { ...payload, sid } });
+    }),
   update: protectedProcedure
     .input(
       z.object({
         id: z.string().optional(),
-        data: ProductUpdateSchema,
+        data: ProductUpdateSchema.partial(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { id, data } = input;
-      const { imageFiles, ...rest } = data;
+      const { imageFiles, moreDescr, ...rest } = data;
 
       const update = { ...rest };
       return await ctx.prisma.product.update({ where: { id }, data: update });

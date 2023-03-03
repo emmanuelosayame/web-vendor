@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "utils/api";
 import { limitText } from "utils/helpers";
+import { initialSD } from "utils/placeholders";
 import { storeVs } from "utils/validation";
 import InputTemp, { TextareaTemp } from "./InputTemp";
 import { LoadingBlur } from "./Loading";
@@ -16,11 +17,28 @@ import { THStack } from "./TElements";
 
 interface Props {
   edit: boolean;
-  store: Store;
+  store?: Store | null;
   id: "new" | "fetch";
+  isAdmin: boolean;
 }
 
-const StoreComponent = ({ edit, store, id }: Props) => {
+interface VForm {
+  setVid: (id?: string) => void;
+  activeV: StoreVendor;
+  mutate: (action: VendorUpdate) => void;
+  store?: Store | null;
+  pageId: string;
+  isAdmin: boolean;
+}
+
+type VendorUpdate =
+  | {
+      type: "add";
+      payload: StoreVendor;
+    }
+  | { type: "remove"; payload: { id: string } };
+
+const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
   const router = useRouter();
   const qc = api.useContext();
 
@@ -30,61 +48,111 @@ const StoreComponent = ({ edit, store, id }: Props) => {
       ? store?.vendors.find((vendor) => vid === vendor.id)
       : { id: "new", email: "", role: "member", status: "active" };
 
+  const { data: currentVendor } = api.vendor.one.useQuery(
+    {},
+    { enabled: !isAdmin }
+  );
+
+  const vendorList: StoreVendor[] | undefined =
+    !isAdmin && id === "new" && currentVendor
+      ? [
+          {
+            email: currentVendor.email,
+            id: currentVendor.id,
+            role: "owner",
+            status: "active",
+          },
+        ]
+      : store?.vendors;
+
   const { mutate: create, isLoading: creating } = api.store.new.useMutation({
-    onSuccess: (data) => router.replace(`/admin/stores/${data.id}`),
+    onSuccess: (data) =>
+      router.replace(isAdmin ? `/admin/stores/${data.id}` : `/`),
   });
 
   const { mutate, isLoading: mutating } = api.store.update.useMutation({
     onSuccess: () => {
-      qc.store.one.refetch();
+      qc.store.oneA.refetch();
       setVid(undefined);
     },
   });
+
+  const { mutate: deleteStore, isLoading: delting } =
+    api.store.delete.useMutation({
+      onSuccess: () => router.replace(`/admin/stores`),
+    });
 
   const formIV = {
     name: store?.name || "",
     about: store?.about || "",
     email: store?.email || "",
-    accountNo: store?.account?.number || "",
-    accountBank: store?.account?.bank || "",
-    accountName: store?.account?.name || "",
-    supportMobile: store?.support?.mobile || "",
-    supportWhatsapp: store?.support?.whatsapp || "",
+    account: {
+      number: store?.account?.number || "",
+      name: store?.account?.name || "",
+      bank: store?.account?.bank || "",
+    },
+    support: {
+      mobile: store?.support?.mobile || "",
+      whatsapp: store?.support?.whatsapp || "",
+    },
   };
 
-  type FormValues = typeof formIV;
-  const storeV: (
-    values: FormValues
-  ) => Omit<Store, "vendors" | "status" | "photoUrl"> = (values) => ({
-    about: values.about,
-    account: {
-      bank: values.accountBank,
-      name: values.accountName,
-      number: values.accountNo,
-    },
-    email: values.email,
-    id: "",
-    name: values.name,
-    support: { mobile: values.supportMobile, whatsapp: values.supportWhatsapp },
-  });
+  // type FormIV = Omit<
+  //   Store,
+  //   "vendors" | "photoUrl" | "bannerUrl" | "id" | "status"
+  // >;
+
+  type FormIV = typeof formIV;
+
+  const onSubmit = async (values: FormIV) => {
+    if (id !== "new" && !!store) {
+      if (!store) return;
+      const payload = diff(formIV, values) as Partial<Store>;
+      mutate({ id: store.id, data: payload });
+    } else {
+      if (isAdmin) {
+        create({
+          data: values,
+        });
+      } else if (currentVendor && currentVendor !== null)
+        create({
+          data: {
+            ...values,
+            vendors: [
+              {
+                email: currentVendor.email,
+                id: currentVendor.id,
+                role: "owner",
+                status: "active",
+              },
+            ],
+          },
+        });
+    }
+  };
+
+  const updateVendors = ({ type, payload }: VendorUpdate) => {
+    const vendors =
+      store?.vendors.filter((vendor) => vendor.id !== payload.id) || [];
+    if (type === "add") {
+      mutate({ id: store?.id, data: { vendors: [...vendors, payload] } });
+    }
+    if (type === "remove") {
+      mutate({ id: store?.id, data: { vendors } });
+    }
+  };
 
   return (
     <>
-      {creating && <LoadingBlur />}
+      {(creating || mutating) && <LoadingBlur />}
 
-      <div className="p-2 bg-white/40 rounded-lg flex flex-col md:flex-row gap-2 h-[98%]">
+      <div className="p-2 bg-white/40 rounded-lg flex flex-col md:flex-row gap-2 h-auto md:h-[98%]">
         {/* 1 */}
         <Formik
           initialValues={formIV}
           validationSchema={storeVs}
-          onSubmit={(values) => {
-            if (id !== "new") {
-              const payload = diff(store, storeV(values)) as Partial<Store>;
-              mutate({ id: store.id, data: payload });
-            } else {
-              create({ data: storeV(values) });
-            }
-          }}
+          onSubmit={onSubmit}
+          enableReinitialize
         >
           {({ dirty, touched, errors, getFieldProps }) => (
             <Form className="rounded-lg w-full md:w-2/3 flex flex-col md:flex-row gap-2 bg-white">
@@ -128,43 +196,35 @@ const StoreComponent = ({ edit, store, id }: Props) => {
                     <h2>banner</h2>
                   </div>
                 </div>
-                {/* <button
-                disabled={!edit || !dirty}
-                type="submit"
-                className="p-2 w-full bg-green-400 text-white rounded-lg 
-                  disabled:opacity-75 hover:bg-green-500"
-              >
-                Save
-              </button> */}
               </div>
 
               {/* 2 */}
-              <div className={`p-3 w-full flex flex-col h-full relative`}>
+              <div className={`p-3 w-full flex flex-col gap-3 h-full relative`}>
                 <div className="space-y-2 flex-1">
-                  {store ? (
+                  {id !== "new" ? (
                     <>
                       <InputTemp
                         heading="Account Name"
                         type="text"
-                        fieldProps={getFieldProps("accountName")}
-                        touched={touched.accountName}
-                        error={errors.accountName}
+                        fieldProps={getFieldProps("account.name")}
+                        touched={touched.account?.name}
+                        error={errors.account?.name}
                       />
                       <div className="flex items-center gap-3">
                         <InputTemp
                           heading="Account No."
                           type="tel"
-                          fieldProps={getFieldProps("accountNo")}
-                          touched={touched.accountNo}
-                          error={errors.accountNo}
+                          fieldProps={getFieldProps("account.number")}
+                          touched={touched.account?.number}
+                          error={errors.account?.number}
                         />
 
                         <InputTemp
                           heading="Bank"
                           type="text"
-                          fieldProps={getFieldProps("accountBank")}
-                          touched={touched.accountBank}
-                          error={errors.accountBank}
+                          fieldProps={getFieldProps("account.bank")}
+                          touched={touched.account?.bank}
+                          error={errors.account?.bank}
                         />
                       </div>
                     </>
@@ -176,17 +236,17 @@ const StoreComponent = ({ edit, store, id }: Props) => {
                     <InputTemp
                       heading="Phone (mobile)."
                       type="tel"
-                      fieldProps={getFieldProps("supportMobile")}
-                      touched={touched.supportMobile}
-                      error={errors.supportMobile}
+                      fieldProps={getFieldProps("support.mobile")}
+                      touched={touched.support?.mobile}
+                      error={errors.support?.mobile}
                     />
 
                     <InputTemp
                       heading="Phone (whatsapp)"
                       type="text"
-                      fieldProps={getFieldProps("supportWhatsapp")}
-                      touched={touched.supportWhatsapp}
-                      error={errors.supportWhatsapp}
+                      fieldProps={getFieldProps("support.whatsapp")}
+                      touched={touched.support?.whatsapp}
+                      error={errors.support?.whatsapp}
                     />
                   </THStack>
                 </div>
@@ -211,31 +271,26 @@ const StoreComponent = ({ edit, store, id }: Props) => {
         >
           <div
             className={`${
-              !store
-                ? "absolute bg-black/10 w-full h-full rounded-lg inset-0 z-30"
+              id === "new"
+                ? "absolute bg-black/10 w-full h-full flex md:items-center text-center text-amber-400 p-10 rounded-lg inset-0 z-30"
                 : "hidden"
             } `}
-          />
-          {vid ? (
+          >
+            <p>You can add members after you create your store</p>
+          </div>
+          {activeV ? (
             <VendorForm
               store={store}
               activeV={activeV}
               setVid={setVid}
-              mutate={(type, data) => {
-                // const vendors =
-                //   store?.vendors.filter((vendor) => vendor.id !== data.id) ||
-                //   [];
-                // if (type === "remove") {
-                //   mutate({ id, data: { vendors } });
-                // } else {
-                //   mutate({ id, data: { vendors: [...vendors, data] } });
-                // }
-              }}
+              mutate={updateVendors}
+              pageId={id}
+              isAdmin={isAdmin}
             />
           ) : (
             <>
               <h3 className=" rounded-lg p-2 text-lg bg-neutral-100">
-                Status : {store?.status || "..."}
+                Status : {id !== "new" ? store?.status : "..."}
               </h3>
 
               <div className="h-full">
@@ -243,70 +298,96 @@ const StoreComponent = ({ edit, store, id }: Props) => {
                   Team
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {store?.vendors.map((vendor) => (
-                    <div
-                      key={vendor.id}
-                      className="border border-neutral-200 rounded-lg p-2 col-span-2 md:col-span-1"
-                    >
-                      <p className="text-sm text-end">
-                        {limitText(vendor.email, 20)}
-                      </p>
-
-                      <div className="flex justify-between">
-                        <p>Role : </p>
-                        <p>{vendor.role}</p>
-                      </div>
-                      <div className="flex justify-between">
-                        <p>Status : </p>
-                        <p>{vendor.status}</p>
-                      </div>
-
-                      <button
-                        // disabled={!edit || !dirty}
-                        type="submit"
-                        className="p-1 w-full mx-auto bg-green-400 text-white rounded-lg 
-                  disabled:opacity-75 hover:bg-green-500"
-                        onClick={() => setVid(vendor.id)}
+                  {vendorList
+                    ?.sort((v) => {
+                      if (!!(currentVendor && currentVendor.id === v.id))
+                        return -1;
+                      return 0;
+                    })
+                    .map((vendor) => (
+                      <div
+                        key={vendor.id}
+                        className="border border-neutral-200 rounded-lg p-2 col-span-2 md:col-span-1"
                       >
-                        Edit Team
-                      </button>
-                    </div>
-                  ))}
+                        <p className="text-sm text-end">
+                          {limitText(vendor.email, 20)}
+                        </p>
+
+                        <div className="flex justify-between">
+                          <p>Role : </p>
+                          <p>{vendor.role}</p>
+                        </div>
+                        <div className="flex justify-between">
+                          <p>Status : </p>
+                          <p>{vendor.status}</p>
+                        </div>
+
+                        <button
+                          disabled={
+                            !!(currentVendor && currentVendor.id === vendor.id)
+                          }
+                          type="submit"
+                          className="p-1 w-full mx-auto bg-green-400 text-white rounded-lg 
+                  disabled:opacity-50 hover:bg-green-500"
+                          onClick={() => setVid(vendor.id)}
+                        >
+                          Edit Team
+                        </button>
+                      </div>
+                    ))}
                 </div>
               </div>
 
               <button
-                // disabled={!edit || !dirty}
+                disabled={!store || (store && store?.vendors.length > 3)}
                 type="submit"
-                className="p-2 w-full md:w-10/12 mx-auto bg-green-400 text-white rounded-lg 
+                className="p-2 w-full bg-green-400 text-white rounded-lg 
                   disabled:opacity-75 hover:bg-green-500"
                 onClick={() => setVid("new")}
               >
                 Add Team
               </button>
 
-              <AlertDialog
-                trigger={store?.status === "active" ? "Disable" : "Activate"}
-                triggerStyles={`p-2 w-full md:w-10/12 mx-auto text-white rounded-lg
+              <div className="flex gap-2 items-center">
+                {id !== "new" && isAdmin ? (
+                  <AlertDialog
+                    trigger={
+                      store?.status === "active" ? "Disable" : "Activate"
+                    }
+                    triggerStyles={`p-2 w-full text-white rounded-lg
             disabled:opacity-75 ${
               store?.status !== "active"
                 ? "hover:bg-blue-600  bg-blue-500"
-                : "hover:bg-red-600  bg-red-500"
+                : "hover:bg-amber-600  bg-amber-500"
             }`}
-                action={store?.status === "active" ? "Disable" : "Activate"}
-                title={`Are you sure you want to ${
-                  store?.status === "active" ? "disable" : "activate"
-                } this store?`}
-                onClickConfirm={() => {
-                  // mutate({
-                  //   id,
-                  //   data: {
-                  //     status:
-                  //       store?.status === "active" ? "disabled" : "active",
-                  //   },
-                  // });
-                }}
-              />
+                    action={store?.status === "active" ? "Disable" : "Activate"}
+                    title={`Are you sure you want to ${
+                      store?.status === "active" ? "disable" : "activate"
+                    } this store?`}
+                    onClickConfirm={() => {
+                      mutate({
+                        id: store?.id,
+                        data: {
+                          status:
+                            store?.status === "active" ? "disabled" : "active",
+                        },
+                      });
+                    }}
+                  />
+                ) : null}
+                {id !== "new" && isAdmin ? (
+                  <AlertDialog
+                    trigger={"Delete"}
+                    triggerStyles={`p-2 w-full text-white rounded-lg
+            disabled:opacity-75 hover:bg-red-600  bg-red-500`}
+                    action="delete"
+                    title={`Are you sure you want to delete this store?`}
+                    onClickConfirm={() => {
+                      deleteStore({ id: store?.id });
+                    }}
+                  />
+                ) : null}
+              </div>
             </>
           )}
         </div>
@@ -315,17 +396,7 @@ const StoreComponent = ({ edit, store, id }: Props) => {
   );
 };
 
-const VendorForm = ({
-  setVid,
-  activeV,
-  mutate,
-  store,
-}: {
-  setVid: (id?: string) => void;
-  activeV?: StoreVendor;
-  mutate: (type: "update" | "create" | "remove", data: StoreVendor) => void;
-  store?: Store | null;
-}) => {
+const VendorForm = ({ setVid, activeV, mutate, store }: VForm) => {
   const { data: vendors } = api.vendor.many.useQuery(
     { limit: 10 },
     { initialData: [] }
@@ -350,6 +421,7 @@ const VendorForm = ({
   const [role, setRole] = useState<"member" | "owner">(
     activeV?.role || "member"
   );
+  const id = activeV.id;
 
   return (
     <>
@@ -358,7 +430,6 @@ const VendorForm = ({
           <ChevronLeftIcon width={30} />
         </button>
       </div>
-      {/* vendor {vid} */}
       <div className="flex flex-col gap-4 h-full">
         <div className="w-full">
           <h3>Email</h3>
@@ -400,22 +471,28 @@ const VendorForm = ({
           className="p-2 w-full md:w-10/12 mx-auto bg-green-400 text-white rounded-lg 
                   disabled:opacity-75 hover:bg-green-500"
           onClick={() => {
-            if (activeV?.id && activeV?.id === "new") {
+            if (id === "new") {
               const vendorId = vendors.find(
                 (vendor) => email === vendor.email
               )?.id;
-              mutate("update", {
-                id: vendorId || "",
-                email,
-                role,
-                status: activeV?.status || "active",
+              mutate({
+                type: "add",
+                payload: {
+                  id: vendorId || "",
+                  email,
+                  role,
+                  status: activeV?.status || "active",
+                },
               });
             } else {
-              mutate("create", {
-                id: activeV?.id || "",
-                email,
-                role,
-                status: activeV?.status || "active",
+              mutate({
+                type: "add",
+                payload: {
+                  id,
+                  email,
+                  role,
+                  status: activeV.status,
+                },
               });
             }
           }}
@@ -424,40 +501,38 @@ const VendorForm = ({
         </button>
       </div>
       {/* buttons */}
-      <div className="w-10/12 mx-auto space-y-3">
-        <button
-          type="submit"
-          className="p-2 w-full mx-auto bg-amber-400 text-white rounded-lg 
+      {id !== "new" && (
+        <div className="w-10/12 mx-auto space-y-3">
+          <button
+            type="submit"
+            className="p-2 w-full mx-auto bg-amber-400 text-white rounded-lg 
                   disabled:bg-neutral-400 hover:bg-amber-500"
-          onClick={() =>
-            mutate("update", {
-              email: activeV?.email || "",
-              role: activeV?.role || "member",
-              id: activeV?.id || "",
-              status: activeV?.status === "active" ? "disabled" : "active",
-            })
-          }
-        >
-          Disable
-        </button>
+            onClick={() =>
+              mutate({
+                type: "add",
+                payload: {
+                  id,
+                  email,
+                  role,
+                  status: activeV.status === "active" ? "disabled" : "active",
+                },
+              })
+            }
+          >
+            Disable
+          </button>
 
-        <button
-          // disabled={!edit || !dirty}
-          type="submit"
-          className="p-2 w-full mx-auto bg-red-400 text-white rounded-lg 
+          <button
+            // disabled={!edit || !dirty}
+            type="submit"
+            className="p-2 w-full mx-auto bg-red-400 text-white rounded-lg 
                   disabled:opacity-75 hover:bg-red-500"
-          onClick={() =>
-            mutate("remove", {
-              id: activeV?.id || "",
-              email: "",
-              role: "member",
-              status: "active",
-            })
-          }
-        >
-          Remove
-        </button>
-      </div>
+            onClick={() => mutate({ type: "remove", payload: { id } })}
+          >
+            Remove
+          </button>
+        </div>
+      )}
     </>
   );
 };

@@ -30,8 +30,10 @@ const Layout = ({
 
   if (!store)
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-blue-300">
-        <SelectStore refetch={refetch} />
+      <div className="fixed inset-0 flex p-2 justify-center items-center bg-blue-300">
+        <div className="w-full md:w-96 h-72">
+          <SelectStore refetch={refetch} />
+        </div>
       </div>
     );
 
