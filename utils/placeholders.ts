@@ -2,12 +2,7 @@ import type { Product, Store } from "@prisma/client";
 import type { ProductPayload } from "src/server/schema";
 
 export interface FormValues
-  extends Omit<
-    ProductPayload,
-    "tags" | "category" | "promotion" | "imageFiles"
-  > {
-  imageFiles: { id: string; file: File }[];
-  thumbnailFile: File | null;
+  extends Omit<ProductPayload, "tags" | "category" | "promotion"> {
   tags: string;
   category: string;
   promotion: string;

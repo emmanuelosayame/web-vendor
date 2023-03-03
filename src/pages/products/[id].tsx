@@ -3,17 +3,9 @@ import Layout from "@components/Layout";
 import { LoadingBlur } from "@components/Loading";
 import AlertDialog from "@components/radix/Alert";
 import Toast, { useToastTrigger } from "@components/radix/Toast";
-import {
-  IconButton,
-  MenuFlex,
-  TDivider,
-  TFlex,
-  THStack,
-  TStack,
-} from "@components/TElements";
+import { IconButton, MenuFlex } from "@components/TElements";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import axios, { AxiosError } from "axios";
-// import { Product } from "@prisma/client";
 import { diff } from "deep-object-diff";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
@@ -23,17 +15,12 @@ import { api } from "utils/api";
 import {
   getFormIV,
   getProductInitialPayload,
-  productPLD,
   type FormValues,
 } from "utils/placeholders";
 import { productVs } from "utils/validation";
 import { type NextPageWithLayout } from "../_app";
 import Gallery from "@components/product/Gallery";
 import { Form1, Form2 } from "@components/product/Forms";
-
-// interface ProductUpdate extends ProductPayload {
-//   imageFiles: { id: string; file: File }[];
-// }
 
 const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
 

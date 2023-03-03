@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { VendorData } from "../schema";
 
@@ -11,8 +12,12 @@ export const vendorRouter = router({
       where: { uid },
     });
 
+    if (!vendor) {
+      throw new TRPCError({ code: "NOT_FOUND" });
+    }
+
     const stores = await ctx.prisma.store.findMany({
-      where: { vendors: { some: { id: { equals: vendor?.id || "" } } } },
+      where: { vendors: { some: { id: vendor?.id } } },
       select: { name: true, id: true },
     });
 

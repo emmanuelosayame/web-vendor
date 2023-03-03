@@ -4,7 +4,13 @@ import { ArchiveBoxXMarkIcon } from "@heroicons/react/24/solid";
 import type { Product } from "@prisma/client";
 import { Content, Root } from "@radix-ui/react-dialog";
 import Image from "next/image";
-import { type ChangeEvent, useCallback, useRef, useState } from "react";
+import {
+  type ChangeEvent,
+  useCallback,
+  useRef,
+  useState,
+  useMemo,
+} from "react";
 import ReactCrop, { type Area } from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
 import { type FormValues } from "utils/placeholders";
@@ -26,12 +32,20 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
   const imageRef = useRef<HTMLInputElement>(null);
   const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
 
-  const [croppedTN, setCTN] = useState<string | undefined>();
-  const [croppedGP, setCGP] = useState<{ id: string; url: string }[]>(
-    imagesPH.map((imagePH) => {
-      return { id: imagePH.id, url: "" };
-    })
+  // const [croppedTN, setCTN] = useState<string | undefined>();
+  const croppedTN = useMemo(
+    () => formikValues.thumbnailFile,
+    [formikValues.thumbnailFile]
   );
+  const croppedGP = useMemo(
+    () => formikValues.imageFiles,
+    [formikValues.imageFiles]
+  );
+  // const [croppedGP, setCGP] = useState<{ id: string; url: string }[]>(
+  //   imagesPH.map((imagePH) => {
+  //     return { id: imagePH.id, url: "" };
+  //   })
+  // );
 
   const [open, setOpen] = useState<string | "thumbnail" | null>(null);
   const [thumbnailPrev, setTNP] = useState<string | undefined>();
@@ -110,32 +124,36 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
     }
   };
 
-  const handleCGP = (id: string, file: Blob) => {
-    const currentPrev = croppedGP.find((prev) => prev.id === id);
-    if (currentPrev && currentPrev.url.slice(0, 5) === "blob:") {
-      URL.revokeObjectURL(currentPrev.url);
-    }
-    const updatedIP = { id, url: URL.createObjectURL(file) };
-    setCGP((state) => [...state.filter((prev) => prev.id !== id), updatedIP]);
-  };
+  // const handleCGP = (id: string, file: string) => {
+  //   const currentPrev = croppedGP.find((prev) => prev.id === id);
+  //   if (currentPrev && currentPrev.url.slice(0, 5) === "blob:") {
+  //     URL.revokeObjectURL(currentPrev.url);
+  //   }
+  //   const updatedIP = { id, url: file };
+  //   setCGP((state) => [...state.filter((prev) => prev.id !== id), updatedIP]);
+  // };
 
   const handleSetImage = async () => {
-    if (!preview?.url) return;
-    const croppedImage = await getCroppedImg(preview.url, croppedAreaPixels);
+    if (!preview?.url || !croppedAreaPixels) return;
+    const croppedImage = await getCroppedImg(
+      preview.url,
+      croppedAreaPixels,
+      open === "thumbnail" ? open : "product"
+    );
     if (!croppedImage) return;
     switch (open) {
       case "thumbnail":
-        setCTN(URL.createObjectURL(croppedImage));
+        // setCTN(croppedImage);
         setFieldValue("thumbnailFile", croppedImage);
         break;
       case "1":
       case "2":
       case "3":
       case "4":
-        handleCGP(open, croppedImage);
+        // handleCGP(open, croppedImage);
         setFieldValue("imageFiles", [
           ...formikValues.imageFiles.filter((img) => img.id !== open),
-          { id: open, croppedImage },
+          { id: open, url: croppedImage },
         ]);
     }
     setOpen(null);
@@ -240,7 +258,7 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
           {/* thumbnal end */}
           <input hidden ref={imageRef} type="file" onChange={handlePreview} />
 
-          {imagesPrev
+          {croppedGP
             .sort((a, b) => Number(a.id) - Number(b.id))
             .map((image) => (
               <div key={image.id}>
