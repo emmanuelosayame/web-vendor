@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const Status = z.enum(["active", "disabled"]);
 
-const PStatus = z.enum(["active", "disabled", "review"]);
+const PStatus = z.enum(["active", "disabled", "review", "incomplete"]);
 
 export const ProductSortEnum = z.enum([
   "title-asc",

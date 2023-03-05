@@ -11,11 +11,11 @@ interface Props {
 
 const SelectStore = ({ refetch }: Props) => {
   const router = useRouter();
+
   const { data: accounts, isLoading } = api.vendor.accounts.useQuery({});
 
-  const qc = api.useContext();
-
   if (isLoading) return <LoadingBlur />;
+
   return (
     <div
       className=" p-3 rounded-lg border flex flex-col w-full h-full

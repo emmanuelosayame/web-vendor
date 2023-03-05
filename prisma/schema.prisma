@@ -53,6 +53,7 @@ enum PStatus {
     active
     disabled
     review
+    incomplete
 }
 
 type MoreDescr {

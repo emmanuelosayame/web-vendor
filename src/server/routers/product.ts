@@ -72,10 +72,11 @@ export const productRouter = router({
       z.object({
         limit: z.number().min(1).max(30).nullish(),
         sort: ProductSortEnum.optional(),
+        pagn: z.number().max(11),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { sort } = input;
+      const { sort, pagn } = input;
       const limit = input.limit ?? 10;
       const sid = ctx.sid;
       const orderBy = {
@@ -84,6 +85,7 @@ export const productRouter = router({
 
       const result = await ctx.prisma.product.findMany({
         where: { sid },
+        skip: (pagn - 1) * limit,
         take: limit,
         orderBy: sort && sort !== "search" ? orderBy : { title: "asc" },
       });

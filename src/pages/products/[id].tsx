@@ -81,10 +81,10 @@ const ProductPage: NextPageWithLayout = () => {
     try {
       await axios.put("/api/upload/product", form, { params: { id } });
       setUploading(false);
-      return { data: "success", error: undefined };
+      return { status: "success", error: undefined };
     } catch (err) {
       setUploading(false);
-      return { data: null, error: err as AxiosError };
+      return { status: "error", error: err as AxiosError };
     }
   };
 
@@ -114,7 +114,7 @@ const ProductPage: NextPageWithLayout = () => {
         });
       }
       if (thumbnailFile || imageFiles.length > 0) {
-        const { data, error } = await uploadImage(pid, {
+        const { status, error } = await uploadImage(pid, {
           file: thumbnailFile,
           files: sortedImageFiles,
         });
@@ -129,10 +129,13 @@ const ProductPage: NextPageWithLayout = () => {
         {
           onSuccess: async (data) => {
             if (thumbnailFile || imageFiles.length > 0) {
-              await uploadImage(data.id, {
+              const { status, error } = await uploadImage(data.id, {
                 file: thumbnailFile,
                 files: sortedImageFiles,
               });
+              if (status === "error") {
+                mutateAsync({ id: data.id, data: { status: "incomplete" } });
+              }
             }
           },
         }

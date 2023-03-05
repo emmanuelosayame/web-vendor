@@ -48,12 +48,14 @@ const Products = () => {
   const mq = useMediaQuery("(min-width: 800px)");
 
   const [pagn, setPagn] = useState(1);
+  const limit = 10;
 
-  const [sort, setSort] = useState<ProductSort>();
+  const [sort, setSort] = useState<ProductSort>("title-asc");
 
   const { data: products, isLoading } = api.product.many.useQuery({
-    limit: 10,
+    limit,
     sort,
+    pagn,
   });
 
   const { data: count } = api.product.count.useQuery(
@@ -65,38 +67,53 @@ const Products = () => {
     <>
       <MenuFlex>
         <Select
+          // disabled
           defaultSelected="all"
-          contentStyles=""
-          triggerStyles="bg-white rounded-md"
-          selectList={[{ item: mq ? "All Products" : "All", value: "all" }]}
+          contentStyles="bg-white"
+          triggerStyles="bg-white rounded-md h-fit"
+          selectList={[
+            { item: mq ? "All Products" : "All", value: "all" },
+            { item: "Disabled", value: "disabled" },
+            { item: "Incomplete", value: "incomplete" },
+            { item: "In Review", value: "review" },
+            { item: "Deals", value: "deal" },
+          ]}
           onValueChange={() => {}}
         />
 
-        <div className=" gap-2 hidden md:flex">
+        <div className="gap-2 flex">
           <Select
-            defaultSelected="title-asc"
+            value={sort}
             contentStyles="bg-white"
-            triggerStyles="bg-white rounded-md"
+            triggerStyles={`bg-white rounded-md ${
+              sort === "search" ? "hidden md:flex" : ""
+            }`}
             selectList={selectList}
             onValueChange={(value) => setSort(value as ProductSort)}
           />
           {sort === "search" ? (
-            <div className="relative w-40">
+            <div className="relative w-fit flex gap-2">
               <MagnifyingGlassIcon
                 className="absolute top-1/2 left-1 -translate-y-1/2"
                 width={25}
               />
               <input
-                className="outline-none py-1 pl-8 pr-2 rounded-md bg-white"
+                className="outline-none py-1 pl-8 pr-2 w-56 rounded-md bg-white"
                 placeholder="search product"
               />
+              <button
+                className="md:hidden bg-neutral-100 py-1 px-3 rounded-lg"
+                onClick={() => setSort("title-asc")}
+              >
+                Cancel
+              </button>
             </div>
           ) : null}
         </div>
 
         <Link
           href={"/products/new"}
-          className="flex items-center bg-white rounded-lg px-3 py-1 hover:bg-opacity-75"
+          className="flex items-center bg-white rounded-lg px-3 py-1 hover:bg-opacity-75 h-fit"
         >
           <p>{mq ? "New Product" : "New"}</p>
           <PlusIcon width={20} />
@@ -188,7 +205,9 @@ const Products = () => {
                     className="bg-blue-400 rounded-xl p-1 text-white hover:bg-blue-600 disabled:opacity-50"
                     aria-label="prev"
                     disabled={pagn < 2}
-                    onClick={() => {}}
+                    onClick={() => {
+                      setPagn((state) => state - 1);
+                    }}
                   >
                     <ArrowLeftIcon stroke="white" width={20} />
                   </button>
@@ -199,7 +218,7 @@ const Products = () => {
                   >
                     {pagn - 1}
                   </span>
-                  <span className="bg-blue-600 bg-opacity-75 rounded-xl w-6 text-center">
+                  <span className="bg-blue-600 bg-opacity-75 rounded-xl w-6 text-center text-white">
                     {pagn}
                   </span>
                   <span className=" w-6 rounded-xl text-center">
@@ -215,8 +234,10 @@ const Products = () => {
                   <button
                     className="bg-blue-400 rounded-xl p-1 text-white hover:bg-blue-500 disabled:opacity-50"
                     aria-label="next"
-                    disabled={false}
-                    onClick={() => {}}
+                    disabled={products && products?.length < limit}
+                    onClick={() => {
+                      setPagn((state) => state + 1);
+                    }}
                   >
                     <ArrowRightIcon width={20} />
                   </button>

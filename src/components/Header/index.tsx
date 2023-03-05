@@ -8,7 +8,7 @@ import type { Store } from "@prisma/client";
 import type { Session } from "next-auth";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Content, Root, Trigger } from "@radix-ui/react-dialog";
+import { Content, Root } from "@radix-ui/react-dialog";
 import useMediaQuery from "utils/useMediaQuery";
 import { useState } from "react";
 import SelectStore from "@components/SelectStore";
@@ -32,7 +32,7 @@ const Header = ({ auth, store, refetch }: Props) => {
     <>
       <Root open={sOpen} onOpenChange={setSOpen}>
         <Content
-          className="fixed outline-none z-30 top-1/4 inset-x-0 p-2 md:left-auto 
+          className="fixed outline-none z-50 top-1/4 inset-x-0 p-2 md:left-auto 
         md:right-40 w-full md:w-96 max-h-[350px]"
         >
           <SelectStore refetch={refetch} />
