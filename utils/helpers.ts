@@ -56,10 +56,13 @@ export const dateTimeLocale = (date: Date | string) => {
   });
 };
 
-export const getStoragePath = (url: string) => {
+export const getStoragePath = (url: string | null | undefined) => {
+  if (!url) return;
   const bucket = process.env.FIREBASE_BUCKET;
   if (!bucket) throw new Error("no bucket");
-  return decodeURIComponent(new URL(url).pathname.substring(1)).slice(
-    `v0/b/${bucket}/o/`.length
-  );
+  const urlObject = new URL(url);
+  if (urlObject.host === "firebasestorage.googleapis.com")
+    return decodeURIComponent(urlObject.pathname.substring(1)).slice(
+      `v0/b/${bucket}/o/`.length
+    );
 };

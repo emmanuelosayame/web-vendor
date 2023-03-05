@@ -3,7 +3,7 @@ import { LoadingBlur } from "@components/Loading";
 import Toast, { useToastTrigger } from "@components/radix/Toast";
 import { IconButton, MenuFlex } from "@components/TElements";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 import { updatedDiff } from "deep-object-diff";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
@@ -81,8 +81,10 @@ const ProductPage: NextPageWithLayout = () => {
     try {
       await axios.put("/api/upload/product", form, { params: { id } });
       setUploading(false);
+      return { data: "success", error: undefined };
     } catch (err) {
       setUploading(false);
+      return { data: null, error: err as AxiosError };
     }
   };
 
@@ -104,26 +106,30 @@ const ProductPage: NextPageWithLayout = () => {
         initialData,
         payload
       ) as Partial<ProductPayload>;
-      if (Object.keys(updatedDetails).length > 0) {
+      const hadFormChanges = Object.keys(updatedDetails).length > 0;
+      if (hadFormChanges) {
         await mutateAsync({
           id: pid,
           data: updatedDetails,
         });
       }
       if (thumbnailFile || imageFiles.length > 0) {
-        await uploadImage(pid, {
+        const { data, error } = await uploadImage(pid, {
           file: thumbnailFile,
           files: sortedImageFiles,
         });
+        !error && qc.product.one.refetch();
+        error && hadFormChanges && qc.product.one.refetch();
+        return;
       }
-      qc.product.one.refetch();
+      hadFormChanges && qc.product.one.refetch();
     } else {
       create(
         { data: payload },
         {
-          onSuccess: (data) => {
+          onSuccess: async (data) => {
             if (thumbnailFile || imageFiles.length > 0) {
-              uploadImage(data.id, {
+              await uploadImage(data.id, {
                 file: thumbnailFile,
                 files: sortedImageFiles,
               });
@@ -159,15 +165,7 @@ const ProductPage: NextPageWithLayout = () => {
         onSubmit={onSubmit}
         enableReinitialize
       >
-        {({
-          getFieldProps,
-          dirty,
-          touched,
-          errors,
-          values,
-          setFieldValue,
-          setValues,
-        }) => (
+        {({ getFieldProps, dirty, touched, errors, values, setFieldValue }) => (
           <Form className="w-full h-full">
             <MenuFlex>
               <IconButton

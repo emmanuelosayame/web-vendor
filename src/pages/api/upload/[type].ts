@@ -50,13 +50,12 @@ const uploadImage: (
     : storagePath.slice(0, storagePath.length - 1) + "-" + nanoid(16);
 
   const filePath =
-    oldUrl && oldUrl.length > 0
-      ? bucket.file(getStoragePath(oldUrl))
-      : `${
-          process.env.NODE_ENV === "development"
-            ? `${storagePath}-dev`
-            : storagePath
-        }/${fileName}.webp`;
+    getStoragePath(oldUrl) ||
+    `${
+      process.env.NODE_ENV === "development"
+        ? `${storagePath}-dev`
+        : storagePath
+    }/${fileName}.webp`;
 
   const [uploadRes] = await bucket.upload(filepath, {
     destination: filePath,
@@ -108,8 +107,6 @@ export default async function handler(
               return;
             }
 
-            console.log(files);
-
             const prevData = await prisma.product.findUnique({ where: { id } });
 
             let thumbnail: string | undefined = undefined;
@@ -144,7 +141,7 @@ export default async function handler(
                   images.push(
                     file.path
                       ? await uploadImage(file.path, {
-                          newFileName: "product",
+                          newFileName: `product-${file.id}`,
                           oldUrl,
                         })
                       : oldUrl || ""
@@ -165,7 +162,10 @@ export default async function handler(
                   images.push(
                     file.path
                       ? await uploadImage(imageFiles.filepath, {
-                          newFileName: "product",
+                          newFileName: `product-${imageFiles.originalFilename?.slice(
+                            0,
+                            1
+                          )}`,
                           oldUrl: prevUrl,
                         })
                       : prevUrl || ""

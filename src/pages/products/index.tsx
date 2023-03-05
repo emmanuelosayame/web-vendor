@@ -130,7 +130,6 @@ const Products = () => {
                   </tr>
                 )}
               </thead>
-              <TDivider className="w-full" />
               <tbody>
                 {products &&
                   products.map((product) => (
