@@ -23,8 +23,8 @@ export const LoadingBlur = ({
 }) => {
   return (
     <div
-      className={`flex justify-center items-center fixed inset-0 bg-white bg-opacity-25
-     backdrop-blur-[2px] z-30 ${position} ${
+      className={`flex justify-center items-center fixed inset-0 bg-white/30
+     backdrop-blur-[2px] z-50 ${position} ${
         position === "absolute" ? "inset-[2px]" : ""
       }`}
     >

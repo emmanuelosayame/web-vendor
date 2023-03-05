@@ -1,15 +1,13 @@
-import InputTemp, { TextareaTemp } from "@components/InputTemp";
 import Layout from "@components/Layout";
 import { LoadingBlur } from "@components/Loading";
-import AlertDialog from "@components/radix/Alert";
 import Toast, { useToastTrigger } from "@components/radix/Toast";
 import { IconButton, MenuFlex } from "@components/TElements";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import axios, { AxiosError } from "axios";
-import { diff } from "deep-object-diff";
+import axios from "axios";
+import { updatedDiff } from "deep-object-diff";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { type ProductPayload } from "src/server/schema";
 import { api } from "utils/api";
 import {
@@ -21,8 +19,6 @@ import { productVs } from "utils/validation";
 import { type NextPageWithLayout } from "../_app";
 import Gallery from "@components/product/Gallery";
 import { Form1, Form2 } from "@components/product/Forms";
-
-const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
 
 const ProductPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -58,46 +54,96 @@ const ProductPage: NextPageWithLayout = () => {
   const { mutate: create, isLoading: creating } =
     api.product.create.useMutation({
       onSuccess: (data) => {
-        // qc.product.one.refetch();
         trigger();
-        router.replace(`/products/${data.id}`);
+        router.replace(`/products`);
       },
     });
-  const { mutate, isLoading: mutating } = api.product.update.useMutation({
+  const { mutateAsync, isLoading: mutating } = api.product.update.useMutation({
     onSettled: () => {
-      qc.product.one.refetch();
       trigger();
     },
   });
 
-  const onSubmit = async (values: FormValues) => {
-    const { imageFiles, tags, promotion, images, ...rest } = values;
+  const uploadImage = async (
+    id: string | undefined,
+    { file, files }: { file: File | null; files: File[] }
+  ) => {
+    const form = new FormData();
+    if (file) {
+      form.append("single", file);
+    }
+    if (files.length > 0) {
+      for (const file of files) {
+        form.append("multiple", file);
+      }
+    }
+    setUploading(true);
+    try {
+      await axios.put("/api/upload/product", form, { params: { id } });
+      setUploading(false);
+    } catch (err) {
+      setUploading(false);
+    }
+  };
 
-    const payload: Omit<ProductPayload, "imageFiles"> = {
+  const onSubmit = async (values: FormValues) => {
+    const { thumbnailFile, imageFiles, tags, promotion, ...rest } = values;
+
+    const sortedImageFiles = imageFiles
+      .sort((a, b) => Number(a.id) - Number(b.id))
+      .map((f) => f.file);
+
+    const payload: ProductPayload = {
       ...rest,
       tags: tags.split(" ; "),
-      images: [...images],
       promotion: promotion.split(" ; "),
     };
 
     if (pid !== "new") {
-      const updatedDetails = diff(initialData, payload) as Partial<
-        Omit<ProductPayload, "imageFiles">
-      >;
-      mutate({
-        id: pid,
-        data: imageFiles ? { imageFiles, ...rest } : updatedDetails,
-      });
+      const updatedDetails = updatedDiff(
+        initialData,
+        payload
+      ) as Partial<ProductPayload>;
+      if (Object.keys(updatedDetails).length > 0) {
+        await mutateAsync({
+          id: pid,
+          data: updatedDetails,
+        });
+      }
+      if (thumbnailFile || imageFiles.length > 0) {
+        await uploadImage(pid, {
+          file: thumbnailFile,
+          files: sortedImageFiles,
+        });
+      }
+      qc.product.one.refetch();
     } else {
-      create({ data: imageFiles ? { imageFiles, ...payload } : payload });
+      create(
+        { data: payload },
+        {
+          onSuccess: (data) => {
+            if (thumbnailFile || imageFiles.length > 0) {
+              uploadImage(data.id, {
+                file: thumbnailFile,
+                files: sortedImageFiles,
+              });
+            }
+          },
+        }
+      );
     }
   };
 
-  if (error) return <p>{error.message}</p>;
+  useEffect(() => {
+    if (error && error.data?.code === "INTERNAL_SERVER_ERROR")
+      setTimeout(() => router.replace("/products"), 700);
+  }, [error, router]);
+
+  if (error) return <p className="text-center">{error.data?.code}</p>;
 
   return (
     <>
-      {(isFetching || mutating || creating) && <LoadingBlur />}
+      {(isFetching || mutating || creating || uploading) && <LoadingBlur />}
 
       <Toast
         open={open}
@@ -141,7 +187,17 @@ const ProductPage: NextPageWithLayout = () => {
                 </p>
               </div>
 
-              <IconButton type="submit" className="bg-white" disabled={!dirty}>
+              <IconButton
+                type="submit"
+                className="bg-white"
+                disabled={
+                  !dirty ||
+                  !(data?.thumbnail || values.thumbnailFile) ||
+                  !(data
+                    ? data?.images.length
+                    : 0 + values.imageFiles.length > 2)
+                }
+              >
                 <p>Save</p>
                 <CheckIcon width={20} />
               </IconButton>
@@ -160,16 +216,22 @@ const ProductPage: NextPageWithLayout = () => {
                   touched={touched}
                   errors={errors}
                   pid={pid}
-                  mutate={mutate}
+                  mutate={mutateAsync}
                 />
 
-                {!isFetching && (
+                {!isFetching ? (
                   <Gallery
                     formikValues={values}
                     setFieldValue={setFieldValue}
-                    data={data}
+                    thumbnail={data?.thumbnail}
+                    images={data?.images.map((url, index) => ({
+                      id: (index + 1).toString(),
+                      url,
+                    }))}
                     pid={pid}
                   />
+                ) : (
+                  <div className="rounded-lg p-2 col-span-5 row-span-3 h-full bg-white" />
                 )}
               </div>
             </div>

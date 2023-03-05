@@ -13,16 +13,16 @@ export const createImage = (url: string) =>
 const getCroppedImg: (
   imageSrc: string,
   pixelCrop: Area,
-  outputName?: string,
+  outputName: string,
   maxRes?: number,
   effect?: {
     rotation?: number;
     flip?: { horizontal: boolean; vertical: boolean };
   }
-) => Promise<string | null> = async (
+) => Promise<File | null> = async (
   imageSrc: string,
   pixelCrop: Area,
-  outputName = "product",
+  outputName,
   maxRes = 1280
 ) => {
   const image = await createImage(imageSrc);
@@ -75,30 +75,29 @@ const getCroppedImg: (
   // return canvas.toDataURL('image/jpeg');
 
   // As a blob
-  // return new Promise((resolve, reject) => {
-  //   canvas.toBlob((blob) => {
-  //     canvas.toBlob(
-  //       (compressedBlob) => {
-  //         if (blob && compressedBlob) {
-  //           const compressed = blob.size > compressedBlob.size;
-  //           resolve(
-  //             new File(
-  //               [image.width > 800 ? blob : compressed ? compressedBlob : blob],
-  //               `${outputName}${compressed ? "-c" : ""}-${nanoid(8)}`,
-  //               {
-  //                 type: "image/webp",
-  //                 lastModified: Date.now(),
-  //               }
-  //             )
-  //           );
-  //         }
-  //       },
-  //       "image/webp",
-  //       0.9
-  //     );
-  //   }, "image/webp");
-  // });
-  return canvas.toDataURL("image/webp", image.width > 800 ? undefined : 0.9);
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      canvas.toBlob(
+        (compressedBlob) => {
+          if (blob && compressedBlob) {
+            const compressed = blob.size > compressedBlob.size;
+            resolve(
+              new File(
+                [image.width > 800 ? blob : compressed ? compressedBlob : blob],
+                outputName + ".webp",
+                {
+                  type: "image/webp",
+                  lastModified: Date.now(),
+                }
+              )
+            );
+          }
+        },
+        "image/webp",
+        0.9
+      );
+    }, "image/webp");
+  });
 };
 
 export default getCroppedImg;

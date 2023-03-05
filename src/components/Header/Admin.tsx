@@ -31,8 +31,8 @@ const HeaderA = ({ auth }: Props) => {
             <NavLink text="Sales" to="/admin/sales" />
             <NavLink text="Notifications" to="/admin/notifications" />
             <NavLink text="Assets" to="/admin/assets" />
-            <NavLink text="Stores" to="/admin/stores" />
             <NavLink text="Vendors" to="/admin/vendors" />
+            <NavLink text="Stores" to="/admin/stores" />
             <NavLink text="Customers" to="/admin/customers" />
             <NavLink text="Settings" to="/admin/settings" />
           </div>
@@ -100,6 +100,12 @@ const HeaderA = ({ auth }: Props) => {
                 text="Notifications"
                 to="/admin/notifications"
               />
+
+              <NavLinkSm
+                onclick={() => setOpen(false)}
+                text="Vendors"
+                to="/admin/vendors"
+              />
               <NavLinkSm
                 onclick={() => setOpen(false)}
                 text="Assets"
@@ -109,11 +115,6 @@ const HeaderA = ({ auth }: Props) => {
                 onclick={() => setOpen(false)}
                 text="Stores"
                 to="/admin/stores"
-              />
-              <NavLinkSm
-                onclick={() => setOpen(false)}
-                text="Vendors"
-                to="/admin/vendors"
               />
               <NavLinkSm
                 onclick={() => setOpen(false)}

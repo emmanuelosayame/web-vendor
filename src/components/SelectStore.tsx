@@ -1,4 +1,4 @@
-import { Loading } from "@components/Loading";
+import { Loading, LoadingBlur } from "@components/Loading";
 import { TDivider } from "@components/TElements";
 import { setCookie } from "cookies-next";
 import Link from "next/link";
@@ -15,7 +15,7 @@ const SelectStore = ({ refetch }: Props) => {
 
   const qc = api.useContext();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <LoadingBlur />;
   return (
     <div
       className=" p-3 rounded-lg border flex flex-col w-full h-full

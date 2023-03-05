@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { nanoid } from "nanoid";
 import { storage } from "utils/f-admin";
 import { z } from "zod";
@@ -57,9 +58,14 @@ export const productRouter = router({
     .input(z.object({ id: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const { id } = input;
-      return await ctx.prisma.product.findUnique({
+      const sid = ctx.sid;
+      const data = await ctx.prisma.product.findUnique({
         where: { id },
       });
+      if (data?.sid !== sid) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+      return data;
     }),
   many: protectedProcedure
     .input(
@@ -86,42 +92,16 @@ export const productRouter = router({
   create: protectedProcedure
     .input(
       z.object({
-        data: ProductSchema.partial({ imageFiles: true, thumbnailFile: true }),
+        data: ProductSchema,
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { prisma, sid } = ctx;
       const { data } = input;
-      const { moreDescr, thumbnailFile, imageFiles, ...rest } = data;
-
-      const thumbnail = !!thumbnailFile
-        ? await uploadImage(thumbnailFile, "thumbnail")
-        : undefined;
-
-      let images: string[] = [];
-
-      if (imageFiles && imageFiles.length > 0) {
-        const filesWPH = [
-          { id: "1" },
-          { id: "2" },
-          { id: "3" },
-          { id: "4" },
-        ].map(
-          (ph) =>
-            imageFiles.find((file) => ph.id === file.id) || {
-              id: ph.id,
-              url: "",
-            }
-        );
-        for await (const file of filesWPH) {
-          images.push(file.url ? await uploadImage(file.url, "product") : "");
-        }
-      }
+      const { moreDescr, ...rest } = data;
 
       const payload = {
         ...rest,
-        thumbnail,
-        images: imageFiles && imageFiles.length > 0 ? images : undefined,
         sid,
       };
       return await prisma.product.create({ data: payload });
@@ -135,52 +115,10 @@ export const productRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, data } = input;
-      const { moreDescr, thumbnailFile, imageFiles, ...rest } = data;
-
-      const thumbnail = !!thumbnailFile
-        ? await uploadImage(thumbnailFile, "thumbnail")
-        : undefined;
-
-      let images: string[] = [];
-
-      if (imageFiles && imageFiles.length > 0) {
-        let uploadFiles: { id: string; url: string | null }[] = [];
-        const product = await ctx.prisma.product.findUnique({
-          where: { id },
-        });
-        if (!product) return;
-        const oldImages = product?.images.map((image, index) => ({
-          id: (index + 1).toString(),
-          url: image,
-        }));
-
-        const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
-        const filesWPH = imagesPH.map(
-          (ph) =>
-            imageFiles.find((file) => ph.id === file.id) || {
-              id: ph.id,
-              url: null,
-            }
-        );
-
-        for await (const file of filesWPH) {
-          uploadFiles.push({
-            id: file.id,
-            url: file.url ? await uploadImage(file.url, "product") : null,
-          });
-        }
-        const uploadedImages = uploadFiles.map((uf) =>
-          uf.url
-            ? uf.url
-            : oldImages.find((ifile) => ifile.id === uf.id)?.url || ""
-        );
-        images.push(...uploadedImages);
-      }
+      const { moreDescr, ...rest } = data;
 
       const update = {
         ...rest,
-        thumbnail,
-        images: imageFiles && imageFiles.length > 0 ? images : undefined,
       };
       return ctx.prisma.product.update({ where: { id }, data: update });
     }),

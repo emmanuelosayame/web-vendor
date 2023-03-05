@@ -41,21 +41,11 @@ const Sales: NextPageWithLayout = () => {
 
   const [filter, setFilter] = useState<Filter>();
 
-  const { data: sales } = api.order.many.useQuery({ limit: 10, filter });
+  const { data: sales, isFetching } = api.order.many.useQuery({
+    limit: 10,
+    filter,
+  });
   const { data: count } = api.order.count.useQuery({}, { placeholderData: 0 });
-
-  const [orderId, setOrderId] = useState("");
-
-  const { refetch, isFetching, data } = api.order.one.useQuery(
-    { orderId },
-    {
-      enabled: false,
-      onSuccess: (data) => {
-        if (!data) {
-        } else router.push(`/sales/${data.orderId}`);
-      },
-    }
-  );
 
   return (
     <>
@@ -82,7 +72,7 @@ const Sales: NextPageWithLayout = () => {
             selectList={[{ item: "Latest", value: "latest" }]}
             onValueChange={(value) => {}}
           />
-          <LoadOrder setOrderId={setOrderId} refetch={refetch} data={data} />
+          <LoadOrder />
         </div>
 
         <Link
@@ -226,15 +216,20 @@ const Sales: NextPageWithLayout = () => {
   );
 };
 
-const LoadOrder = ({
-  refetch,
-  setOrderId,
-  data,
-}: {
-  refetch: () => void;
-  setOrderId: Dispatch<SetStateAction<string>>;
-  data: Order | null | undefined;
-}) => {
+const LoadOrder = () => {
+  const router = useRouter();
+  const [orderId, setOrderId] = useState("");
+
+  const { refetch, isFetching, data } = api.order.one.useQuery(
+    { orderId },
+    {
+      enabled: false,
+      onSuccess: (data) => {
+        if (!data) {
+        } else router.push(`/sales/${data.orderId}`);
+      },
+    }
+  );
   return (
     <Root>
       <Trigger className="bg-white rounded-md py-1 px-3 hover:bg-opacity-70">
@@ -262,8 +257,8 @@ const LoadOrder = ({
               />
             </div>
             <button
-              className="py-1 px-4 h-fit rounded-lg bg-green-400 hover:bg-green-500
-                 text-white drop-shadow-md"
+              disabled={!(orderId.length > 20)}
+              className="btn-green w-24"
               onClick={() => refetch()}
             >
               Load

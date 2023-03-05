@@ -55,3 +55,11 @@ export const dateTimeLocale = (date: Date | string) => {
     minute: "2-digit",
   });
 };
+
+export const getStoragePath = (url: string) => {
+  const bucket = process.env.FIREBASE_BUCKET;
+  if (!bucket) throw new Error("no bucket");
+  return decodeURIComponent(new URL(url).pathname.substring(1)).slice(
+    `v0/b/${bucket}/o/`.length
+  );
+};

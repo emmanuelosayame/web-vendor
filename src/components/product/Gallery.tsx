@@ -18,7 +18,8 @@ import image from "public/placeholder.png";
 import getCroppedImg from "./helper";
 
 interface Props {
-  data?: Product | null;
+  thumbnail: string | undefined;
+  images?: { id: string; url: string }[];
   formikValues: FormValues;
   setFieldValue: (
     field: string,
@@ -28,38 +29,31 @@ interface Props {
   pid?: string;
 }
 
-const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
+const imagesPH = ["1", "2", "3", "4"];
+
+const Gallery = ({
+  thumbnail,
+  images,
+  formikValues,
+  setFieldValue,
+  pid,
+}: Props) => {
   const imageRef = useRef<HTMLInputElement>(null);
-  const imagesPH = [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }];
 
-  const images = data?.images.map((url, index) => ({
-    id: (index + 1).toString(),
-    url,
-  }));
-  const thumbnail = data?.thumbnail;
+  const [croppedTN, setCTNP] = useState(thumbnail);
 
-  const croppedTN = useMemo(
-    () => formikValues.thumbnailFile || thumbnail,
-    [formikValues.thumbnailFile, thumbnail]
-  );
-  const croppedGP = useMemo(
-    () =>
-      [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }].map((ph) => ({
-        id: ph.id,
-        url:
-          formikValues.imageFiles.find((fileUrl) => fileUrl.id === ph.id)
-            ?.url ||
-          images?.find((fileUrl) => fileUrl.id === ph.id)?.url ||
-          "",
-      })),
-    [formikValues.imageFiles, images]
+  const [croppedGP, setCGP] = useState(
+    imagesPH.map((ph) => ({
+      id: ph,
+      url: images?.find((fileUrl) => fileUrl.id === ph)?.url || "",
+    }))
   );
 
   const [open, setOpen] = useState<string | "thumbnail" | null>(null);
   const [thumbnailPrev, setTNP] = useState<string | undefined>();
   const [imagesPrev, setIP] = useState<{ id: string; url: string }[]>(
-    imagesPH.map((imagePH) => {
-      return { id: imagePH.id, url: "" };
+    imagesPH.map((id) => {
+      return { id, url: "" };
     })
   );
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -97,10 +91,14 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
       images?.find((imageFile) => id === imageFile.id)?.url || "";
     if (currentPrev && currentPrev.url.slice(0, 5) === "blob:")
       URL.revokeObjectURL(currentPrev.url);
-    setIP((state) => [
+    setCGP((state) => [
       ...state.filter((prev) => prev.id !== id),
       { id, url: serverUrl },
     ]);
+    setFieldValue(
+      "imageFiles",
+      formikValues.imageFiles.filter((f) => f.id !== id)
+    );
   };
 
   const onCropComplete = useCallback(
@@ -130,28 +128,40 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
     }
   };
 
+  const handleCGP = (id: string, croppedImage: File) => {
+    const currentPrev = croppedGP.find((f) => f.id === id)?.url;
+    if (currentPrev && currentPrev.slice(0, 5) === "blob:")
+      URL.revokeObjectURL(currentPrev);
+    setCGP((state) => [
+      ...state.filter((prev) => id !== prev.id),
+      { id, url: URL.createObjectURL(croppedImage) },
+    ]);
+    setFieldValue("imageFiles", [
+      ...formikValues.imageFiles.filter((file) => file.id !== id),
+      { id, file: croppedImage },
+    ]);
+  };
+
   const handleSetImage = async () => {
-    if (!preview?.url || !croppedAreaPixels) return;
+    if (!preview?.url || !croppedAreaPixels || !open) return;
     const croppedImage = await getCroppedImg(
       preview.url,
       croppedAreaPixels,
-      open === "thumbnail" ? open : "product"
+      open
     );
     if (!croppedImage) return;
     switch (open) {
       case "thumbnail":
-        // setCTN(croppedImage);
+        if (croppedTN && croppedTN.slice(0, 5) === "blob:")
+          URL.revokeObjectURL(croppedTN);
+        setCTNP(URL.createObjectURL(croppedImage));
         setFieldValue("thumbnailFile", croppedImage);
         break;
       case "1":
       case "2":
       case "3":
       case "4":
-        // handleCGP(open, croppedImage);
-        setFieldValue("imageFiles", [
-          ...formikValues.imageFiles.filter((img) => img.id !== open),
-          { id: open, url: croppedImage },
-        ]);
+        handleCGP(open, croppedImage);
     }
     setOpen(null);
   };
@@ -231,6 +241,11 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
               <button
                 type="button"
                 className="text-orange-500 rounded-full p-1.5 bg-orange-200 drop-shadow-md"
+                onClick={() => {
+                  // setTNP(undefined);
+                  setCTNP(undefined);
+                  setFieldValue("thumbnailFile", null);
+                }}
               >
                 <ArchiveBoxXMarkIcon width={20} />
               </button>
@@ -253,7 +268,13 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
             )}
           </div>
           {/* thumbnal end */}
-          <input hidden ref={imageRef} type="file" onChange={handlePreview} />
+          <input
+            hidden
+            ref={imageRef}
+            type="file"
+            accept="image/jpeg, image/png, image/webp"
+            onChange={handlePreview}
+          />
 
           {croppedGP
             .sort((a, b) => Number(a.id) - Number(b.id))
@@ -309,7 +330,7 @@ const Gallery = ({ data, formikValues, setFieldValue, pid }: Props) => {
         <TDivider className="mb-4" />
         <THStack className="flex-wrap justify-center gap-5 md:flex-nowrap md:gap-1">
           {imagesPH.slice(0, 2).map((image) => (
-            <div key={image.id} className="flex flex-col md:flex-row gap-2">
+            <div key={image} className="flex flex-col md:flex-row gap-2">
               <div>
                 <TFlex className="pb-2 items-center gap-2 justify-center">
                   <button

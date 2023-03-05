@@ -6,6 +6,8 @@ export interface FormValues
   tags: string;
   category: string;
   promotion: string;
+  thumbnailFile: File | null;
+  imageFiles: { id: string; file: File }[];
 }
 
 export const initialSD: Store = {
