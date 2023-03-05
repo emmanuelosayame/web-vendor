@@ -149,7 +149,7 @@ export const MenuFlex = ({ children }: { children: ReactNode }) => {
   return (
     <div
       className={`flex justify-between w-full px-2 md:px-3 pt-1 absolute inset-x-0 
-  top-16 md:top-20 z-40 ${bg}`}
+  top-16 md:top-20 z-30 ${bg}`}
     >
       {children}
     </div>

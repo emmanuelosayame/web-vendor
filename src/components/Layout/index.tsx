@@ -24,8 +24,8 @@ const Layout = ({
     refetch,
   } = api.store.one.useQuery({}, { enabled: !!auth?.user });
 
-  if (status === "loading" || isLoading) return <Loading />;
   if (status === "unauthenticated") return <Login />;
+  if (status === "loading" || isLoading) return <Loading />;
 
   if (!store)
     return (
