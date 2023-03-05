@@ -14,6 +14,8 @@ import { LineChart, PieChart } from "../components/Charts";
 import { TFlex } from "@components/TElements";
 import Layout from "@components/Layout";
 import type { NextPageWithLayout } from "./_app";
+import { csToStyle } from "utils/helpers";
+import { useStore } from "store";
 
 const mockdata = {
   labels: [
@@ -95,9 +97,10 @@ const salesData = {
 };
 
 const Home: NextPageWithLayout = () => {
+  const bg = csToStyle(useStore((state) => state.colorScheme)).bg;
   return (
     <>
-      <div className="absolute inset-x-0 top-16 md:top-20 z-30 bg-blue-600">
+      <div className={`absolute inset-x-0 top-16 md:top-20 z-30 ${bg}`}>
         <div className="gap-2 px-2 py-2 md:p-4 flex overflow-x-auto md:justify-center">
           <Card1 text="customers" value="5k">
             <UserGroupIcon width={22} color="rgba(255.0, 204.0, 0.0, 0.7)" />

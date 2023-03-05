@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { HTMLAttributes, ReactNode } from "react";
+import { useStore } from "store";
 import type {
   // AvatarProps,
   ButtonProps,
@@ -8,6 +9,7 @@ import type {
   IconButtonProps,
   StackProps,
 } from "types/TElements";
+import { csToStyle } from "utils/helpers";
 
 export const TButton = ({
   type = "button",
@@ -142,11 +144,14 @@ export const IconBack = ({
   );
 };
 
-export const MenuFlex = ({ children }: { children: ReactNode }) => (
-  <div
-    className="flex justify-between w-full px-2 md:px-3 pt-1 absolute inset-x-0 
-  top-16 md:top-20 z-20 bg-blue-600"
-  >
-    {children}
-  </div>
-);
+export const MenuFlex = ({ children }: { children: ReactNode }) => {
+  const bg = csToStyle(useStore((state) => state.colorScheme)).bg;
+  return (
+    <div
+      className={`flex justify-between w-full px-2 md:px-3 pt-1 absolute inset-x-0 
+  top-16 md:top-20 z-40 ${bg}`}
+    >
+      {children}
+    </div>
+  );
+};

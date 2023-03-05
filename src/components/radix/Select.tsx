@@ -38,24 +38,24 @@ const Select = <T,>({
           <ChevronDownIcon width={25} />
         </RadixSelect.Icon>
       </RadixSelect.Trigger>
-      {/* <RadixSelect.Portal> */}
-      <RadixSelect.Content
-        className={` ${contentStyles} shadow-lg z-50 overflow-hidden rounded-2xl`}
-      >
-        <RadixSelect.Viewport className="z-50">
-          {selectList.map((selectItem) => (
-            <RadixSelect.Item
-              key={selectItem.value}
-              value={selectItem.value}
-              className="py-1.5 px-5 hover:text-blue-500 cursor-pointer text-base outline-none"
-            >
-              <RadixSelect.ItemText>{selectItem.item}</RadixSelect.ItemText>
-              <RadixSelect.ItemIndicator />
-            </RadixSelect.Item>
-          ))}
-        </RadixSelect.Viewport>
-      </RadixSelect.Content>
-      {/* </RadixSelect.Portal> */}
+      <RadixSelect.Portal>
+        <RadixSelect.Content
+          className={` ${contentStyles} shadow-lg z-50 overflow-hidden rounded-2xl`}
+        >
+          <RadixSelect.Viewport className="z-50">
+            {selectList.map((selectItem) => (
+              <RadixSelect.Item
+                key={selectItem.value}
+                value={selectItem.value}
+                className="py-1.5 px-5 hover:text-blue-500 cursor-pointer text-base outline-none"
+              >
+                <RadixSelect.ItemText>{selectItem.item}</RadixSelect.ItemText>
+                <RadixSelect.ItemIndicator />
+              </RadixSelect.Item>
+            ))}
+          </RadixSelect.Viewport>
+        </RadixSelect.Content>
+      </RadixSelect.Portal>
     </RadixSelect.Root>
   );
 };

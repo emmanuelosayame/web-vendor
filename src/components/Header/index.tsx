@@ -11,10 +11,9 @@ import { useRouter } from "next/router";
 import { Content, Root, Trigger } from "@radix-ui/react-dialog";
 import useMediaQuery from "utils/useMediaQuery";
 import { useState } from "react";
-import { type User } from "next-auth";
-import { api } from "utils/api";
-import { setCookie } from "cookies-next";
 import SelectStore from "@components/SelectStore";
+import { useStore } from "store";
+import { csToStyle } from "utils/helpers";
 
 interface Props {
   auth: Session | null;
@@ -24,6 +23,7 @@ interface Props {
 
 const Header = ({ auth, store, refetch }: Props) => {
   const mq = useMediaQuery("(min-width: 800px)");
+  const bg = csToStyle(useStore((state) => state.colorScheme)).bg;
 
   const [open, setOpen] = useState(false);
   const [sOpen, setSOpen] = useState(false);
@@ -32,14 +32,14 @@ const Header = ({ auth, store, refetch }: Props) => {
     <>
       <Root open={sOpen} onOpenChange={setSOpen}>
         <Content
-          className="fixed outline-none z-40 top-1/4 inset-x-0 p-2 md:left-auto 
+          className="fixed outline-none z-30 top-1/4 inset-x-0 p-2 md:left-auto 
         md:right-40 w-full md:w-96 max-h-[350px]"
         >
           <SelectStore refetch={refetch} />
         </Content>
       </Root>
 
-      <div className="absolute inset-x-0 bg-blue-600 top-0 z-40">
+      <div className={`absolute inset-x-0 top-0 z-40 ${bg}`}>
         <div className="md:m-2 md:rounded-lg bg-white/40 md:p-2 ">
           <div className="flex h-12 bg-white md:rounded-lg justify-between items-center px-2 md:px-4">
             <div className="hidden md:flex gap-2 items-center">
@@ -81,8 +81,11 @@ const Header = ({ auth, store, refetch }: Props) => {
                 <ChevronDownIcon width={20} />
               </div>
 
-              <Link href={"/settings"}>
-                <Avatar className="w-9 h-9 rounded-full" />
+              <Link href={"/settings"} className="h-full flex items-center">
+                <Avatar
+                  className="w-9 h-9 rounded-full"
+                  src={auth?.user.image}
+                />
               </Link>
               <Link href={"/notifications"} className="opacity-40">
                 <BellAlertIcon width={25} />
@@ -155,18 +158,18 @@ const NavLinkSm = ({
   onclick: () => void;
 }) => {
   const router = useRouter();
+  const colorScheme = useStore((state) => state.colorScheme);
+  const { bg, text: textStyle } = csToStyle(colorScheme);
   const active = !!(nested
     ? router.asPath === to
     : (router.asPath === to || `/${router.route.split("/")[1]}` === to) &&
       router.asPath !== "/mypages/landing");
 
-  // const colorScheme = useStore((state) => state.colorScheme);
-
   return (
     <Link
       href={to}
-      className={`font-medium text-lg hover:text-blue-700 text-neutral-500 block ${
-        active ? "text-blue-500" : ""
+      className={`font-medium text-lg hover:opacity-90  block ${
+        active ? `${textStyle}` : "text-neutral-500"
       }`}
       onClick={onclick}
     >
@@ -185,18 +188,20 @@ const NavLink = ({
   nested?: boolean;
 }) => {
   const router = useRouter();
+  const colorScheme = useStore((state) => state.colorScheme);
+  const { bg, text: textStyle } = csToStyle(colorScheme);
   const active = !!(nested
     ? router.asPath === to
     : (router.asPath === to || `/${router.route.split("/")[1]}` === to) &&
       router.asPath !== "/mypages/landing");
 
-  // const colorScheme = useStore((state) => state.colorScheme);
-
   return (
     <Link
       href={to}
-      className={`font-semibold text-lg hover:text-blue-700 text-neutral-500 ${
-        active ? "text-blue-500" : ""
+      className={`font-medium text-lg hover:opacity-90  block ${
+        active
+          ? `${"text-neutral-700 text-xl font-semibold"} `
+          : "text-neutral-500"
       }`}
     >
       {text}

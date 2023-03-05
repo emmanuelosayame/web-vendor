@@ -2,6 +2,7 @@ import InputTemp, { TextareaTemp } from "@components/InputTemp";
 import Layout from "@components/Layout";
 import { Loading, LoadingBlur } from "@components/Loading";
 import Avatar from "@components/radix/Avatar";
+import Select from "@components/radix/Select";
 import {
   IconBack,
   IconButton,
@@ -19,7 +20,9 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
 import { useStore } from "store";
+import { type CSNames } from "types/shared";
 import { api } from "utils/api";
+import { csToStyle } from "utils/helpers";
 import { vendorVs } from "utils/validation";
 import { type NextPageWithLayout } from "../_app";
 
@@ -28,7 +31,16 @@ const Profile: NextPageWithLayout = () => {
   const qc = api.useContext();
   const saveRef = useRef<HTMLButtonElement | null>(null);
   const colorScheme = useStore((state) => state.colorScheme);
+  const { bg, text } = csToStyle(colorScheme);
   const changeCS = useStore((state) => state.setColorScheme);
+
+  const csList = [
+    { item: "Montery", value: "montery" },
+    { item: "Sierra", value: "sierra" },
+    { item: "Alice", value: "alice" },
+    { item: "Greenade", value: "greenade" },
+    { item: "PurpleIsle", value: "purpleIsle" },
+  ];
 
   const { data, isLoading } = api.vendor.one.useQuery({});
 
@@ -83,7 +95,10 @@ const Profile: NextPageWithLayout = () => {
                 <h3 className="text-lg text-center border-b border-b-neutral-200 w-full">
                   Profile
                 </h3>
-                <Avatar className="w-28 rounded-full mt-2" />
+                <Avatar
+                  className="w-28 rounded-full mt-2"
+                  src={data?.photoUrl}
+                />
                 <div className="flex items-center gap-3">
                   <InputTemp
                     heading="Firstname"
@@ -151,7 +166,20 @@ const Profile: NextPageWithLayout = () => {
             )}
           </Formik>
           {/* 2 */}
-          <div className="bg-white rounded-lg p-3 w-full md:w-1/3"></div>
+          <div className="bg-white rounded-lg p-3 w-full md:w-1/3">
+            <h3 className="text-lg text-center border-b border-b-neutral-200 w-full">
+              Preference
+            </h3>
+            <p className="my-2">Color Scheme</p>
+            <Select<CSNames>
+              contentStyles="bg-white"
+              triggerStyles={`border border-neutral-200
+               rounded-lg w-full ${bg} bg-opacity-70 text-white`}
+              defaultSelected={colorScheme}
+              onValueChange={(value) => changeCS(value)}
+              selectList={csList}
+            />
+          </div>
         </div>
       </div>
     </>

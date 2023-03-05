@@ -16,8 +16,7 @@ const Layout = ({
   nopx?: "sm" | "lg" | "all";
 }) => {
   const { data: auth, status } = useSession();
-  const colorScheme = useStore((state) => state.colorScheme);
-  const bg = csToStyle(colorScheme).bg;
+  const bg = csToStyle(useStore((state) => state.colorScheme)).bg;
 
   const {
     data: store,
@@ -25,12 +24,14 @@ const Layout = ({
     refetch,
   } = api.store.one.useQuery({}, { enabled: !!auth?.user });
 
-  if (status === "unauthenticated") return <Login />;
   if (status === "loading" || isLoading) return <Loading />;
+  if (status === "unauthenticated") return <Login />;
 
   if (!store)
     return (
-      <div className="fixed inset-0 flex p-2 justify-center items-center bg-blue-300">
+      <div
+        className={`fixed inset-0 flex p-2 justify-center items-center ${bg}`}
+      >
         <div className="w-full md:w-96 max-h-80">
           <SelectStore refetch={refetch} />
         </div>
@@ -38,10 +39,10 @@ const Layout = ({
     );
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full ">
       <Header auth={auth} store={store} refetch={refetch} />
       <div
-        className={`h-full bg-blue-600 pt-28 md:pt-32 ${
+        className={`h-full ${bg} pt-28 md:pt-32 z-20 ${
           nopx === "sm"
             ? "md:px-3"
             : nopx === "lg"
