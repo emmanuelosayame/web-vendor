@@ -1,5 +1,6 @@
 import { Loading, LoadingBlur } from "@components/Loading";
 import { TDivider } from "@components/TElements";
+import { QrCodeIcon } from "@heroicons/react/24/outline";
 import { setCookie } from "cookies-next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -7,10 +8,12 @@ import { api } from "utils/api";
 
 interface Props {
   refetch: () => void;
+  onSwitchedFn?: () => void;
 }
 
-const SelectStore = ({ refetch }: Props) => {
+const SelectStore = ({ onSwitchedFn = () => {} }: Props) => {
   const router = useRouter();
+  const qc = api.useContext();
 
   const { data: accounts, isLoading } = api.vendor.accounts.useQuery({});
 
@@ -29,30 +32,39 @@ const SelectStore = ({ refetch }: Props) => {
             className="w-full text-black/90 p-3 drop-shadow-sm ring-1 ring-black/10 bg-white rounded-lg
                      hover:bg-neutral-100 hover:text-blue-500 text-lg"
             key={account.id}
-            onClick={() => {
+            onClick={async () => {
               setCookie("sid", account.id, {
                 sameSite: true,
                 secure: true,
               });
-              router.reload();
+              await router.replace("/");
+              await qc.invalidate();
+              await qc.product.one.reset();
+              onSwitchedFn();
             }}
           >
             {account.name}
           </button>
         ))}
       </div>
-      <TDivider className="my-3" />
-      <button
-        disabled={
+
+      {
+        !(
           router.pathname === "/create-store" ||
-          (accounts && accounts?.length > 1)
-        }
-        onClick={() => router.push("/create-store")}
-        className="w-full text-center p-2 bg-blue-600 disabled:opacity-50
+          (accounts && accounts?.length > 1 && (
+            <>
+              <TDivider className="my-3" />
+              <button
+                onClick={() => router.push("/create-store")}
+                className="w-full text-center p-2 bg-blue-600 disabled:opacity-50
          hover:bg-blue-700 drop-shadow-md text-white rounded-lg"
-      >
-        Create
-      </button>
+              >
+                Create
+              </button>
+            </>
+          ))
+        )
+      }
     </div>
   );
 };

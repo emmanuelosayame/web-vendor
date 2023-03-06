@@ -5,48 +5,6 @@ import { z } from "zod";
 import { ProductSortEnum, ProductSchema } from "../schema";
 import { router, protectedProcedure } from "../trpc";
 
-const uploadImage = async (imageStr: string, fileName: string) => {
-  const createPersistentDownloadUrl = (
-    bucket: string,
-    pathToFile: string,
-    downloadToken: string
-  ) => {
-    return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(
-      pathToFile
-    )}?alt=media&token=${downloadToken}`;
-  };
-
-  const bucket = storage.bucket();
-  const storageFile = bucket.file(
-    `products/${fileName.slice(0, 1)}-${nanoid(12)}` || ""
-  );
-  const base64EncodedImageString = imageStr.replace(
-    /^data:image\/\w+;base64,/,
-    ""
-  );
-  const imageBuffer = Buffer.from(base64EncodedImageString, "base64");
-
-  await storageFile.save(imageBuffer, {
-    contentType: "image/webp",
-    metadata: {
-      cacheControl: `public,max-age=31536000,must-revalidate`,
-      contentDisposition: `attachment; filename*=utf-8\'\'${storageFile.name}`,
-      metadata: {
-        firebaseStorageDownloadTokens: nanoid(18),
-      },
-    },
-    public: true,
-  });
-
-  const [metadata] = await storageFile.getMetadata();
-
-  return createPersistentDownloadUrl(
-    metadata.bucket,
-    metadata.name,
-    metadata.metadata.firebaseStorageDownloadTokens
-  );
-};
-
 export const productRouter = router({
   count: protectedProcedure
     .input(z.object({}))
@@ -62,10 +20,10 @@ export const productRouter = router({
       const data = await ctx.prisma.product.findUnique({
         where: { id },
       });
-      if (data?.sid !== sid) {
-        throw new TRPCError({ code: "FORBIDDEN" });
+      if (data?.sid === sid) {
+        return data;
       }
-      return data;
+      throw new TRPCError({ code: "FORBIDDEN" });
     }),
   many: protectedProcedure
     .input(

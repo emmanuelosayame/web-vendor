@@ -6,23 +6,32 @@ import { router, protectedProcedure } from "../trpc";
 import { isAdmin } from "./utils";
 
 export const vendorRouter = router({
-  accounts: protectedProcedure.input(z.object({})).query(async ({ ctx }) => {
-    const uid = ctx.session.user.id;
-    const vendor = await ctx.prisma.vendor.findFirst({
-      where: { uid },
-    });
+  accounts: protectedProcedure
+    .input(z.object({ all: z.boolean().optional() }))
+    .query(async ({ ctx, input }) => {
+      const uid = ctx.session.user.id;
+      const vendor = await ctx.prisma.vendor.findFirst({
+        where: { uid },
+      });
 
-    if (!vendor) {
-      throw new TRPCError({ code: "NOT_FOUND" });
-    }
+      if (!vendor) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
 
-    const stores = await ctx.prisma.store.findMany({
-      where: { vendors: { some: { id: { equals: vendor?.id } } } },
-      select: { name: true, id: true },
-    });
+      const stores = await ctx.prisma.store.findMany({
+        where: input.all
+          ? {
+              vendors: { some: { id: { equals: vendor?.id } } },
+            }
+          : {
+              vendors: { some: { id: { equals: vendor?.id } } },
+              status: "active",
+            },
+        select: { name: true, id: true, status: true, vendors: true },
+      });
 
-    return stores;
-  }),
+      return stores;
+    }),
   one: protectedProcedure
     .input(z.object({ vid: z.string().optional() }))
     .query(async ({ ctx, input }) => {

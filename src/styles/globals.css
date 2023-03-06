@@ -12,6 +12,9 @@
   .btn-amber {
     @apply p-2 w-full bg-amber-400 text-white rounded-lg text-center disabled:opacity-75 hover:bg-amber-500;
   }
+  .divider-200 {
+    @apply border-b border-b-neutral-200;
+  }
 }
 
 .CollapsibleContent[data-state="open"] {

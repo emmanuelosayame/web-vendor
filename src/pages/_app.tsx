@@ -9,6 +9,7 @@ import type { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
 import Login from "@components/Login";
 import { LoadingBlur } from "@components/Loading";
+import Head from "next/head";
 
 export type NextPageWithLayout<P = Record<string, never>, IP = P> = NextPage<
   P,
@@ -39,6 +40,9 @@ const MyApp = ({
   const getLayout = Component.getLayout || ((page: ReactElement) => page);
   return (
     <>
+      <Head>
+        <title>vendor@delorand</title>
+      </Head>
       <style jsx global>
         {`
           html {

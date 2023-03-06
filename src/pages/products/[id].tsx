@@ -26,23 +26,13 @@ const ProductPage: NextPageWithLayout = () => {
 
   const [uploading, setUploading] = useState(false);
 
-  const { data, isFetching, isLoading, error } = api.product.one.useQuery(
-    { id: pid },
-    {
-      enabled: !!pid && pid !== "new",
-      // placeholderData: productPLD,
-      // onSuccess: (data) =>
-      //   setIP(
-      //     imagesPH.map((imagePH) => {
-      //       const serverUrl =
-      //         data?.images?.find(
-      //           (url, index) => imagePH.id === index.toString()
-      //         ) || "";
-      //       return { id: imagePH.id, url: "" };
-      //     })
-      //   ),
-    }
-  );
+  const { data, isFetching, isLoading, error, status } =
+    api.product.one.useQuery(
+      { id: pid },
+      {
+        enabled: !!pid && pid !== "new",
+      }
+    );
 
   const formIV = getFormIV(data);
   const initialData = getProductInitialPayload(data);
@@ -144,7 +134,11 @@ const ProductPage: NextPageWithLayout = () => {
   };
 
   useEffect(() => {
-    if (error && error.data?.code === "INTERNAL_SERVER_ERROR")
+    if (
+      error &&
+      (error.data?.code === "INTERNAL_SERVER_ERROR" ||
+        error.data?.code === "FORBIDDEN")
+    )
       setTimeout(() => router.replace("/products"), 700);
   }, [error, router]);
 
@@ -152,7 +146,9 @@ const ProductPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {(isFetching || mutating || creating || uploading) && <LoadingBlur />}
+      {(isFetching || isLoading || mutating || creating || uploading) && (
+        <LoadingBlur />
+      )}
 
       <Toast
         open={open}

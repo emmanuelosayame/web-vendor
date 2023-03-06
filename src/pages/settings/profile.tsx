@@ -3,26 +3,16 @@ import Layout from "@components/Layout";
 import { Loading, LoadingBlur } from "@components/Loading";
 import Avatar from "@components/radix/Avatar";
 import Select from "@components/radix/Select";
-import {
-  IconBack,
-  IconButton,
-  MenuFlex,
-  TDivider,
-} from "@components/TElements";
-import {
-  CheckIcon,
-  PencilSquareIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { IconBack, IconButton, MenuFlex } from "@components/TElements";
+import { PencilSquareIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { diff } from "deep-object-diff";
 import { Form, Formik } from "formik";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
 import { useStore } from "store";
 import { type CSNames } from "types/shared";
 import { api } from "utils/api";
-import { csToStyle } from "utils/helpers";
+import { csToStyle, limitText } from "utils/helpers";
 import { vendorVs } from "utils/validation";
 import { type NextPageWithLayout } from "../_app";
 
@@ -43,6 +33,8 @@ const Profile: NextPageWithLayout = () => {
   ];
 
   const { data, isLoading } = api.vendor.one.useQuery({});
+  const { data: stores, isLoading: loadingStores } =
+    api.vendor.accounts.useQuery({ all: true });
 
   const { mutate, isLoading: mutating } = api.vendor.update.useMutation({
     onSuccess: () => {
@@ -84,7 +76,6 @@ const Profile: NextPageWithLayout = () => {
 
       <div className="w-full h-full overflow-y-auto pb-2">
         <div className="bg-white/40 backdrop-blur-md rounded-lg p-2 flex flex-col md:flex-row gap-2 md:h-full">
-          <div className="bg-white rounded-lg p-3 w-full md:w-1/3"></div>
           <Formik
             initialValues={profileIV}
             validationSchema={vendorVs}
@@ -179,6 +170,49 @@ const Profile: NextPageWithLayout = () => {
               onValueChange={(value) => changeCS(value)}
               selectList={csList}
             />
+          </div>
+          {/* 3 */}
+          <div className="bg-white rounded-lg p-3 w-full md:w-1/3">
+            <h3 className="text-lg text-center border-b border-b-neutral-200 w-full">
+              {stores && stores.length > 1 ? "Stores" : "Store"}
+            </h3>
+            <div className=" mt-5 p-2 rounded-lg space-y-2">
+              {stores?.map((store) => (
+                <div
+                  key={store.id}
+                  className="border border-neutral-200 p-2 rounded-lg"
+                >
+                  <div className="flex justify-between items-center">
+                    <p className="text-2xl text-neutral-600 font-semibold">
+                      {limitText(store.name, 20)}
+                    </p>
+                    <p
+                      className={`${
+                        store.status === "active"
+                          ? "text-green-500"
+                          : store.status === "review"
+                          ? "text-amber-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {store.status}
+                    </p>
+                  </div>
+                  <div className="border border-neutral-200 p-2 rounded-lg">
+                    <h3 className="text-lg divider-200 text-center">Team</h3>
+                    {store?.vendors.map((vendor) => (
+                      <div
+                        key={vendor.id}
+                        className="flex justify-between items-center"
+                      >
+                        <p>{vendor.email}</p>
+                        <p>{vendor.role}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -118,6 +118,7 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
         create({
           data: {
             ...values,
+            status: "review",
             vendors: [
               {
                 email: currentVendor.email,

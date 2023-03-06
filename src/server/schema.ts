@@ -2,6 +2,8 @@ import { z } from "zod";
 
 const Status = z.enum(["active", "disabled"]);
 
+const SStatus = z.enum(["active", "disabled", "review"]);
+
 const PStatus = z.enum(["active", "disabled", "review", "incomplete"]);
 
 export const ProductSortEnum = z.enum([
@@ -80,7 +82,7 @@ export const StoreSchema = z.object({
   about: z.string(),
   email: z.string(),
   photoUrl: z.string(),
-  status: Status,
+  status: SStatus,
   vendors: StoreVendors,
   account: StoreAccount,
   support: StoreSupport,
