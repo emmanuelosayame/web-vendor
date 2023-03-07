@@ -13,7 +13,7 @@ import { Card1 } from "../components/Card";
 import { LineChart, PieChart } from "../components/Charts";
 import { TFlex } from "@components/TElements";
 import Layout from "@components/Layout";
-import type { NextPageWithLayout } from "./_app";
+import { type NextPageWithLayout } from "@t/shared";
 import { csToStyle } from "utils/helpers";
 import { useStore } from "store";
 

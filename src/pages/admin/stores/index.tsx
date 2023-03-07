@@ -7,7 +7,7 @@ import Link from "next/link";
 import { api } from "utils/api";
 import { limitText } from "utils/helpers";
 import useMediaQuery from "utils/useMediaQuery";
-import { type NextPageWithLayout } from "../../_app";
+import { type NextPageWithLayout } from "@t/shared";
 
 const Stores: NextPageWithLayout = () => {
   const { data: stores } = api.store.many.useQuery({ limit: 10 });

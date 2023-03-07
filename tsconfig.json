@@ -8,6 +8,7 @@
       "@lib/*":["./lib/*"],
        "@radix/*":["src/components/radix/*"],
        "@utils/*":["./src/utils/*"],
+       "@t/*":["./types/*"],
     },
     "target": "es2017",
     "lib": ["dom", "dom.iterable", "esnext"],

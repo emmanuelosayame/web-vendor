@@ -18,7 +18,7 @@ import { useStore } from "store";
 import { api } from "utils/api";
 import { csToStyle } from "utils/helpers";
 import { categoryVS } from "utils/validation";
-import { type NextPageWithLayout } from "../../../../types/shared";
+import { type NextPageWithLayout } from "@t/shared";
 
 const CategoriesPage: NextPageWithLayout = () => {
   const router = useRouter();

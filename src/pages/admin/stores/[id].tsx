@@ -7,7 +7,7 @@ import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "utils/api";
-import { type NextPageWithLayout } from "../../_app";
+import { type NextPageWithLayout } from "@t/shared";
 import AlertDialog from "@components/radix/Alert";
 import { emailV, storeVs } from "utils/validation";
 import { identity } from "lodash";

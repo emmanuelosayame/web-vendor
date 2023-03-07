@@ -14,7 +14,7 @@ import { type CSNames } from "types/shared";
 import { api } from "utils/api";
 import { csToStyle, limitText } from "utils/helpers";
 import { vendorVs } from "utils/validation";
-import { type NextPageWithLayout } from "../../../../types/shared";
+import { type NextPageWithLayout } from "@t/shared";
 
 const Profile: NextPageWithLayout = () => {
   const router = useRouter();

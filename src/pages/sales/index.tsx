@@ -27,7 +27,7 @@ import { api } from "utils/api";
 import { limitText } from "utils/helpers";
 import useMediaQuery from "utils/useMediaQuery";
 import debounce from "lodash/debounce";
-import { type NextPageWithLayout } from "../../../../types/shared";
+import { type NextPageWithLayout } from "@t/shared";
 import { useRouter } from "next/router";
 import { type Filter } from "src/server/routers/order";
 import { LoadingBlur } from "@components/Loading";
