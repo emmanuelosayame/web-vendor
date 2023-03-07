@@ -4,7 +4,7 @@ import { MenuFlex } from "@components/TElements";
 import { EnvelopeIcon, EnvelopeOpenIcon } from "@heroicons/react/24/solid";
 import { dateLocale, timeLocale } from "utils/helpers";
 import { data } from "utils/mock";
-import { type NextPageWithLayout } from "../_app";
+import { type NextPageWithLayout } from "../../../../types/shared";
 
 const orders = data.filter((not) => not.type === "order");
 

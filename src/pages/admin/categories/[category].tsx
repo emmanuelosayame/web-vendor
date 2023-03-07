@@ -2,7 +2,7 @@ import InputTemp from "@components/InputTemp";
 import LayoutA from "@components/Layout/Admin";
 import { Loading, LoadingBlur } from "@components/Loading";
 import AlertDialog from "@components/radix/Alert";
-import { IconButton, MenuFlex } from "@components/TElements";
+import { MenuFlex } from "@components/TElements";
 import {
   ChevronLeftIcon,
   PlusIcon,
@@ -11,19 +11,31 @@ import {
 import type { Category } from "@prisma/client";
 import { Content, Root, Trigger } from "@radix-ui/react-dialog";
 import { Form, Formik } from "formik";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useStore } from "store";
 import { api } from "utils/api";
 import { csToStyle } from "utils/helpers";
 import { categoryVS } from "utils/validation";
-import { type NextPageWithLayout } from "../_app";
+import { type NextPageWithLayout } from "../../../../types/shared";
 
-const Categories: NextPageWithLayout = () => {
-  const { data: topLevel, isLoading } = api.categories.many.useQuery(1);
-  const { data: subLevel, isLoading: loadingSub } =
-    api.categories.many.useQuery(2);
+const CategoriesPage: NextPageWithLayout = () => {
+  const router = useRouter();
+  const id = router.query.category?.toString();
+
+  const { data: parent, isFetching: fetchingParent } =
+    api.categories.one.useQuery({ id }, { enabled: !!id });
+  const { data: topLevel, isFetching } = api.categories.many.useQuery(
+    { parent: id },
+    {
+      enabled: !!parent,
+    }
+  );
 
   const [selected, setSelected] = useState<string | null>();
+  const { data: subLevel, isFetching: loadingSub } =
+    api.categories.many.useQuery({ tid: 3 }, { enabled: !!selected });
   const currentSub = subLevel?.filter((cat) => selected === cat.parent);
 
   const [add, setAdd] = useState(false);
@@ -44,45 +56,62 @@ const Categories: NextPageWithLayout = () => {
       onSuccess: () => qc.categories.many.refetch(),
     });
 
-  if (isLoading || loadingSub || creating || deleting) return <Loading />;
+  if (isFetching || loadingSub || creating || deleting || fetchingParent)
+    return <Loading />;
+
+  if (!parent)
+    return (
+      <div className="bg-white rounded-lg mx-auto w-fit p-3 gap-3 flex flex-col justify-center items-center">
+        <p>Something went wrong</p>
+        <Link href={"/"} className="border-200 p-1 rounded-lg">
+          Go back
+        </Link>
+      </div>
+    );
 
   return (
     <>
       <MenuFlex>
-        <p></p>
+        <h3 className="py-1 px-4 bg-white rounded-lg">{parent.name}</h3>
         <Root>
           <Trigger className="flex items-center gap-2 bg-white rounded-lg py-1 px-2">
             <span>Add Top Category</span>
             <PlusIcon width={25} />
           </Trigger>
-          <Content className="fixed center-x center-y bg-white rounded-lg p-3 drop-shadow-md border-200">
+          <Content
+            className="fixed inset-x-3 md:center-x center-y 
+          bg-white rounded-lg p-3 drop-shadow-md border-200 md:w-fit"
+          >
             <Formik
               initialValues={{ name: "", slug: "" }}
               onSubmit={(values) => {
+                if (!parent.id) return;
                 create({
                   data: {
                     name: values.name,
                     slug: values.slug,
-                    parent: null,
-                    tid: 1,
+                    parent: parent.id,
+                    tid: 2,
                   },
                 });
               }}
               validationSchema={categoryVS}
             >
               {({ getFieldProps, dirty, errors, touched }) => (
-                <Form className="w-96 space-y-3">
+                <Form className="space-y-3 w-full md:w-96">
                   <InputTemp
                     fieldProps={getFieldProps("name")}
                     heading="Name"
                     touched={touched.name}
                     error={errors.name}
+                    placeholder="Enter category name"
                   />
                   <InputTemp
                     fieldProps={getFieldProps("slug")}
                     heading="Id"
                     touched={touched.slug}
                     error={errors.slug}
+                    placeholder="Category unique name e.g name lowercase..."
                   />
                   <button disabled={!dirty} type="submit" className="btn-green">
                     Add
@@ -120,7 +149,7 @@ const Categories: NextPageWithLayout = () => {
           <div
             className={`${!selected ? "hidden md:block" : ""} w-full md:w-1/2`}
           >
-            {selected && topLevel && topLevel?.length > 0 ? (
+            {!!selected && !!currentSub && topLevel && topLevel?.length > 0 ? (
               <>
                 <div className="flex w-full justify-between relative mb-2">
                   <button
@@ -164,7 +193,7 @@ const Categories: NextPageWithLayout = () => {
                         id: "new",
                         name: "",
                         parent: "",
-                        tid: 2,
+                        tid: 3,
                         slug: "",
                       }}
                       setAdd={setAdd}
@@ -231,13 +260,20 @@ const SCat = ({
           category.id === "new" ? "bg-amber-100" : ""
         }`}
       >
-        <div className="relative w-full h-8 rounded-lg border-200 overflow-hidden">
+        <div className="relative w-full space-y-2 overflow-hidden">
           <input
             disabled={!edit}
             placeholder="Enter category name"
-            className="w-full p-1 bg-white h-full"
+            className="w-full bg-white h-8 rounded-lg border-200 px-2"
             value={name}
             onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            disabled={!edit}
+            placeholder="Enter unique name (Lowercase)"
+            className="w-full bg-white h-8 rounded-lg border-200 px-2"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
           />
         </div>
         <div className="flex gap-2 h-8">
@@ -251,7 +287,7 @@ const SCat = ({
               onClickConfirm={() =>
                 category &&
                 remove(
-                  { id: category?.id, tid: 2 },
+                  { id: category?.id, tid: 3 },
                   { onSuccess: () => setEdit(false) }
                 )
               }
@@ -280,7 +316,7 @@ const SCat = ({
               onClick={() =>
                 parent &&
                 create(
-                  { data: { name, parent, slug, tid: 2 } },
+                  { data: { name, parent, slug, tid: 3 } },
                   { onSuccess: () => setEdit(false) }
                 )
               }
@@ -313,9 +349,12 @@ const SCat = ({
 
 const TCat = ({ category }: { category?: Category }) => {
   const [name, setName] = useState<string>(category?.name || "");
+  const [slug, setSlug] = useState<string>(category?.slug || "");
+
   const [edit, setEdit] = useState(false);
   useEffect(() => {
     category?.name && setName(category?.name);
+    category?.slug && setSlug(category?.slug);
   }, [category]);
 
   const qc = api.useContext();
@@ -329,12 +368,18 @@ const TCat = ({ category }: { category?: Category }) => {
       {mutating && <LoadingBlur />}
 
       <div className="p-3 rounded-lg border border-neutral-300 space-y-3 drop-shadow-sm">
-        <div className="relative w-full h-10 rounded-lg border-200 overflow-hidden">
+        <div className="relative w-full overflow-hidden flex gap-2">
           <input
             disabled={!edit}
-            className="w-full p-1 bg-white h-full text-lg text-center"
+            className="w-full px-2 bg-white text-lg text-center h-10 rounded-lg border-200"
             value={name}
             onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            disabled={!edit}
+            className="w-full px-2 bg-white text-lg text-center h-10 rounded-lg border-200"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
           />
         </div>
         <div className="flex gap-2 h-fit">
@@ -356,7 +401,7 @@ const TCat = ({ category }: { category?: Category }) => {
 
           {edit ? (
             <AlertDialog
-              disabled={category?.name === name}
+              disabled={category?.name === name || category?.slug === slug}
               trigger="Save"
               action="Rename"
               actionStyles="bg-amber-400 hover:bg-amber-500"
@@ -376,7 +421,7 @@ const TCat = ({ category }: { category?: Category }) => {
     </>
   );
 };
-Categories.getLayout = function getLayout(page) {
+CategoriesPage.getLayout = function getLayout(page) {
   return <LayoutA>{page}</LayoutA>;
 };
-export default Categories;
+export default CategoriesPage;

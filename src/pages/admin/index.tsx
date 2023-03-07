@@ -1,5 +1,5 @@
 import LayoutA from "@components/Layout/Admin";
-import { type NextPageWithLayout } from "../_app";
+import { type NextPageWithLayout } from "../../../../types/shared";
 
 const Dashboard: NextPageWithLayout = () => {
   return <div className="">dash</div>;

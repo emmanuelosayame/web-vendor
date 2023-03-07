@@ -64,7 +64,7 @@ export const Form2 = ({
   setFieldError,
 }: PropsPlus) => {
   const router = useRouter();
-  const { data: categories } = api.categories.many.useQuery(2);
+  const { data: categories } = api.categories.many.useQuery({ tid: 3 });
 
   const catList =
     categories?.map((cat) => ({

@@ -195,11 +195,12 @@ const Gallery = ({
                 }}
               />
             ) : (
-              <Image
-                alt="placeholder"
-                src={image}
-                className="m-auto rounded-md opacity-70"
-              />
+              <div
+                className="m-auto bg-black/50 w-full h-full rounded-md opacity-70
+               flex justify-center items-center text-white text-xl"
+              >
+                <p>upload image</p>
+              </div>
             )}
           </div>
           <div className="flex gap-2 items-center w-full">

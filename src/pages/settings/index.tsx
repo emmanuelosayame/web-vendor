@@ -17,7 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { signOut } from "next-auth/react";
 import { api } from "utils/api";
-import { type NextPageWithLayout } from "../_app";
+import { type NextPageWithLayout } from "../../../../types/shared";
 
 const Settings: NextPageWithLayout = () => {
   const { data: store } = api.store.one.useQuery({});

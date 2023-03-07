@@ -69,6 +69,10 @@ export const productVs = Yup.object().shape({
 });
 
 export const categoryVS = Yup.object().shape({
-  name: Yup.string().min(4).max(30).required("Enter a name"),
-  slug: Yup.string().min(4).max(30).required("Enter an Id e.g name lowerc.."),
+  name: Yup.string().min(3).max(30).required("Enter a name"),
+  slug: Yup.string()
+    .min(3, "too short")
+    .max(30, "too long")
+    .lowercase("must be in lowercase")
+    .required("Enter an Id e.g name lowerc.."),
 });

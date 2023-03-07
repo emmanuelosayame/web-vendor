@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 import { useRef } from "react";
 import { useStore } from "store";
 import { api } from "utils/api";
-import { type NextPageWithLayout } from "../_app";
+import { type NextPageWithLayout } from "../../../../types/shared";
 
 const Profile: NextPageWithLayout = () => {
   const router = useRouter();

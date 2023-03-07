@@ -22,7 +22,10 @@ export const csToStyle = (colorScheme: CSNames, hover: boolean = false) => {
         text: "text-amber-500",
       };
     case "greenade":
-      return { bg: "bg-green-500", text: "text-green-700" };
+      return {
+        bg: `bg-green-400 ${hover ? "hover:bg-green-600" : ""}`,
+        text: "text-green-500",
+      };
     case "purpleIsle":
       return { bg: "bg-amber-500", text: "text-white" };
     case "sierra":

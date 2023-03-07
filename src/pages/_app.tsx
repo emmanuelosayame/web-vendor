@@ -1,26 +1,12 @@
-import type { AppProps } from "next/app";
-import { type Session } from "next-auth";
 import { SessionProvider, useSession } from "next-auth/react";
 import { api } from "../../utils/api";
 import font from "next/font/local";
-
 import "../styles/globals.css";
 import type { ReactElement, ReactNode } from "react";
-import type { NextPage } from "next";
 import Login from "@components/Login";
 import { LoadingBlur } from "@components/Loading";
 import Head from "next/head";
-
-export type NextPageWithLayout<P = Record<string, never>, IP = P> = NextPage<
-  P,
-  IP
-> & {
-  getLayout?: (page: ReactElement) => ReactNode;
-};
-
-type AppPropsWithLayout = AppProps<{ session: Session }> & {
-  Component: NextPageWithLayout;
-};
+import type { AppPropsWithLayout } from "types/shared";
 
 const spaceGrotesk = font({
   src: [

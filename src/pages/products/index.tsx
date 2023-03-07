@@ -63,6 +63,11 @@ const Products = () => {
     { placeholderData: 0 }
   );
 
+  const { data: categories } = api.categories.many.useQuery({ tid: 3 });
+
+  const getCat = (id: string) =>
+    categories?.find((cat) => id === cat.id)?.name || id;
+
   return (
     <>
       <MenuFlex>
@@ -154,7 +159,7 @@ const Products = () => {
                       {mq ? (
                         <>
                           <td>{limitText(product.title, 20)}</td>
-                          <td>{product.category}</td>
+                          <td>{getCat(product.category)}</td>
                           <td hidden={!mq}>{product.id.slice(19, 25)}</td>
                           <td>{product.price}</td>
                           <td>{product.stock}</td>

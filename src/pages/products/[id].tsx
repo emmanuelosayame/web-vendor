@@ -16,7 +16,7 @@ import {
   type FormValues,
 } from "utils/placeholders";
 import { productVs } from "utils/validation";
-import { type NextPageWithLayout } from "../_app";
+import { type NextPageWithLayout } from "../../../types/shared";
 import Gallery from "@components/product/Gallery";
 import { Form1, Form2 } from "@components/product/Forms";
 
@@ -26,13 +26,12 @@ const ProductPage: NextPageWithLayout = () => {
 
   const [uploading, setUploading] = useState(false);
 
-  const { data, isFetching, isLoading, error, status } =
-    api.product.one.useQuery(
-      { id: pid },
-      {
-        enabled: !!pid && pid !== "new",
-      }
-    );
+  const { data, isFetching, error, status } = api.product.one.useQuery(
+    { id: pid },
+    {
+      enabled: !!pid && pid !== "new",
+    }
+  );
 
   const formIV = getFormIV(data);
   const initialData = getProductInitialPayload(data);
@@ -146,9 +145,7 @@ const ProductPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {(isFetching || isLoading || mutating || creating || uploading) && (
-        <LoadingBlur />
-      )}
+      {(isFetching || mutating || creating || uploading) && <LoadingBlur />}
 
       <Toast
         open={open}
@@ -197,10 +194,10 @@ const ProductPage: NextPageWithLayout = () => {
                 className="bg-white"
                 disabled={
                   !dirty ||
-                  !(data?.thumbnail || values.thumbnailFile) ||
-                  !(data
-                    ? data?.images.length
-                    : 0 + values.imageFiles.length > 2)
+                  (!data?.thumbnail && !values.thumbnailFile) ||
+                  !!(!!data
+                    ? data.images.length + values.imageFiles.length < 3
+                    : values.imageFiles.length < 3)
                 }
               >
                 <p>Save</p>
