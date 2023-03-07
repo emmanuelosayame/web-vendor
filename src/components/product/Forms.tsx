@@ -1,9 +1,11 @@
 import InputTemp, { TextareaTemp } from "@components/InputTemp";
 import AlertDialog from "@components/radix/Alert";
+import Select from "@components/radix/Select";
 import { TDivider, THStack, TStack } from "@components/TElements";
 import type { FieldInputProps, FormikErrors, FormikTouched } from "formik";
 import { useRouter } from "next/router";
 import { type ProductPayload } from "src/server/schema";
+import { api } from "utils/api";
 import { type FormValues } from "utils/placeholders";
 
 interface Props {
@@ -15,6 +17,13 @@ interface Props {
 interface PropsPlus extends Props {
   pid: string | undefined;
   mutate: (values: { id?: string; data: Partial<ProductPayload> }) => void;
+  values: FormValues;
+  setFieldValue: (
+    field: string,
+    value: any,
+    shouldValidate?: boolean | undefined
+  ) => void;
+  setFieldError: (field: string, message: string | undefined) => void;
 }
 
 export const Form1 = ({ getFieldProps, touched, errors }: Props) => {
@@ -50,8 +59,21 @@ export const Form2 = ({
   errors,
   pid,
   mutate,
+  values,
+  setFieldValue,
+  setFieldError,
 }: PropsPlus) => {
   const router = useRouter();
+  const { data: categories } = api.categories.many.useQuery(2);
+
+  const catList =
+    categories?.map((cat) => ({
+      item: cat.name,
+      value: cat.id,
+    })) || [];
+
+  console.log(values);
+
   return (
     <TStack className="rounded-lg p-2 col-span-2 row-span-5 bg-white">
       <h3>Product Info</h3>
@@ -66,15 +88,20 @@ export const Form2 = ({
         error={errors.brand}
       />
 
-      <InputTemp
-        type="text"
-        fieldProps={getFieldProps("category")}
-        style={{}}
-        heading="Category"
-        placeholder="Product Category"
-        touched={touched.category}
-        error={errors.category}
+      <Select
+        required
+        placeholder="Select category"
+        onValueChange={(e) => {
+          e && setFieldValue("category", e);
+          values.category && setFieldError("category", undefined);
+        }}
+        value={values.category}
+        disabled={catList.length < 1}
+        selectList={catList}
+        contentStyles="bg-white"
+        triggerStyles="border-200 rounded-lg bg-neutral-100"
       />
+      {errors.category && <p>{errors.category}</p>}
 
       <THStack className="items-center p-2">
         <InputTemp

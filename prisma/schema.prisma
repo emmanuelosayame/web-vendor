@@ -264,7 +264,15 @@ type SaleCustomer {
     id   String
 }
 
-model Sale {
-    id       String       @id @default(auto()) @map("_id") @db.ObjectId
-    customer SaleCustomer
+// model Sale {
+//     id       String       @id @default(auto()) @map("_id") @db.ObjectId
+//     customer SaleCustomer
+// }
+
+model Category {
+    id     String  @id @default(auto()) @map("_id") @db.ObjectId
+    parent String?
+    name   String  @unique()
+    slug   String  @unique()
+    tid    Int
 }

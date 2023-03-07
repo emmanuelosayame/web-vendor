@@ -19,14 +19,9 @@ export const vendorRouter = router({
       }
 
       const stores = await ctx.prisma.store.findMany({
-        where: input.all
-          ? {
-              vendors: { some: { id: { equals: vendor?.id } } },
-            }
-          : {
-              vendors: { some: { id: { equals: vendor?.id } } },
-              status: "active",
-            },
+        where: {
+          vendors: { some: { id: { equals: vendor?.id } } },
+        },
         select: { name: true, id: true, status: true, vendors: true },
       });
 

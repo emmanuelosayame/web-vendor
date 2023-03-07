@@ -9,6 +9,8 @@ interface SelectProps<T> {
   selectList: { value: string; item: string }[];
   value?: T;
   disabled?: boolean;
+  required?: boolean;
+  placeholder?: string;
 }
 
 const Select = <T,>({
@@ -19,6 +21,8 @@ const Select = <T,>({
   triggerStyles = "bg-white rounded-md w-24",
   value,
   disabled,
+  required,
+  placeholder,
 }: SelectProps<T>) => {
   return (
     <RadixSelect.Root
@@ -26,13 +30,18 @@ const Select = <T,>({
       defaultValue={defaultSelected}
       onValueChange={(e) => onValueChange(e as T)}
       disabled={disabled}
+      required={required}
     >
       <RadixSelect.Trigger
+        type="button"
         className={`${triggerStyles} outline-none py-1 px-3 flex  justify-between`}
         aria-label="Sort"
       >
         <div className="">
-          <RadixSelect.Value className="text-white  text-center" />
+          <RadixSelect.Value
+            placeholder={placeholder}
+            className="text-white  text-center"
+          />
         </div>
         <RadixSelect.Icon className=" ml-1 ">
           <ChevronDownIcon width={25} />

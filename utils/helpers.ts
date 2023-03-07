@@ -14,10 +14,13 @@ export const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
-export const csToStyle = (colorScheme: CSNames) => {
+export const csToStyle = (colorScheme: CSNames, hover: boolean = false) => {
   switch (colorScheme) {
     case "alice":
-      return { bg: "bg-blue-500", text: "text-amber-500" };
+      return {
+        bg: `bg-blue-500 ${hover ? "hover:bg-blue-600" : ""}`,
+        text: "text-amber-500",
+      };
     case "greenade":
       return { bg: "bg-green-500", text: "text-green-700" };
     case "purpleIsle":
@@ -25,7 +28,10 @@ export const csToStyle = (colorScheme: CSNames) => {
     case "sierra":
       return { bg: "bg-blue-400", text: "text-blue-600" };
     case "montery":
-      return { bg: "bg-red-400", text: "text-red-300" };
+      return {
+        bg: `bg-red-400 ${hover ? "hover:bg-red-500" : ""}`,
+        text: "text-red-300",
+      };
     default:
       return { bg: "bg-red-500", text: "text-amber-500" };
   }

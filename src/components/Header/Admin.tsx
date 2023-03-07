@@ -11,6 +11,8 @@ import { useRouter } from "next/router";
 import { Content, Root, Trigger } from "@radix-ui/react-dialog";
 import useMediaQuery from "utils/useMediaQuery";
 import { useState } from "react";
+import { useStore } from "store";
+import { csToStyle } from "utils/helpers";
 
 interface Props {
   auth: Session | null;
@@ -18,11 +20,12 @@ interface Props {
 
 const HeaderA = ({ auth }: Props) => {
   const mq = useMediaQuery("(min-width: 800px)");
+  const bg = csToStyle(useStore((state) => state.colorScheme)).bg;
 
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="absolute inset-x-0 bg-blue-600 top-0 z-30">
+    <div className={`absolute inset-x-0 ${bg} top-0 z-30`}>
       <div className="md:m-2 md:rounded-lg bg-white/40 md:p-2 ">
         <div className="flex h-12 bg-white md:rounded-lg justify-between items-center px-2 md:px-4">
           <div className="hidden md:flex gap-2 items-center">
@@ -31,6 +34,7 @@ const HeaderA = ({ auth }: Props) => {
             <NavLink text="Sales" to="/admin/sales" />
             <NavLink text="Notifications" to="/admin/notifications" />
             <NavLink text="Assets" to="/admin/assets" />
+            <NavLink text="Categories" to="/admin/categories" />
             <NavLink text="Vendors" to="/admin/vendors" />
             <NavLink text="Stores" to="/admin/stores" />
             <NavLink text="Customers" to="/admin/customers" />
@@ -113,6 +117,11 @@ const HeaderA = ({ auth }: Props) => {
               />
               <NavLinkSm
                 onclick={() => setOpen(false)}
+                text="Categories"
+                to="/admin/categories"
+              />
+              <NavLinkSm
+                onclick={() => setOpen(false)}
                 text="Stores"
                 to="/admin/stores"
               />
@@ -151,13 +160,11 @@ const NavLinkSm = ({
     : (router.asPath === to || `/${router.route.split("/")[1]}` === to) &&
       router.asPath !== "/mypages/landing");
 
-  // const colorScheme = useStore((state) => state.colorScheme);
-
   return (
     <Link
       href={to}
-      className={`font-medium text-lg hover:text-blue-700 text-neutral-500 block ${
-        active ? "text-blue-500" : ""
+      className={`font-medium text-lg hover:text-neutral-500 text-neutral-700 block ${
+        active ? "text-black" : ""
       }`}
       onClick={onclick}
     >
@@ -184,8 +191,8 @@ const NavLink = ({
   return (
     <Link
       href={to}
-      className={`font-semibold hover:text-blue-700 text-neutral-500 ${
-        active ? "text-blue-500" : ""
+      className={`text-base hover:text-neutral-400 block ${
+        active ? "text-black" : "text-neutral-700"
       }`}
     >
       {text}

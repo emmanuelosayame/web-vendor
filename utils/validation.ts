@@ -52,7 +52,7 @@ export const productVs = Yup.object().shape({
   title: Yup.string().min(2).max(100).required(),
   description: Yup.string().min(2).max(500).required(),
   brand: Yup.string().min(2).max(50).required(),
-  category: Yup.string().min(2).max(30).required(),
+  category: Yup.string().required(),
   price: Yup.number().moreThan(5, "too low").lessThan(1000000).required(),
   stock: Yup.number().moreThan(1, "too low").lessThan(10000),
   package: Yup.string().min(2).max(100).required(),
@@ -66,4 +66,9 @@ export const productVs = Yup.object().shape({
   // imageFiles: z.array(z.object({ name: z.string(), size: z.number() })),
   moreDescr: Yup.array(Yup.object({ id: Yup.string(), url: Yup.string() })),
   status: Yup.string(),
+});
+
+export const categoryVS = Yup.object().shape({
+  name: Yup.string().min(4).max(30).required("Enter a name"),
+  slug: Yup.string().min(4).max(30).required("Enter an Id e.g name lowerc.."),
 });

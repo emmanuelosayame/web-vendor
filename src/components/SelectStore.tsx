@@ -1,7 +1,7 @@
 import { Loading, LoadingBlur } from "@components/Loading";
 import { TDivider } from "@components/TElements";
 import { QrCodeIcon } from "@heroicons/react/24/outline";
-import { setCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { api } from "utils/api";
@@ -17,6 +17,8 @@ const SelectStore = ({ onSwitchedFn = () => {} }: Props) => {
 
   const { data: accounts, isLoading } = api.vendor.accounts.useQuery({});
 
+  const activeStoreId = getCookie("sid");
+
   if (isLoading) return <LoadingBlur />;
 
   return (
@@ -29,10 +31,19 @@ const SelectStore = ({ onSwitchedFn = () => {} }: Props) => {
       <div className="w-full rounded-lg my-2 space-y-2 flex-1">
         {accounts?.map((account) => (
           <button
-            className="w-full text-black/90 p-3 drop-shadow-sm ring-1 ring-black/10 bg-white rounded-lg
-                     hover:bg-neutral-100 hover:text-blue-500 text-lg"
+            disabled={account.status !== "active"}
+            className={`w-full text-black/90 p-3 drop-shadow-sm ring-1 ring-black/10 bg-white rounded-lg
+            text-lg ${
+              account.status !== "active"
+                ? " opacity-50"
+                : "hover:bg-neutral-100 hover:text-blue-500"
+            }`}
             key={account.id}
             onClick={async () => {
+              if (activeStoreId === account.id) {
+                onSwitchedFn();
+                return;
+              }
               setCookie("sid", account.id, {
                 sameSite: true,
                 secure: true,
@@ -43,7 +54,8 @@ const SelectStore = ({ onSwitchedFn = () => {} }: Props) => {
               onSwitchedFn();
             }}
           >
-            {account.name}
+            {account.name}{" "}
+            {account.status !== "active" && `(${account.status})`}
           </button>
         ))}
       </div>

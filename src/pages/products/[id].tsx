@@ -164,7 +164,15 @@ const ProductPage: NextPageWithLayout = () => {
         onSubmit={onSubmit}
         enableReinitialize
       >
-        {({ getFieldProps, dirty, touched, errors, values, setFieldValue }) => (
+        {({
+          getFieldProps,
+          dirty,
+          touched,
+          errors,
+          values,
+          setFieldValue,
+          setFieldError,
+        }) => (
           <Form className="w-full h-full">
             <MenuFlex>
               <IconButton
@@ -214,6 +222,9 @@ const ProductPage: NextPageWithLayout = () => {
                   errors={errors}
                   pid={pid}
                   mutate={mutateAsync}
+                  values={values}
+                  setFieldValue={setFieldValue}
+                  setFieldError={setFieldError}
                 />
 
                 {!isFetching ? (
