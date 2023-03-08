@@ -2,7 +2,7 @@ import InputTemp from "@components/InputTemp";
 import LayoutA from "@components/Layout/Admin";
 import { Loading, LoadingBlur } from "@components/Loading";
 import AlertDialog from "@components/radix/Alert";
-import { MenuFlex } from "@components/TElements";
+import { IconBack, MenuFlex } from "@components/TElements";
 import {
   ChevronLeftIcon,
   PlusIcon,
@@ -19,10 +19,13 @@ import { api } from "utils/api";
 import { csToStyle } from "utils/helpers";
 import { categoryVS } from "utils/validation";
 import { type NextPageWithLayout } from "@t/shared";
+import useMediaQuery from "utils/useMediaQuery";
 
 const CategoriesPage: NextPageWithLayout = () => {
   const router = useRouter();
   const id = router.query.category?.toString();
+
+  const mq = useMediaQuery("(min-width: 800px)");
 
   const { data: parent, isFetching: fetchingParent } =
     api.categories.one.useQuery({ id }, { enabled: !!id });
@@ -72,10 +75,11 @@ const CategoriesPage: NextPageWithLayout = () => {
   return (
     <>
       <MenuFlex>
+        <IconBack>Back</IconBack>
         <h3 className="py-1 px-4 bg-white rounded-lg">{parent.name}</h3>
         <Root>
           <Trigger className="flex items-center gap-2 bg-white rounded-lg py-1 px-2">
-            <span>Add Top Category</span>
+            <span>{mq ? "Add Top Category" : "Add"}</span>
             <PlusIcon width={25} />
           </Trigger>
           <Content
@@ -401,7 +405,10 @@ const TCat = ({ category }: { category?: Category }) => {
 
           {edit ? (
             <AlertDialog
-              disabled={category?.name === name || category?.slug === slug}
+              disabled={
+                category?.name === name ||
+                (category && category?.slug.length < 2)
+              }
               trigger="Save"
               action="Rename"
               actionStyles="bg-amber-400 hover:bg-amber-500"

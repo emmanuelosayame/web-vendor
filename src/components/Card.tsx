@@ -16,7 +16,7 @@ export const Card1 = ({
     <div>
       <THStack
         className="w-44 items-center rounded-xl
-       bg-white bg-opacity-60 py-1 px-2 md:py-3 md:px-4 backdrop:blur-md"
+       bg-white/50 py-1 px-2 md:py-3 md:px-4 backdrop:blur-lg"
       >
         {children}
         <div className="flex-1">

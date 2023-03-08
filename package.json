@@ -1,17 +1,19 @@
 {
-  "name": "web-admin",
+  "name": "web-vendor",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "next build",
     "dev": "next dev",
     "postinstall": "prisma generate",
+    "analyze": "cross-env ANALYZE=true next build",
     "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {
     "@heroicons/react": "^2.0.14",
     "@next-auth/prisma-adapter": "^1.0.5",
+    "@next/bundle-analyzer": "^13.0.3",
     "@prisma/client": "^4.11.0",
     "@radix-ui/react-alert-dialog": "^1.0.2",
     "@radix-ui/react-avatar": "^1.0.1",
@@ -63,6 +65,7 @@
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "@typescript-eslint/parser": "^5.47.1",
     "autoprefixer": "^10.4.7",
+    "cross-env": "^7.0.3",
     "eslint": "^8.30.0",
     "eslint-config-next": "13.1.6",
     "postcss": "^8.4.14",

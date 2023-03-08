@@ -1,5 +1,6 @@
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import * as RadixSelect from "@radix-ui/react-select";
+import { type CSSProperties } from "react";
 
 interface SelectProps<T> {
   triggerStyles?: string;
@@ -11,6 +12,7 @@ interface SelectProps<T> {
   disabled?: boolean;
   required?: boolean;
   placeholder?: string;
+  style?: CSSProperties;
 }
 
 const Select = <T,>({
@@ -23,6 +25,7 @@ const Select = <T,>({
   disabled,
   required,
   placeholder,
+  style,
 }: SelectProps<T>) => {
   return (
     <RadixSelect.Root
@@ -36,6 +39,7 @@ const Select = <T,>({
         type="button"
         className={`${triggerStyles} outline-none py-1 px-3 flex  justify-between`}
         aria-label="Sort"
+        style={style}
       >
         <div className="">
           <RadixSelect.Value

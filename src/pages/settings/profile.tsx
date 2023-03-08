@@ -21,15 +21,16 @@ const Profile: NextPageWithLayout = () => {
   const qc = api.useContext();
   const saveRef = useRef<HTMLButtonElement | null>(null);
   const colorScheme = useStore((state) => state.colorScheme);
-  const { bg, text } = csToStyle(colorScheme);
+  const { style } = csToStyle(colorScheme);
   const changeCS = useStore((state) => state.setColorScheme);
 
-  const csList = [
+  const csList: { item: string; value: CSNames }[] = [
     { item: "Montery", value: "montery" },
     { item: "Sierra", value: "sierra" },
     { item: "Alice", value: "alice" },
     { item: "Greenade", value: "greenade" },
     { item: "PurpleIsle", value: "purpleIsle" },
+    { item: "Yellowmine", value: "yellowmine" },
   ];
 
   const { data, isLoading } = api.vendor.one.useQuery({});
@@ -163,9 +164,10 @@ const Profile: NextPageWithLayout = () => {
             </h3>
             <p className="my-2">Color Scheme</p>
             <Select<CSNames>
+              style={style}
               contentStyles="bg-white"
               triggerStyles={`border border-neutral-200
-               rounded-lg w-full ${bg} bg-opacity-70 text-white`}
+               rounded-lg w-full bg-opacity-70 text-white`}
               defaultSelected={colorScheme}
               onValueChange={(value) => changeCS(value)}
               selectList={csList}

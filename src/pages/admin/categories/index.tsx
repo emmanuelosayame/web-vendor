@@ -45,13 +45,13 @@ const Categories: NextPageWithLayout = () => {
       </MenuFlex>
 
       <div className="p-2 bg-white/40 rounded-lg h-[98%]">
-        <div className="p-3 bg-white rounded-lg h-full overflow-y-auto flex gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+        <div className="p-3 bg-white rounded-lg h-full overflow-y-auto flex gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full h-fit">
             {topLevel?.map((cat) => (
               <Fragment key={cat.id}>
                 {edit ? (
                   <div
-                    className={`border-200 rounded-xl p-10 h-40 flex flex-col items-center
+                    className={`border-200 rounded-xl  p-5 md:p-10 h-40 flex flex-col items-center
                  justify-center bg-white text-red-500`}
                   >
                     <p className="text-3xl">{cat.name}</p>
@@ -68,8 +68,8 @@ const Categories: NextPageWithLayout = () => {
                   <Link
                     href={`/admin/categories/${cat.id}`}
                     key={cat.id}
-                    className={`border-200 rounded-xl p-10 h-40 flex flex-col items-center
-                 justify-center hover:opacity-70 ${bg} text-white`}
+                    className={`border-200 rounded-xl p-5 md:p-16 flex flex-col items-center
+                 justify-center hover:opacity-70 ${bg} text-white w-full`}
                   >
                     <p className="text-3xl">{cat.name}</p>
                   </Link>

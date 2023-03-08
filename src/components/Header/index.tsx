@@ -23,7 +23,7 @@ interface Props {
 
 const Header = ({ auth, store, refetch }: Props) => {
   const mq = useMediaQuery("(min-width: 800px)");
-  const bg = csToStyle(useStore((state) => state.colorScheme)).bg;
+  const style = csToStyle(useStore((state) => state.colorScheme)).style;
 
   const [open, setOpen] = useState(false);
   const [sOpen, setSOpen] = useState(false);
@@ -39,8 +39,8 @@ const Header = ({ auth, store, refetch }: Props) => {
         </Content>
       </Root>
 
-      <div className={`absolute inset-x-0 top-0 z-40 ${bg}`}>
-        <div className="md:m-2 md:rounded-lg bg-white/40 md:p-2 ">
+      <div className={`absolute inset-x-0 top-0 z-40`}>
+        <div className="md:m-2 md:rounded-lg bg-white/40 md:p-2 backdrop-blur-md">
           <div className="flex h-12 bg-white md:rounded-lg justify-between items-center px-2 md:px-4">
             <div className="hidden md:flex gap-2 items-center">
               <NavLink text="Dashboard" to="/" />
@@ -159,7 +159,7 @@ const NavLinkSm = ({
 }) => {
   const router = useRouter();
   const colorScheme = useStore((state) => state.colorScheme);
-  const { bg, text: textStyle } = csToStyle(colorScheme);
+  const { textStyle } = csToStyle(colorScheme);
   const active = !!(nested
     ? router.asPath === to
     : (router.asPath === to || `/${router.route.split("/")[1]}` === to) &&
@@ -172,6 +172,7 @@ const NavLinkSm = ({
         active ? `${textStyle}` : "text-neutral-500"
       }`}
       onClick={onclick}
+      style={active ? textStyle : {}}
     >
       {text}
     </Link>
@@ -189,7 +190,7 @@ const NavLink = ({
 }) => {
   const router = useRouter();
   const colorScheme = useStore((state) => state.colorScheme);
-  const { bg, text: textStyle } = csToStyle(colorScheme);
+  const { textStyle } = csToStyle(colorScheme);
   const active = !!(nested
     ? router.asPath === to
     : (router.asPath === to || `/${router.route.split("/")[1]}` === to) &&
@@ -203,6 +204,7 @@ const NavLink = ({
           ? `${"text-neutral-700 text-xl font-semibold"} `
           : "text-neutral-500"
       }`}
+      style={active ? textStyle : {}}
     >
       {text}
     </Link>

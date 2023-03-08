@@ -4,7 +4,6 @@ import {
   BellAlertIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-import type { Store } from "@prisma/client";
 import type { Session } from "next-auth";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -20,12 +19,12 @@ interface Props {
 
 const HeaderA = ({ auth }: Props) => {
   const mq = useMediaQuery("(min-width: 800px)");
-  const bg = csToStyle(useStore((state) => state.colorScheme)).bg;
+  const style = csToStyle(useStore((state) => state.colorScheme)).style;
 
   const [open, setOpen] = useState(false);
 
   return (
-    <div className={`absolute inset-x-0 ${bg} top-0 z-30`}>
+    <div className={`absolute inset-x-0 top-0 z-30`} style={style}>
       <div className="md:m-2 md:rounded-lg bg-white/40 md:p-2 ">
         <div className="flex h-12 bg-white md:rounded-lg justify-between items-center px-2 md:px-4">
           <div className="hidden md:flex gap-2 items-center">

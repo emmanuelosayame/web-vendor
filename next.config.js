@@ -1,9 +1,13 @@
 // @ts-check
 
 /** @type {import("next").NextConfig} */
+
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
 const config = {
   reactStrictMode: true,
-
   images: {
     domains: [
       "dummyjson.com",
@@ -23,4 +27,5 @@ const config = {
     defaultLocale: "en",
   },
 };
-export default config;
+
+module.exports = withBundleAnalyzer(config);

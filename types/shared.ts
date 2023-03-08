@@ -19,7 +19,8 @@ export type CSNames =
   | "sierra"
   | "alice"
   | "greenade"
-  | "purpleIsle";
+  | "purpleIsle"
+  | "yellowmine";
 
 export interface ColorScheme {
   name: CSNames;

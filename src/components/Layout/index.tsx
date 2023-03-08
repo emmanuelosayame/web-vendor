@@ -16,7 +16,7 @@ const Layout = ({
   nopx?: "sm" | "lg" | "all";
 }) => {
   const { data: auth, status } = useSession();
-  const bg = csToStyle(useStore((state) => state.colorScheme)).bg;
+  const style = csToStyle(useStore((state) => state.colorScheme)).style;
 
   const {
     data: store,
@@ -30,7 +30,8 @@ const Layout = ({
   if (!store)
     return (
       <div
-        className={`fixed inset-0 flex p-2 justify-center items-center ${bg}`}
+        className={`fixed inset-0 flex p-2 justify-center items-center}`}
+        style={style}
       >
         <div className="w-full md:w-96 max-h-80">
           <SelectStore refetch={refetch} />
@@ -42,7 +43,7 @@ const Layout = ({
     <div className="relative h-full ">
       <Header auth={auth} store={store} refetch={refetch} />
       <div
-        className={`h-full ${bg} pt-28 md:pt-32 z-20 ${
+        className={`h-full pt-28 md:pt-32 z-20 ${
           nopx === "sm"
             ? "md:px-3"
             : nopx === "lg"
@@ -51,6 +52,7 @@ const Layout = ({
             ? ""
             : "px-3"
         }`}
+        style={style}
       >
         {children}
       </div>

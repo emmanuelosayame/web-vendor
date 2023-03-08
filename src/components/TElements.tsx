@@ -145,11 +145,12 @@ export const IconBack = ({
 };
 
 export const MenuFlex = ({ children }: { children: ReactNode }) => {
-  const bg = csToStyle(useStore((state) => state.colorScheme)).bg;
+  const style = csToStyle(useStore((state) => state.colorScheme)).style;
   return (
     <div
       className={`flex justify-between w-full px-2 md:px-3 pt-1 absolute inset-x-0 
-  top-16 md:top-20 z-30 ${bg}`}
+  top-16 md:top-20 z-30 bg-transparent`}
+      // style={style}
     >
       {children}
     </div>
