@@ -63,7 +63,7 @@ const Products = () => {
     { placeholderData: 0 }
   );
 
-  const { data: categories } = api.categories.many.useQuery({ tid: 3 });
+  const { data: categories } = api.category.many.useQuery({ tid: 3 });
 
   const getCat = (id: string) =>
     categories?.find((cat) => id === cat.id)?.name || id;

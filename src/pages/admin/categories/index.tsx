@@ -17,10 +17,10 @@ const Categories: NextPageWithLayout = () => {
   const [edit, setEdit] = useState(false);
 
   const qc = api.useContext();
-  const { data: topLevel } = api.categories.many.useQuery({ tid: 1 });
-  const { mutate: remove } = api.categories.delete.useMutation({
+  const { data: topLevel } = api.category.many.useQuery({ tid: 1 });
+  const { mutate: remove } = api.category.delete.useMutation({
     onSuccess: async () => {
-      await qc.categories.many.refetch();
+      await qc.category.many.refetch();
     },
   });
 
@@ -91,9 +91,9 @@ const AddCategory = ({ edit }: ACProps) => {
   const [open, setOpen] = useState(false);
 
   const qc = api.useContext();
-  const { mutate: create } = api.categories.create.useMutation({
+  const { mutate: create } = api.category.create.useMutation({
     onSuccess: async () => {
-      await qc.categories.many.refetch();
+      await qc.category.many.refetch();
       setOpen(false);
     },
   });
