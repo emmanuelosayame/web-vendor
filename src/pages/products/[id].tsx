@@ -58,6 +58,7 @@ const ProductPage: NextPageWithLayout = () => {
     { file, files }: { file: File | null; files: File[] }
   ) => {
     const form = new FormData();
+    form.append("id", id || "new");
     if (file) {
       form.append("single", file);
     }
@@ -68,7 +69,7 @@ const ProductPage: NextPageWithLayout = () => {
     }
     setUploading(true);
     try {
-      await axios.put("/api/upload/product", form, { params: { id } });
+      await axios.put("/api/upload/product", form);
       setUploading(false);
       return { status: "success", error: undefined };
     } catch (err) {
@@ -103,7 +104,7 @@ const ProductPage: NextPageWithLayout = () => {
         });
       }
       if (thumbnailFile || imageFiles.length > 0) {
-        const { status, error } = await uploadImage(pid, {
+        const { status, error } = await uploadImage(data?.id, {
           file: thumbnailFile,
           files: sortedImageFiles,
         });

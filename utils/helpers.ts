@@ -117,14 +117,3 @@ export const dateTimeLocale = (date: Date | string) => {
     minute: "2-digit",
   });
 };
-
-export const getStoragePath = (url: string | null | undefined) => {
-  if (!url) return;
-  const bucket = process.env.FIREBASE_BUCKET;
-  if (!bucket) throw new Error("no bucket");
-  const urlObject = new URL(url);
-  if (urlObject.host === "firebasestorage.googleapis.com")
-    return decodeURIComponent(urlObject.pathname.substring(1)).slice(
-      `v0/b/${bucket}/o/`.length
-    );
-};

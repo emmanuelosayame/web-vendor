@@ -72,8 +72,6 @@ export const Form2 = ({
       value: cat.id,
     })) || [];
 
-  console.log(values);
-
   return (
     <TStack className="rounded-lg p-2 col-span-2 row-span-5 bg-white">
       <h3>Product Info</h3>

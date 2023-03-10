@@ -9,7 +9,7 @@ export const Loading = ({
     <div
       className={`flex justify-center items-center ${
         position === "fixed" ? "fixed" : "absolute"
-      } inset-0 bg-white w-screen h-screen`}
+      } inset-0 bg-white z-50 w-screen h-screen`}
     >
       <FadeLoader color="gray" />
     </div>

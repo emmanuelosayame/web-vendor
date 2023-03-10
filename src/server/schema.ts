@@ -88,6 +88,28 @@ export const StoreSchema = z.object({
   support: StoreSupport,
 });
 
+export const AssetPayload = z.object({
+  title: z.string(),
+  description: z.string(),
+  code: z.number(),
+  path: z.string(),
+  basepath: z.string(),
+  images: z.array(
+    z.object({
+      id: z.string(),
+      url: z.string(),
+      tag: z.string(),
+    })
+  ),
+  texts: z.array(
+    z.object({
+      id: z.string(),
+      body: z.string(),
+      tag: z.string(),
+    })
+  ),
+});
+
 export type ProductPayload = z.infer<typeof ProductSchema>;
 
 export type ProductSort = z.infer<typeof ProductSortEnum>;

@@ -11,10 +11,20 @@ import { type NextPageWithLayout } from "@t/shared";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { assetsSelectList } from "utils/list";
-import img1 from "public/loginbg1.jpg";
+import img1 from "public/e7e850b1-79ff-4d42-9058-46bf415540a7.webp";
 import img2 from "public/flashsale.png";
-import { type Reducer, useReducer, type ReactNode } from "react";
+import {
+  type Reducer,
+  useReducer,
+  type ReactNode,
+  useState,
+  useRef,
+  type ChangeEvent,
+} from "react";
 import { api } from "utils/api";
+import { LoadingBlur } from "@components/Loading";
+import SelectImage from "@components/SelectImage";
+import axios from "axios";
 
 type Actions =
   | {
@@ -34,9 +44,9 @@ type Actions =
 
 const initialState = {
   ids: {
-    texts: 1,
-    images: 1,
-    deals: 1,
+    texts: "1",
+    images: "1",
+    deals: "1",
   },
   edits: {
     texts: false,
@@ -67,13 +77,13 @@ const reducer: Reducer<typeof initialState, Actions> = (state, actions) => {
     case "decrement-images":
       const newIndex =
         action.type === "increment"
-          ? state.ids[action.id] + 1
-          : state.ids[action.id] - 1;
+          ? Number(state.ids[action.id]) + 1
+          : Number(state.ids[action.id]) - 1;
       return {
         ...state,
         ids: {
           ...state.ids,
-          [action.id]: newIndex,
+          [action.id]: newIndex.toString(),
         },
         edits: {
           ...state.edits,
@@ -95,18 +105,130 @@ const reducer: Reducer<typeof initialState, Actions> = (state, actions) => {
 const AssetsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const { data } = api.asset.one.useQuery({ basepath: "", path: "/" });
+  const imageRef = useRef<HTMLInputElement>(null);
+
+  const { data, isFetching } = api.asset.one.useQuery({
+    basepath: "",
+    path: "/",
+  });
 
   const [{ edits, ids }, dispatch] = useReducer(reducer, initialState);
 
-  const activeText = data?.texts?.find((text) => ids.texts === Number(text.id));
-  const activeImage = data?.images?.find(
-    (image) => ids.images === Number(image.id)
-  );
-  // console.log(data);
+  const activeText = data?.texts?.find((text) => ids.texts === text.id);
+  const activeImage = data?.images?.find((image) => ids.images === image.id);
+
+  const [open, setOpen] = useState<string | null>(null);
+
+  const [prev, setPrev] = useState<{ id: string; url: string }>();
+  const [croppedImage, setCroppedImage] = useState<{
+    images?: { id: string; url: string; file: File | null };
+    deals?: { id: string; url: string; file: File | null };
+  }>({
+    deals: { id: "server", url: "", file: null },
+    images: { id: "server", url: "", file: null },
+  });
+
+  const handlePreview = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !open) return;
+    if (prev?.url && prev.url.slice(0, 5) === "blob:") {
+      URL.revokeObjectURL(prev?.url);
+    }
+    setPrev({ id: open, url: URL.createObjectURL(file) });
+  };
+
+  const handleCropped = (cropped: File, opened: string) => {
+    switch (opened) {
+      case "images-new":
+        setCroppedImage((state) => ({
+          images: {
+            file: cropped,
+            id: "new",
+            url: URL.createObjectURL(cropped),
+          },
+          deals: state.deals,
+        }));
+        break;
+      case "deals-new":
+        setCroppedImage((state) => ({
+          deals: {
+            file: cropped,
+            id: "new",
+            url: URL.createObjectURL(cropped),
+          },
+          images: state.images,
+        }));
+        break;
+      case "images":
+        setCroppedImage((state) => ({
+          images: {
+            file: cropped,
+            id: ids.images,
+            url: URL.createObjectURL(cropped),
+          },
+          deals: state.deals,
+        }));
+        break;
+      case "deals":
+        setCroppedImage((state) => ({
+          deals: {
+            file: cropped,
+            id: ids.deals,
+            url: URL.createObjectURL(cropped),
+          },
+          images: state.images,
+        }));
+        break;
+    }
+    setOpen(null);
+  };
+
+  const { mutate } = api.asset.update.useMutation();
+
+  const [uploading, setUploading] = useState(false);
+  const saveImage = async ({
+    imageId,
+    file,
+    tag,
+  }: {
+    imageId: string;
+    file: File;
+    tag: string;
+  }) => {
+    if (!data?.id) return;
+
+    const form = new FormData();
+    form.append("id", data.id);
+    form.append("file", file);
+    form.append("tag", tag);
+    form.append("imageId", imageId);
+    setUploading(true);
+    try {
+      await axios.put("/api/upload/asset", form, { params: { id: data?.id } });
+      setUploading(false);
+    } catch (err) {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="overflow-y-auto h-full py-2">
+      {(isFetching || uploading) && <LoadingBlur />}
+      <SelectImage
+        aspect={open === "images" || open === "images-new" ? 2 / 1 : 4 / 3}
+        handleCropped={handleCropped}
+        imageRef={imageRef}
+        open={open}
+        setOpen={setOpen}
+        previewUrl={prev?.url}
+      />
+      <input
+        hidden
+        ref={imageRef}
+        type="file"
+        accept="image/jpeg, image/png, image/webp"
+        onChange={handlePreview}
+      />
       <MenuFlex>
         <Select<string>
           triggerStyles="w-fit bg-white"
@@ -119,20 +241,25 @@ const AssetsPage: NextPageWithLayout = () => {
       </MenuFlex>
 
       <div
-        className="outer-box h-auto md:h-[97%] w-full grid grid-cols-1 md:grid-cols-3 
+        className="outer-box h-auto w-full grid grid-cols-1 md:grid-cols-3 
         md:grid-rows-3 gap-3 "
       >
         <SlideContainer
-          onAddClick={() => {}}
+          onAddClick={() => {
+            // dispatch({ type: "edit-texts" });
+          }}
           onEditClick={() => dispatch({ type: "edit-texts" })}
           onLeftClick={() => dispatch({ type: "decrement-texts" })}
           onRightClick={() => dispatch({ type: "increment-texts" })}
           onSaveClick={() => {}}
           outerClassName="md:col-span-1 md:row-span-1"
           heading="Text Display"
-          leftDisabled={ids.texts < 2}
-          rightDisabled={data ? ids.texts === data.texts.length : true}
+          leftDisabled={Number(ids.texts) < 2}
+          rightDisabled={
+            data ? ids.texts === data.texts.length.toString() : true
+          }
           edit={edits.texts}
+          onCancelClick={() => {}}
         >
           {edits.texts ? (
             <input
@@ -149,25 +276,60 @@ const AssetsPage: NextPageWithLayout = () => {
         </SlideContainer>
 
         <SlideContainer
-          onAddClick={() => {}}
+          onAddClick={() => setOpen("images-new")}
           onEditClick={() => dispatch({ type: "edit-images" })}
           onLeftClick={() => dispatch({ type: "decrement-images" })}
           onRightClick={() => dispatch({ type: "increment-images" })}
           outerClassName="md:col-span-2 md:row-span-3"
           heading="Image Display"
-          onSaveClick={() => {}}
+          headerId={croppedImage.images?.id === "new" ? "New" : ids.images}
+          onSaveClick={() => {
+            const imageFile = croppedImage.images?.file;
+            const imageId = croppedImage.images?.id;
+            if (!imageFile || !imageId) return;
+            saveImage({
+              file: imageFile,
+              imageId,
+              tag: "slide",
+            });
+          }}
+          saveDisabled={
+            !!(open !== "images-new" && !croppedImage?.images?.file)
+          }
+          edit={!!croppedImage?.images?.file || edits.images}
+          onCancelClick={() => {
+            croppedImage?.images?.file &&
+              setCroppedImage((state) => ({ deals: state.deals }));
+            edits.images && dispatch({ type: "edit-images" });
+          }}
+          leftDisabled={Number(ids.images) < 2}
+          rightDisabled={
+            data ? ids.images === data.images.length.toString() : true
+          }
         >
-          <Image alt="" src={img1} className="w-full h-4/5 rounded-lg" />
+          {/* <a href={croppedImage.images?.url} download>
+            download
+          </a> */}
+          <Image
+            alt=""
+            src={croppedImage.images?.url || img1}
+            width={1200}
+            height={700}
+            className="w-full h-fit bg-black/30 rounded-lg overflow-hidden"
+          />
         </SlideContainer>
 
         <SlideContainer
-          onAddClick={() => {}}
+          onAddClick={() => setOpen("deals-new")}
           onEditClick={() => dispatch({ type: "edit-deals" })}
           onLeftClick={() => dispatch({ type: "decrement-deals" })}
           onRightClick={() => dispatch({ type: "increment-deals" })}
           outerClassName="md:col-span-1 md:row-span-2"
           heading="Deals Display"
           onSaveClick={() => {}}
+          onCancelClick={() => {
+            dispatch({ type: "edit-deals" });
+          }}
         >
           <Image alt="" src={img2} className="w-full h-4/6 rounded-lg" />
         </SlideContainer>
@@ -189,6 +351,9 @@ interface SlideProps {
   leftDisabled?: boolean;
   rightDisabled?: boolean;
   onSaveClick: () => void;
+  onCancelClick: () => void;
+  saveDisabled?: boolean;
+  headerId?: string;
 }
 
 const SlideContainer = ({
@@ -204,6 +369,9 @@ const SlideContainer = ({
   leftDisabled,
   rightDisabled,
   onSaveClick,
+  onCancelClick,
+  saveDisabled,
+  headerId,
 }: SlideProps) => {
   return (
     <div
@@ -211,22 +379,36 @@ const SlideContainer = ({
     >
       <TFlex className="justify-between p-1 divider-200">
         <h3 className="text-xl">{heading}</h3>
-        <TFlex className="gap-4 justify-between">
-          <button onClick={onAddClick} disabled={addDisabled}>
-            <PlusIcon width={30} />
-          </button>
+        <h3 className="text-xl text-red-500">{headerId}</h3>
+        <TFlex className="gap-4 justify-between h-8 items-center">
+          {!edit && (
+            <button onClick={onAddClick} disabled={addDisabled}>
+              <PlusIcon width={30} />
+            </button>
+          )}
           {edit && (
             <button
-              className="bg-green-400 text-white px-4 rounded-md 
-              drop-shadow-sm hover:bg-green-500"
+              disabled={saveDisabled}
+              className="bg-green-400 text-white px-4 rounded-md h-full 
+              drop-shadow-sm hover:bg-green-500 disabled:opacity-60 disabled:hover:bg-green-400"
               onClick={onSaveClick}
             >
               save
             </button>
           )}
-          <button onClick={onEditClick}>
-            <PencilSquareIcon width={30} />
-          </button>
+          {edit ? (
+            <button
+              className="bg-amber-400 text-white px-4 rounded-md h-full 
+              drop-shadow-sm hover:bg-amber-500"
+              onClick={onCancelClick}
+            >
+              Cancel
+            </button>
+          ) : (
+            <button onClick={onEditClick}>
+              <PencilSquareIcon width={30} />
+            </button>
+          )}
         </TFlex>
       </TFlex>
 
@@ -236,7 +418,7 @@ const SlideContainer = ({
         <button
           onClick={onLeftClick}
           className="hover:text-amber-300 disabled:opacity-40"
-          disabled={leftDisabled}
+          disabled={leftDisabled || edit}
         >
           <ArrowLeftIcon width={30} />
         </button>
@@ -244,7 +426,7 @@ const SlideContainer = ({
         <button
           onClick={onRightClick}
           className="hover:text-amber-300 disabled:opacity-40"
-          disabled={rightDisabled}
+          disabled={rightDisabled || edit}
         >
           <ArrowRightIcon width={30} />
         </button>
@@ -252,45 +434,6 @@ const SlideContainer = ({
     </div>
   );
 };
-
-// const EditAddBtns = ({
-//   onAddClick,
-//   onEditClick,
-// }: {
-//   onAddClick: () => void;
-//   onEditClick: () => void;
-// }) => {
-//   return (
-//     <TFlex className="gap-4 justify-between">
-//       <button onClick={onEditClick}>
-//         <PencilSquareIcon width={30} />
-//       </button>
-//       <button onClick={onAddClick}>
-//         <PlusIcon width={30} />
-//       </button>
-//     </TFlex>
-//   );
-// };
-
-// const ArrowBtns = ({
-//   onLeftClick,
-//   onRightClick,
-// }: {
-//   onLeftClick: () => void;
-//   onRightClick: () => void;
-// }) => {
-//   return (
-//     <TFlex className="justify-between">
-//       <button onClick={onLeftClick} className="hover:text-amber-300">
-//         <ArrowLeftIcon width={30} />
-//       </button>
-
-//       <button onClick={onRightClick} className="hover:text-amber-300">
-//         <ArrowRightIcon width={30} />
-//       </button>
-//     </TFlex>
-//   );
-// };
 
 AssetsPage.getLayout = function getLayout(page) {
   return <LayoutA>{page}</LayoutA>;
