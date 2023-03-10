@@ -2,7 +2,7 @@ import { z } from "zod";
 import { StoreSchema } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
-import { isAdmin } from "./utils";
+import { isAdmin } from "../utils";
 
 export const storeRouter = router({
   one: protectedProcedure.input(z.object({})).query(async ({ ctx, input }) => {

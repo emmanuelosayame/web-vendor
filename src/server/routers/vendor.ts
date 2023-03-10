@@ -3,7 +3,7 @@ import { z } from "zod";
 import { VendorData } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
-import { isAdmin } from "./utils";
+import { isAdmin } from "../utils";
 
 export const vendorRouter = router({
   accounts: protectedProcedure

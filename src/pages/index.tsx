@@ -100,6 +100,9 @@ const Home: NextPageWithLayout = () => {
   const style = csToStyle(useStore((state) => state.colorScheme)).style;
   return (
     <>
+      <Head>
+        <title>DASHBOARD</title>
+      </Head>
       <div className={`absolute inset-x-0 top-16 md:top-20 z-30`} style={style}>
         <div className="gap-2 px-2 py-2 md:p-4 flex overflow-x-auto md:justify-center">
           <Card1 text="customers" value="5k">

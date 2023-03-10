@@ -20,7 +20,7 @@ const Select = <T,>({
   onValueChange,
   selectList,
   contentStyles = "bg-white",
-  triggerStyles = "bg-white rounded-md w-24",
+  triggerStyles = "bg-white w-24",
   value,
   disabled,
   required,
@@ -37,7 +37,7 @@ const Select = <T,>({
     >
       <RadixSelect.Trigger
         type="button"
-        className={`${triggerStyles} outline-none py-1 px-3 flex  justify-between`}
+        className={`${triggerStyles} rounded-md outline-none py-1 px-3 flex  justify-between`}
         aria-label="Sort"
         style={style}
       >
@@ -53,7 +53,7 @@ const Select = <T,>({
       </RadixSelect.Trigger>
       <RadixSelect.Portal>
         <RadixSelect.Content
-          className={` ${contentStyles} shadow-lg z-50 overflow-hidden rounded-2xl`}
+          className={` ${contentStyles} border border-neutral-100 shadow-lg z-50 overflow-hidden rounded-2xl`}
         >
           <RadixSelect.Viewport className="z-50">
             {selectList.map((selectItem) => (

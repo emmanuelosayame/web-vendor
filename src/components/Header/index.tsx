@@ -23,7 +23,6 @@ interface Props {
 
 const Header = ({ auth, store, refetch }: Props) => {
   const mq = useMediaQuery("(min-width: 800px)");
-  const style = csToStyle(useStore((state) => state.colorScheme)).style;
 
   const [open, setOpen] = useState(false);
   const [sOpen, setSOpen] = useState(false);

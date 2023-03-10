@@ -145,7 +145,6 @@ export const IconBack = ({
 };
 
 export const MenuFlex = ({ children }: { children: ReactNode }) => {
-  const style = csToStyle(useStore((state) => state.colorScheme)).style;
   return (
     <div
       className={`flex justify-between w-full px-2 md:px-3 pt-1 absolute inset-x-0 

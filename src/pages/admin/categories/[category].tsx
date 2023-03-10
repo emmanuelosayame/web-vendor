@@ -28,8 +28,8 @@ const CategoriesPage: NextPageWithLayout = () => {
   const mq = useMediaQuery("(min-width: 800px)");
 
   const { data: parent, isFetching: fetchingParent } =
-    api.categories.one.useQuery({ id }, { enabled: !!id });
-  const { data: topLevel, isFetching } = api.categories.many.useQuery(
+    api.category.one.useQuery({ id }, { enabled: !!id });
+  const { data: topLevel, isFetching } = api.category.many.useQuery(
     { parent: id },
     {
       enabled: !!parent,
@@ -37,8 +37,10 @@ const CategoriesPage: NextPageWithLayout = () => {
   );
 
   const [selected, setSelected] = useState<string | null>();
-  const { data: subLevel, isFetching: loadingSub } =
-    api.categories.many.useQuery({ tid: 3 }, { enabled: !!selected });
+  const { data: subLevel, isFetching: loadingSub } = api.category.many.useQuery(
+    { tid: 3 },
+    { enabled: !!selected }
+  );
   const currentSub = subLevel?.filter((cat) => selected === cat.parent);
 
   const [add, setAdd] = useState(false);
@@ -51,12 +53,12 @@ const CategoriesPage: NextPageWithLayout = () => {
   const qc = api.useContext();
 
   const { mutate: create, isLoading: creating } =
-    api.categories.create.useMutation({
-      onSuccess: () => qc.categories.many.refetch(),
+    api.category.create.useMutation({
+      onSuccess: () => qc.category.many.refetch(),
     });
   const { mutate: remove, isLoading: deleting } =
-    api.categories.delete.useMutation({
-      onSuccess: () => qc.categories.many.refetch(),
+    api.category.delete.useMutation({
+      onSuccess: () => qc.category.many.refetch(),
     });
 
   if (isFetching || loadingSub || creating || deleting || fetchingParent)
@@ -127,8 +129,8 @@ const CategoriesPage: NextPageWithLayout = () => {
         </Root>
       </MenuFlex>
 
-      <div className="p-2 bg-white/40 rounded-lg h-[98%]">
-        <div className="p-3 bg-white rounded-lg h-full overflow-y-auto flex gap-4">
+      <div className="outer-box h-[98%]">
+        <div className="inner-box overflow-y-auto flex gap-4">
           <div
             className={`md:grid md:grid-cols-2 gap-2 h-fit w-full md:w-1/2 ${
               selected ? "hidden " : "flex flex-col "
@@ -240,19 +242,19 @@ const SCat = ({
 
   const qc = api.useContext();
 
-  const { mutate, isLoading: mutating } = api.categories.update.useMutation({
-    onSuccess: () => qc.categories.many.refetch(),
+  const { mutate, isLoading: mutating } = api.category.update.useMutation({
+    onSuccess: () => qc.category.many.refetch(),
   });
   const { mutate: create, isLoading: creating } =
-    api.categories.create.useMutation({
+    api.category.create.useMutation({
       onSuccess: () => {
         setAdd(false);
-        qc.categories.many.refetch();
+        qc.category.many.refetch();
       },
     });
   const { mutate: remove, isLoading: deleting } =
-    api.categories.delete.useMutation({
-      onSuccess: () => qc.categories.many.refetch(),
+    api.category.delete.useMutation({
+      onSuccess: () => qc.category.many.refetch(),
     });
 
   return (
@@ -363,8 +365,8 @@ const TCat = ({ category }: { category?: Category }) => {
 
   const qc = api.useContext();
 
-  const { mutate, isLoading: mutating } = api.categories.update.useMutation({
-    onSuccess: () => qc.categories.many.refetch(),
+  const { mutate, isLoading: mutating } = api.category.update.useMutation({
+    onSuccess: () => qc.category.many.refetch(),
   });
 
   return (

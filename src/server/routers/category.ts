@@ -9,7 +9,7 @@ const MutatePayload = z.object({
   tid: z.number(),
 });
 
-export const categoriesRouter = router({
+export const categoryRouter = router({
   many: protectedProcedure
     .input(
       z.object({

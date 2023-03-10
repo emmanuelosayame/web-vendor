@@ -18,13 +18,19 @@
     @apply border-b border-b-neutral-200;
   }
   .border-200 {
-    @apply border border-neutral-200;
+    @apply border border-neutral-200 rounded-lg;
   }
   .center-x {
     @apply left-1/2 -translate-x-1/2;
   }
   .center-y {
     @apply top-1/2 -translate-y-1/2;
+  }
+  .inner-box {
+    @apply p-3 bg-white rounded-lg h-full;
+  }
+  .outer-box {
+    @apply p-2 bg-white/40 rounded-lg;
   }
 }
 

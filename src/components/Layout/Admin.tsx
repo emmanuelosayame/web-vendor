@@ -6,6 +6,7 @@ import { csToStyle } from "utils/helpers";
 import { Loading } from "@components/Loading";
 import { useSession } from "next-auth/react";
 import Login from "@components/Login";
+import ErrorScreen from "@components/ErrorScreen";
 
 const LayoutA = ({
   children,
@@ -22,15 +23,7 @@ const LayoutA = ({
 
   if (auth?.user.role !== "admin")
     return (
-      <div
-        className={` h-screen w-screen flex justify-center items-center`}
-        style={style}
-      >
-        <div className="p-3 rounded-lg bg-neutral-100 text-neutral-500 text-center">
-          <h3>Access Denied !</h3>
-          <p className="text-sm">{"you probably aren't an admin"}</p>
-        </div>
-      </div>
+      <ErrorScreen description="you probably aren't an admin" style={style} />
     );
 
   return (

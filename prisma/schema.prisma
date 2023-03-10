@@ -276,3 +276,26 @@ model Category {
     slug   String  @unique()
     tid    Int
 }
+
+type AssetImages {
+    id  String
+    url String
+    tag String
+}
+
+type AssetTexts {
+    id   String
+    body String
+    tag  String
+}
+
+model Asset {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    basepath    String
+    path        String
+    title       String
+    description String
+    code        Int
+    images      AssetImages[]
+    texts       AssetTexts[]
+}

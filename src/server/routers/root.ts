@@ -4,7 +4,8 @@ import { productRouter } from "./product";
 import { storeRouter } from "./store";
 import { vendorRouter } from "./vendor";
 import { customerRouter } from "./customer";
-import { categoriesRouter } from "./categories";
+import { categoryRouter } from "./category";
+import { assetRouter } from "./asset";
 
 export const appRouter = router({
   product: productRouter,
@@ -12,7 +13,8 @@ export const appRouter = router({
   vendor: vendorRouter,
   order: orderRouter,
   customer: customerRouter,
-  categories: categoriesRouter,
+  category: categoryRouter,
+  asset: assetRouter,
 });
 
 // export type definition of API
