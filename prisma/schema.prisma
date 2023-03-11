@@ -283,7 +283,6 @@ type AssetImages {
 }
 
 type AssetTexts {
-    id   String
     body String
     tag  String
 }

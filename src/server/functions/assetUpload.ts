@@ -57,7 +57,6 @@ export const uploadAsset = async ({ req, res }: Args) => {
 
     res.status(200).json({ status: "success" });
   } catch (err) {
-    console.log(err);
     res.status(500).send(err as any);
   }
 };

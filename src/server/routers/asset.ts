@@ -39,6 +39,42 @@ export const assetRouter = router({
       const { id, data } = input;
       return await ctx.prisma.asset.update({ where: { id }, data });
     }),
+  updateDisplayText: adminProcedure
+    .input(
+      z.object({
+        id: z.string().optional(),
+        data: AssetPayload.shape.texts,
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, data } = input;
+      if (data.id === "new") {
+        return await ctx.prisma.asset.update({
+          where: { id },
+          data: { texts: { push: { body: data.body, tag: data.tag } } },
+        });
+      } else {
+        const prevData = await ctx.prisma.asset.findFirst({ where: { id } });
+        if (!prevData) throw new TRPCError({ code: "NOT_FOUND" });
+        const newTexts = prevData.texts
+          .map((text, index) => ({
+            id: (index + 1).toString(),
+            ...text,
+          }))
+          .map((text) =>
+            text.id === data.id
+              ? {
+                  tag: data.tag,
+                  body: data.body,
+                }
+              : { body: text.body, tag: text.tag }
+          );
+        return await ctx.prisma.asset.update({
+          where: { id },
+          data: { texts: newTexts },
+        });
+      }
+    }),
   create: adminProcedure
     .input(z.object({ data: AssetPayload }))
     .mutation(async ({ ctx, input }) => {

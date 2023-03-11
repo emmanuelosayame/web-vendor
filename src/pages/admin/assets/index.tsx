@@ -36,8 +36,9 @@ type Actions =
         | "decrement-texts"
         | "decrement-images"
         | "decrement-deals";
-      payload?: number;
+      payload?: string;
     }
+  | { type: "set-texts"; payload: string }
   | {
       type: "edit-texts" | "edit-images" | "edit-deals";
       payload?: boolean;
@@ -98,6 +99,12 @@ const reducer: Reducer<typeof initialState, Actions> = (state, actions) => {
         ...state,
         edits: { ...state.edits, [action.id]: !state.edits[action.id] },
       };
+    case "set-texts": {
+      return {
+        ...state,
+        ids: { ...state.ids, texts: actions.payload },
+      };
+    }
     default:
       return state;
   }
@@ -119,11 +126,19 @@ const AssetsPage: NextPageWithLayout = () => {
       })),
     [data?.images]
   );
+  const serverTexts = useMemo(
+    () =>
+      data?.texts.map((text, index) => ({
+        id: (index + 1).toString(),
+        ...text,
+      })),
+    [data?.texts]
+  );
 
   const serverImages = allImages?.filter((image) => image.tag === "slide");
   const serverDeals = allImages?.filter((image) => image.tag === "deal");
   const [{ edits, ids }, dispatch] = useReducer(reducer, initialState);
-  const activeText = data?.texts?.find((text) => ids.texts === text.id);
+  const activeText = serverTexts?.find((text) => ids.texts === text.id);
   const activeImage = serverImages?.find((image) => ids.images === image.id);
   const activeDeal = serverDeals?.find((image) => ids.images === image.id);
 
@@ -191,7 +206,14 @@ const AssetsPage: NextPageWithLayout = () => {
   };
 
   const qc = api.useContext();
-  const { mutate } = api.asset.update.useMutation();
+  const { mutate, isLoading: mutating } =
+    api.asset.updateDisplayText.useMutation({
+      onSuccess: () => {
+        qc.asset.one.refetch();
+        ids.texts === "new" && dispatch({ type: "set-texts", payload: "1" });
+        edits.texts && dispatch({ type: "edit-texts" });
+      },
+    });
 
   const [uploading, setUploading] = useState(false);
   const upload = async ({
@@ -223,22 +245,38 @@ const AssetsPage: NextPageWithLayout = () => {
     }
   };
 
-  const saveImages = () => {
-    const imageFile = croppedImage?.images?.file;
-    const imageId = croppedImage?.images?.id;
-    if (!imageFile || !imageId) return;
-    upload({
-      file: imageFile,
-      imageId,
-      tag: "slide",
-    });
+  const saveImages = (type: "images" | "deals") => {
+    if (type === "images") {
+      const imageFile = croppedImage?.images?.file;
+      const imageId = croppedImage?.images?.id;
+      if (!imageFile || !imageId) return;
+      upload({
+        file: imageFile,
+        imageId,
+        tag: "slide",
+      });
+      return;
+    }
+    if (type === "deals") {
+      const imageFile = croppedImage?.deals?.file;
+      const imageId = croppedImage?.deals?.id;
+      if (!imageFile || !imageId) return;
+      upload({
+        file: imageFile,
+        imageId,
+        tag: "deal",
+      });
+      return;
+    }
   };
+
+  const [body, setBody] = useState("");
 
   return (
     <div className="overflow-y-auto h-full py-2">
-      {(isFetching || uploading) && <LoadingBlur />}
+      {(isFetching || mutating || uploading) && <LoadingBlur />}
       <SelectImage
-        aspect={open === "images" || open === "images-new" ? 2 / 1 : 4 / 3}
+        aspect={open === "images" || open === "images-new" ? 2 / 1 : 2 / 1}
         handleCropped={handleCropped}
         imageRef={imageRef}
         open={open}
@@ -269,31 +307,48 @@ const AssetsPage: NextPageWithLayout = () => {
       >
         <SlideContainer
           onAddClick={() => {
-            // dispatch({ type: "edit-texts" });
+            dispatch({ type: "set-texts", payload: "new" });
           }}
           onEditClick={() => dispatch({ type: "edit-texts" })}
           onLeftClick={() => dispatch({ type: "decrement-texts" })}
           onRightClick={() => dispatch({ type: "increment-texts" })}
-          onSaveClick={() => {}}
+          onSaveClick={() => {
+            mutate({
+              id: data?.id,
+              data: { body, tag: "slide", id: ids.texts },
+            });
+          }}
           outerClassName="md:col-span-1 md:row-span-1"
           heading="Text Display"
-          leftDisabled={Number(ids.texts) < 2}
-          rightDisabled={
-            data ? ids.texts === data.texts.length.toString() : true
+          headerId={
+            serverTexts && serverTexts.length > 0 ? ids.texts : "No Text"
           }
-          edit={edits.texts}
-          onCancelClick={() => {}}
+          leftDisabled={Number(ids.texts) < 2 || ids.texts === "new"}
+          rightDisabled={
+            ids.texts === "new" ||
+            !!(data && data?.texts.length.toString() === ids.texts)
+          }
+          edit={edits.texts || ids.texts === "new"}
+          onCancelClick={() => {
+            ids.texts === "new" &&
+              dispatch({ type: "set-texts", payload: "1" });
+            edits.texts && dispatch({ type: "edit-texts" });
+          }}
+          hasServerData={!!(serverTexts && serverTexts?.length > 0)}
         >
-          {edits.texts ? (
+          {edits.texts || ids.texts === "new" ? (
             <input
-              disabled={!edits.texts}
+              disabled={!edits.texts && ids.texts !== "new"}
               placeholder="Enter slide text"
               className="resize-none border-200 p-2 w-full text-xl"
               defaultValue={activeText?.body}
+              onChange={(e) => setBody(e.target.value)}
             />
           ) : (
             <h3 className="border-200 p-2 w-full text-xl bg-neutral-100 text-neutral-600">
-              {activeText?.body}
+              {!!(serverTexts && serverTexts?.length > 0)
+                ? activeText?.body
+                : "No text"}
             </h3>
           )}
         </SlideContainer>
@@ -305,8 +360,14 @@ const AssetsPage: NextPageWithLayout = () => {
           onRightClick={() => dispatch({ type: "increment-images" })}
           outerClassName="md:col-span-2 md:row-span-3"
           heading="Image Display"
-          headerId={croppedImage?.images?.id === "new" ? "New" : ids.images}
-          onSaveClick={saveImages}
+          headerId={
+            croppedImage?.images?.id === "new"
+              ? "New"
+              : serverImages && serverImages.length < 1
+              ? "No Image"
+              : ids.images
+          }
+          onSaveClick={() => saveImages("images")}
           saveDisabled={
             !!(open !== "images-new" && !croppedImage?.images?.file)
           }
@@ -318,11 +379,9 @@ const AssetsPage: NextPageWithLayout = () => {
           }}
           leftDisabled={Number(ids.images) < 2}
           rightDisabled={
-            serverImages
-              ? ids.images === serverImages.length.toString() ||
-                serverImages.length < 1
-              : true
+            serverImages && ids.images === serverImages.length.toString()
           }
+          hasServerData={serverImages && serverImages.length > 0}
         >
           <div className="relative">
             <Image
@@ -352,12 +411,46 @@ const AssetsPage: NextPageWithLayout = () => {
           onRightClick={() => dispatch({ type: "increment-deals" })}
           outerClassName="md:col-span-1 md:row-span-2"
           heading="Deals Display"
-          onSaveClick={() => {}}
+          headerId={
+            croppedImage?.deals?.id === "new"
+              ? "New"
+              : serverDeals && serverDeals.length < 1
+              ? "No Image"
+              : ids?.deals
+          }
+          leftDisabled={Number(ids.deals) < 2}
+          rightDisabled={
+            serverDeals && ids.deals === serverDeals.length.toString()
+          }
+          hasServerData={serverDeals && serverDeals?.length > 0}
+          onSaveClick={() => saveImages("deals")}
           onCancelClick={() => {
-            dispatch({ type: "edit-deals" });
+            croppedImage?.deals?.file &&
+              setCroppedImage((state) => ({ images: state?.images }));
+            edits.deals && dispatch({ type: "edit-deals" });
           }}
+          saveDisabled={!!(open !== "deals-new" && !croppedImage?.deals?.file)}
+          edit={!!croppedImage?.deals?.file || edits.deals}
         >
-          <Image alt="" src={img2} className="w-full h-4/6 rounded-lg" />
+          <div className="relative">
+            <Image
+              alt=""
+              src={croppedImage?.deals?.url || activeDeal?.url || img2}
+              className={`w-full h-fit bg-black/30 rounded-lg overflow-hidden ${
+                edits.deals ? "brightness-75" : ""
+              }`}
+              width={800}
+              height={500}
+            />
+            {edits.deals && (
+              <button
+                className="btn-green w-fit drop-shadow-md absolute center-y center-x"
+                onClick={() => setOpen("deals")}
+              >
+                Change
+              </button>
+            )}
+          </div>
         </SlideContainer>
       </div>
     </div>
@@ -380,6 +473,7 @@ interface SlideProps {
   onCancelClick: () => void;
   saveDisabled?: boolean;
   headerId?: string;
+  hasServerData?: boolean;
 }
 
 const SlideContainer = ({
@@ -398,15 +492,16 @@ const SlideContainer = ({
   onCancelClick,
   saveDisabled,
   headerId,
+  hasServerData,
 }: SlideProps) => {
   return (
     <div
       className={`inner-box ${outerClassName} flex flex-col gap-3 md:justify-between`}
     >
-      <TFlex className="justify-between p-1 divider-200">
-        <h3 className="text-xl">{heading}</h3>
-        <h3 className="text-xl text-red-500">{headerId}</h3>
-        <TFlex className="gap-4 justify-between h-8 items-center">
+      <TFlex className="justify-between p-1 divider-200 items-center">
+        <h3 className="text-lg md:text-xl">{heading}</h3>
+        <h3 className="text-base md:text-lg text-red-500">{headerId}</h3>
+        <TFlex className="gap-2 md:gap-4 justify-between h-8 items-center text-sm">
           {!edit && (
             <button onClick={onAddClick} disabled={addDisabled}>
               <PlusIcon width={30} />
@@ -422,19 +517,21 @@ const SlideContainer = ({
               save
             </button>
           )}
-          {edit ? (
-            <button
-              className="bg-amber-400 text-white px-4 rounded-md h-full 
+          <>
+            {edit ? (
+              <button
+                className="bg-amber-400 text-white px-4 rounded-md h-full 
               drop-shadow-sm hover:bg-amber-500"
-              onClick={onCancelClick}
-            >
-              Cancel
-            </button>
-          ) : (
-            <button onClick={onEditClick}>
-              <PencilSquareIcon width={30} />
-            </button>
-          )}
+                onClick={onCancelClick}
+              >
+                Cancel
+              </button>
+            ) : hasServerData ? (
+              <button onClick={onEditClick}>
+                <PencilSquareIcon width={30} />
+              </button>
+            ) : null}
+          </>
         </TFlex>
       </TFlex>
 
@@ -444,7 +541,7 @@ const SlideContainer = ({
         <button
           onClick={onLeftClick}
           className="hover:text-amber-300 disabled:opacity-40"
-          disabled={leftDisabled || edit}
+          disabled={leftDisabled || edit || !hasServerData}
         >
           <ArrowLeftIcon width={30} />
         </button>
@@ -452,7 +549,7 @@ const SlideContainer = ({
         <button
           onClick={onRightClick}
           className="hover:text-amber-300 disabled:opacity-40"
-          disabled={rightDisabled || edit}
+          disabled={rightDisabled || edit || !hasServerData}
         >
           <ArrowRightIcon width={30} />
         </button>

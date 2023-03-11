@@ -101,13 +101,11 @@ export const AssetPayload = z.object({
       tag: z.string(),
     })
   ),
-  texts: z.array(
-    z.object({
-      id: z.string(),
-      body: z.string(),
-      tag: z.string(),
-    })
-  ),
+  texts: z.object({
+    id: z.string(),
+    body: z.string(),
+    tag: z.string(),
+  }),
 });
 
 export type ProductPayload = z.infer<typeof ProductSchema>;
