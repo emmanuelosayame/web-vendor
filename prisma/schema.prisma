@@ -278,7 +278,6 @@ model Category {
 }
 
 type AssetImages {
-    id  String
     url String
     tag String
 }

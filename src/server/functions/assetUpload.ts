@@ -25,35 +25,39 @@ export const uploadAsset = async ({ req, res }: Args) => {
       res.status(400).send({ error: "INCOMPLETE PAYLOAD" });
       return;
     }
+    const prevData = await prisma.asset.findFirst({ where: { id } });
+    const prevImages = prevData?.images.map((img, index) => ({
+      id: (index + 1).toString(),
+      ...img,
+    }));
+    if (!prevData) {
+      res.status(500).send({ error: "CANNOT FIND RELATION" });
+    }
     if (imageId === "new") {
-      const prevData = await prisma.asset.findFirst({ where: { id } });
-      if (!prevData) {
-        res.status(500).send({ error: "CANNOT FIND RELATION" });
-      } else
-        await prisma.asset.update({
-          where: { id },
-          data: {
-            images: {
-              push: { id: (prevData.images.length + 1).toString(), tag, url },
-            },
-          },
-        });
-    } else {
       await prisma.asset.update({
         where: { id },
         data: {
           images: {
-            updateMany: {
-              where: { id: imageId },
-              data: { id: imageId, tag, url },
-            },
+            push: { tag, url },
           },
+        },
+      });
+    } else {
+      const images = prevImages?.map((image) => ({
+        tag: image.tag,
+        url: image.id === imageId ? url : image.url,
+      }));
+      await prisma.asset.update({
+        where: { id },
+        data: {
+          images,
         },
       });
     }
 
     res.status(200).json({ status: "success" });
   } catch (err) {
+    console.log(err);
     res.status(500).send(err as any);
   }
 };

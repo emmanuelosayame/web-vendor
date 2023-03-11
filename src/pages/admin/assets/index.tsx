@@ -20,6 +20,7 @@ import {
   useState,
   useRef,
   type ChangeEvent,
+  useMemo,
 } from "react";
 import { api } from "utils/api";
 import { LoadingBlur } from "@components/Loading";
@@ -104,18 +105,27 @@ const reducer: Reducer<typeof initialState, Actions> = (state, actions) => {
 
 const AssetsPage: NextPageWithLayout = () => {
   const router = useRouter();
-
   const imageRef = useRef<HTMLInputElement>(null);
-
   const { data, isFetching } = api.asset.one.useQuery({
     basepath: "",
     path: "/",
   });
 
-  const [{ edits, ids }, dispatch] = useReducer(reducer, initialState);
+  const allImages = useMemo(
+    () =>
+      data?.images.map((image, index) => ({
+        id: (index + 1).toString(),
+        ...image,
+      })),
+    [data?.images]
+  );
 
+  const serverImages = allImages?.filter((image) => image.tag === "slide");
+  const serverDeals = allImages?.filter((image) => image.tag === "deal");
+  const [{ edits, ids }, dispatch] = useReducer(reducer, initialState);
   const activeText = data?.texts?.find((text) => ids.texts === text.id);
-  const activeImage = data?.images?.find((image) => ids.images === image.id);
+  const activeImage = serverImages?.find((image) => ids.images === image.id);
+  const activeDeal = serverDeals?.find((image) => ids.images === image.id);
 
   const [open, setOpen] = useState<string | null>(null);
 
@@ -123,10 +133,7 @@ const AssetsPage: NextPageWithLayout = () => {
   const [croppedImage, setCroppedImage] = useState<{
     images?: { id: string; url: string; file: File | null };
     deals?: { id: string; url: string; file: File | null };
-  }>({
-    deals: { id: "server", url: "", file: null },
-    images: { id: "server", url: "", file: null },
-  });
+  }>();
 
   const handlePreview = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -146,7 +153,7 @@ const AssetsPage: NextPageWithLayout = () => {
             id: "new",
             url: URL.createObjectURL(cropped),
           },
-          deals: state.deals,
+          deals: state?.deals,
         }));
         break;
       case "deals-new":
@@ -156,7 +163,7 @@ const AssetsPage: NextPageWithLayout = () => {
             id: "new",
             url: URL.createObjectURL(cropped),
           },
-          images: state.images,
+          images: state?.images,
         }));
         break;
       case "images":
@@ -166,7 +173,7 @@ const AssetsPage: NextPageWithLayout = () => {
             id: ids.images,
             url: URL.createObjectURL(cropped),
           },
-          deals: state.deals,
+          deals: state?.deals,
         }));
         break;
       case "deals":
@@ -176,17 +183,18 @@ const AssetsPage: NextPageWithLayout = () => {
             id: ids.deals,
             url: URL.createObjectURL(cropped),
           },
-          images: state.images,
+          images: state?.images,
         }));
         break;
     }
     setOpen(null);
   };
 
+  const qc = api.useContext();
   const { mutate } = api.asset.update.useMutation();
 
   const [uploading, setUploading] = useState(false);
-  const saveImage = async ({
+  const upload = async ({
     imageId,
     file,
     tag,
@@ -204,11 +212,26 @@ const AssetsPage: NextPageWithLayout = () => {
     form.append("imageId", imageId);
     setUploading(true);
     try {
-      await axios.put("/api/upload/asset", form, { params: { id: data?.id } });
+      await axios.put("/api/upload/asset", form);
       setUploading(false);
+      qc.asset.one.refetch();
+      croppedImage?.images?.file &&
+        setCroppedImage((state) => ({ deals: state?.deals }));
+      edits.images && dispatch({ type: "edit-images" });
     } catch (err) {
       setUploading(false);
     }
+  };
+
+  const saveImages = () => {
+    const imageFile = croppedImage?.images?.file;
+    const imageId = croppedImage?.images?.id;
+    if (!imageFile || !imageId) return;
+    upload({
+      file: imageFile,
+      imageId,
+      tag: "slide",
+    });
   };
 
   return (
@@ -282,41 +305,44 @@ const AssetsPage: NextPageWithLayout = () => {
           onRightClick={() => dispatch({ type: "increment-images" })}
           outerClassName="md:col-span-2 md:row-span-3"
           heading="Image Display"
-          headerId={croppedImage.images?.id === "new" ? "New" : ids.images}
-          onSaveClick={() => {
-            const imageFile = croppedImage.images?.file;
-            const imageId = croppedImage.images?.id;
-            if (!imageFile || !imageId) return;
-            saveImage({
-              file: imageFile,
-              imageId,
-              tag: "slide",
-            });
-          }}
+          headerId={croppedImage?.images?.id === "new" ? "New" : ids.images}
+          onSaveClick={saveImages}
           saveDisabled={
             !!(open !== "images-new" && !croppedImage?.images?.file)
           }
           edit={!!croppedImage?.images?.file || edits.images}
           onCancelClick={() => {
             croppedImage?.images?.file &&
-              setCroppedImage((state) => ({ deals: state.deals }));
+              setCroppedImage((state) => ({ deals: state?.deals }));
             edits.images && dispatch({ type: "edit-images" });
           }}
           leftDisabled={Number(ids.images) < 2}
           rightDisabled={
-            data ? ids.images === data.images.length.toString() : true
+            serverImages
+              ? ids.images === serverImages.length.toString() ||
+                serverImages.length < 1
+              : true
           }
         >
-          {/* <a href={croppedImage.images?.url} download>
-            download
-          </a> */}
-          <Image
-            alt=""
-            src={croppedImage.images?.url || img1}
-            width={1200}
-            height={700}
-            className="w-full h-fit bg-black/30 rounded-lg overflow-hidden"
-          />
+          <div className="relative">
+            <Image
+              alt=""
+              src={croppedImage?.images?.url || activeImage?.url || img1}
+              width={1200}
+              height={700}
+              className={`w-full h-fit bg-black/30 rounded-lg overflow-hidden ${
+                edits.images ? "brightness-75" : ""
+              }`}
+            />
+            {edits.images && (
+              <button
+                className="btn-green w-fit drop-shadow-md absolute center-y center-x"
+                onClick={() => setOpen("images")}
+              >
+                Change
+              </button>
+            )}
+          </div>
         </SlideContainer>
 
         <SlideContainer
