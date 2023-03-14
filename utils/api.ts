@@ -2,7 +2,6 @@ import { httpBatchLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import superjson from "superjson";
-
 import { type AppRouter } from "../src/server/routers/root";
 import { getBaseUrl } from "./helpers";
 

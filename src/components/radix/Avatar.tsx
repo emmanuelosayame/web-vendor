@@ -6,9 +6,16 @@ interface AvatarProps {
   alt?: string;
   className?: string;
   fallback?: string;
+  fallbackStyle?: string;
 }
 
-const Avatar = ({ src, alt, className, fallback }: AvatarProps) => {
+const Avatar = ({
+  src,
+  alt,
+  className,
+  fallback,
+  fallbackStyle,
+}: AvatarProps) => {
   const fallbackInitials = fallback
     ?.split(" ")
     .map((name) => name.charAt(0).toUpperCase())
@@ -26,7 +33,11 @@ const Avatar = ({ src, alt, className, fallback }: AvatarProps) => {
         className="w-full h-full bg-gray-500 p-1 flex text-[whitesmoke] items-center justify-center"
         delayMs={200}
       >
-        {!fallback ? <UserIcon width={"100%"} /> : <p>{fallbackInitials}</p>}
+        {!fallback ? (
+          <UserIcon width={"100%"} />
+        ) : (
+          <p className={fallbackStyle}>{fallbackInitials}</p>
+        )}
       </RadixAvatar.Fallback>
     </RadixAvatar.Root>
   );

@@ -9,6 +9,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "2",
@@ -18,6 +19,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "3",
@@ -27,6 +29,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "4",
@@ -36,6 +39,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "5",
@@ -45,6 +49,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "6",
@@ -54,6 +59,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "7",
@@ -63,6 +69,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "8",
@@ -72,6 +79,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "9",
@@ -81,6 +89,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "10",
@@ -90,6 +99,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "11",
@@ -99,6 +109,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
   {
     id: "12",
@@ -108,5 +119,6 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
+    sid: "",
   },
 ];

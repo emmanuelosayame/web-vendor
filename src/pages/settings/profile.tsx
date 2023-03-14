@@ -88,8 +88,10 @@ const Profile: NextPageWithLayout = () => {
                   Profile
                 </h3>
                 <Avatar
-                  className="w-28 rounded-full mt-2"
+                  fallbackStyle="text-xl font-semibold"
+                  className="w-24 h-24 rounded-full mt-2"
                   src={data?.photoUrl}
+                  fallback={`${data?.firstName} ${data?.lastName}`}
                 />
                 <div className="flex items-center gap-3">
                   <InputTemp

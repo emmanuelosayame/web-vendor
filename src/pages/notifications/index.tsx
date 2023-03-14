@@ -5,25 +5,41 @@ import { EnvelopeIcon, EnvelopeOpenIcon } from "@heroicons/react/24/solid";
 import { dateLocale, timeLocale } from "utils/helpers";
 import { data } from "utils/mock";
 import { type NextPageWithLayout } from "@t/shared";
+import type { Notification, NType } from "@prisma/client";
+import { api } from "utils/api";
+import { useState } from "react";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 const orders = data.filter((not) => not.type === "order");
 
 const Notifications: NextPageWithLayout = () => {
+  const [ntype, setNtype] = useState<NType | "all">("all");
+
+  const { data } = api.notification.many.useQuery({ ntype });
+
+  const [active, setActive] = useState<string | undefined>();
+  const activeN = orders.find((n) => active === n.id);
+
   return (
     <>
       <MenuFlex>
-        <Select
+        <Select<NType | "all">
           defaultSelected="all"
           contentStyles="bg-white"
-          triggerStyles="bg-white rounded-lg w-28 justify-between"
-          onValueChange={() => {}}
+          triggerStyles="bg-white rounded-lg w-32 justify-between"
+          value={ntype}
+          onValueChange={(e) => setNtype(e)}
           selectList={[
             { item: "All", value: "all" },
-            { item: "Orders", value: "orders" },
+            { item: "Orders", value: "order" },
             { item: "Complaint", value: "complaint" },
             { item: "Support", value: "support" },
           ]}
         />
+
+        {/* <h3 className=" inset-x-0 bg-white text-center text-xl rounded-lg px-3">
+          Orders
+        </h3> */}
 
         <Select
           defaultSelected="latest"
@@ -39,93 +55,86 @@ const Notifications: NextPageWithLayout = () => {
         />
       </MenuFlex>
 
-      <div className="h-[95%] bg-white/40 p-2 w-full rounded-lg">
-        <div className="flex flex-col md:flex-row gap-2 h-full">
-          {/* orders */}
-          <div className="w-full relative rounded-lg bg-white px-2 py-2 h-full max-h-96 md:max-h-full">
-            <h3 className="absolute inset-x-0 mx-2 bg-white text-center text-xl border-b border-b-neutral-300">
-              Orders
-            </h3>
-            <div className="pt-10 space-y-1 h-full overflow-y-auto">
-              {orders.map((notification) => {
-                const opened = notification.status === "opened";
-                return (
-                  <div
-                    key={notification.id}
-                    className={`${
-                      opened
-                        ? "bg-neutral-50 ring-1 ring-neutral-300 hover:bg-neutral-300"
-                        : "bg-blue-400 ring-1 ring-neutral-300 text-white hover:bg-blue-600"
-                    } rounded-md cursor-pointer p-2`}
-                  >
-                    <div className="flex justify-between">
-                      <p>{notification.title}</p>
-                      <div>
-                        {opened ? (
-                          <EnvelopeOpenIcon
-                            width={20}
-                            className="text-neutral-400"
-                          />
-                        ) : (
-                          <EnvelopeIcon width={20} className="white" />
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <p>{dateLocale(notification.on)}</p>
-                      <p className="text-[12px]">
-                        {timeLocale(notification.on)}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+      <div className="h-[97%] bg-white/40 p-2 w-full rounded-lg">
+        <div className="w-full rounded-lg flex gap-2 bg-white h-full overflow-y-auto py-2 px-3">
+          <div
+            className={`w-full md:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-3 ${
+              !!activeN ? "hidden md:grid" : ""
+            }`}
+          >
+            {orders.map((n) => (
+              <NContainer key={n.id} notification={n} setActive={setActive} />
+            ))}
           </div>
 
-          <div className="w-full relative rounded-lg bg-white px-2 h-full py-2 max-h-96 md:max-h-full">
-            <h3 className="absolute inset-x-0 mx-2 bg-white text-center text-xl border-b border-b-neutral-300">
-              Support/Complaints
-            </h3>
-            <div className="pt-10 space-y-1 h-full overflow-y-auto">
-              {orders.map((notification) => {
-                const opened = notification.status === "opened";
-                return (
-                  <div
-                    key={notification.id}
-                    className={`${
-                      opened
-                        ? "bg-neutral-50 ring-1 ring-neutral-300 hover:bg-neutral-300"
-                        : "bg-blue-400 ring-1 ring-neutral-300 text-white hover:bg-blue-600"
-                    } rounded-md cursor-pointer p-2`}
+          <div
+            className={`w-full md:w-1/2 py-3 px-2 md:px-6 md:block ${
+              !!activeN ? "block" : "hidden"
+            }`}
+          >
+            {activeN ? (
+              <>
+                <div className="flex justify-between">
+                  <button
+                    className="md:hidden"
+                    onClick={() => setActive(undefined)}
                   >
-                    <div className="flex justify-between">
-                      <p>{notification.title}</p>
-                      <div>
-                        {opened ? (
-                          <EnvelopeOpenIcon
-                            width={20}
-                            className="text-neutral-400"
-                          />
-                        ) : (
-                          <EnvelopeIcon width={20} className="white" />
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <p>{dateLocale(notification.on)}</p>
-                      <p className="text-[12px]">
-                        {timeLocale(notification.on)}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    <ChevronLeftIcon width={30} />
+                  </button>
+                  <p className="text-lg">{dateLocale(activeN.on)}</p>
+                  <p className="">{timeLocale(activeN.on)}</p>
+                </div>
+                <h3 className="text-center text-xl md:text-2xl">
+                  {activeN.title}
+                </h3>
+                <p>{activeN.body}</p>
+              </>
+            ) : (
+              <div className="flex justify-center items-center h-full">
+                <p className="text-xl text-center text-neutral-500">
+                  Select notification to view
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </>
+  );
+};
+
+interface Props {
+  notification: Notification;
+  setActive: (id: string) => void;
+}
+
+const NContainer = ({ notification, setActive }: Props) => {
+  const opened = notification.status === "opened";
+
+  return (
+    <div
+      className={`${
+        opened
+          ? "bg-neutral-50 border border-neutral-300 hover:bg-neutral-200 drop-shadow-sm"
+          : "bg-neutral-200 border border-neutral-200 text-neutral-800 hover:bg-neutral-300 drop-shadow-sm"
+      } rounded-lg cursor-pointer py-2 px-4`}
+      onClick={() => setActive(notification.id)}
+    >
+      <div className="flex justify-between">
+        <p>{notification.title}</p>
+        <div>
+          {opened ? (
+            <EnvelopeOpenIcon width={20} className="text-neutral-400" />
+          ) : (
+            <EnvelopeIcon width={20} className="white" />
+          )}
+        </div>
+      </div>
+      <div className="flex justify-between text-sm">
+        <p>{dateLocale(notification.on)}</p>
+        <p className="text-[12px]">{timeLocale(notification.on)}</p>
+      </div>
+    </div>
   );
 };
 

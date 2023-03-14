@@ -178,7 +178,6 @@ enum NType {
 enum NStatus {
     opened
     sealed
-    pinned
 }
 
 model Notification {
@@ -188,7 +187,9 @@ model Notification {
     status NStatus
     title  String
     body   String
+    // body2  String
     type   NType
+    rid    String
 }
 
 type OrdersItem {
