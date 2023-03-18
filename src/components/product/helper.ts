@@ -23,7 +23,7 @@ const getCroppedImg: (
   imageSrc: string,
   pixelCrop: Area,
   outputName,
-  maxRes = 1140
+  maxRes = 1080
 ) => {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");

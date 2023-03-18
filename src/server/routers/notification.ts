@@ -21,9 +21,31 @@ export const notificationRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
+      const sid = ctx.sid;
+      const uid = ctx.session.user.id;
+      return await ctx.prisma.notification.findMany({ where: { rid: uid } });
+    }),
+  manyA: adminProcedure
+    .input(
+      z.object({
+        ntype: Ntype,
+        // parent: z.string().optional(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
       return await ctx.prisma.notification.findMany({ where: {} });
     }),
-  one: adminProcedure
+  count: protectedProcedure
+    .input(
+      z.object({
+        ntype: Ntype,
+        // parent: z.string().optional(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.prisma.notification.findMany({ where: {} });
+    }),
+  one: protectedProcedure
     .input(
       z.object({
         id: z.string().optional(),
@@ -33,7 +55,7 @@ export const notificationRouter = router({
       const { id } = input;
       return await ctx.prisma.notification.findUnique({ where: { id } });
     }),
-  update: adminProcedure
+  update: protectedProcedure
     .input(z.object({ id: z.string(), data: MutatePayload.shape.status }))
     .mutation(async ({ ctx, input }) => {
       const { id, data } = input;

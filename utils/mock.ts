@@ -9,7 +9,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "2",
@@ -19,7 +19,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "3",
@@ -29,7 +29,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "4",
@@ -39,7 +39,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "5",
@@ -49,7 +49,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "6",
@@ -59,7 +59,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "7",
@@ -69,7 +69,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "8",
@@ -79,7 +79,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "9",
@@ -89,7 +89,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "10",
@@ -99,7 +99,7 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "11",
@@ -109,7 +109,7 @@ export const data: NType[] = [
     status: "sealed",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
   {
     id: "12",
@@ -119,6 +119,6 @@ export const data: NType[] = [
     status: "opened",
     title: "New Order from Aliko Dangote",
     type: "order",
-    sid: "",
+    rid: "",
   },
 ];
