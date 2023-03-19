@@ -25,8 +25,6 @@ interface PropsPlus extends Props {
     shouldValidate?: boolean | undefined
   ) => void;
   setFieldError: (field: string, message: string | undefined) => void;
-  variant: boolean;
-  setVariant: (checked: boolean) => void;
 }
 
 export const Form1 = ({ getFieldProps, touched, errors }: Props) => {
@@ -65,8 +63,6 @@ export const Form2 = ({
   values,
   setFieldValue,
   setFieldError,
-  variant,
-  setVariant,
 }: PropsPlus) => {
   const router = useRouter();
   const { data: categories } = api.category.many.useQuery({ tid: 3 });
@@ -162,10 +158,6 @@ export const Form2 = ({
           touched={touched.specs?.others}
           error={errors.specs?.others}
         />
-      </div>
-
-      <div className="p-2">
-        <Switch label="Variants" checked={variant} onCChange={setVariant} />
       </div>
 
       {pid !== "new" ? (

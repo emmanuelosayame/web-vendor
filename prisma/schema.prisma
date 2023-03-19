@@ -67,11 +67,12 @@ type VariantOption {
 }
 
 type ProductVariant {
-    title   String
-    price   String
-    image   String
-    options VariantOption[]
-    sku     String
+    title     String
+    price     Int
+    image     String
+    options   VariantOption[]
+    sku       String
+    updatedAt String
 }
 
 model Product {

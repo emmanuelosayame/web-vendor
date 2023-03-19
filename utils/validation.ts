@@ -66,6 +66,25 @@ export const productVs = Yup.object().shape({
   // imageFiles: z.array(z.object({ name: z.string(), size: z.number() })),
   moreDescr: Yup.array(Yup.object({ id: Yup.string(), url: Yup.string() })),
   status: Yup.string(),
+  variants: Yup.array().of(
+    Yup.object().shape({
+      title: Yup.string()
+        .required("required")
+        .min(2, "too short")
+        .max(50, "too long"),
+      price: Yup.number()
+        .moreThan(5, "too low")
+        .lessThan(1000000, "max price...")
+        .required("required"),
+      // options: Yup.array().of(
+      //   Yup.object().shape({
+      //     k: Yup.string().min(2).max(50),
+      //     v: Yup.string().min(2).max(50),
+      //   })
+      // ),
+      options: Yup.array(),
+    })
+  ),
 });
 
 export const categoryVS = Yup.object().shape({

@@ -3,11 +3,8 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { ArchiveBoxXMarkIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { type ChangeEvent, useRef, useState } from "react";
-import { type Area } from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
 import { type FormValues } from "utils/placeholders";
-import image from "public/placeholder.png";
-import getCroppedImg from "./helper";
 import SelectImage from "@components/SelectImage";
 
 interface Props {

@@ -8,10 +8,10 @@ const PStatus = z.enum(["active", "disabled", "review", "incomplete"]);
 
 const ProductVariant = z.object({
   title: z.string(),
-  price: z.string(),
-  image: z.string(),
+  price: z.number(),
   options: z.array(z.object({ k: z.string(), v: z.string() })),
   sku: z.string(),
+  // updatedAt: z.string(),
 });
 
 export const ProductSortEnum = z.enum([

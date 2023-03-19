@@ -80,58 +80,59 @@ const ProductPage: NextPageWithLayout = () => {
   };
 
   const onSubmit = async (values: FormValues) => {
-    const { thumbnailFile, imageFiles, tags, promotion, ...rest } = values;
+    console.log(values);
+    // const { thumbnailFile, imageFiles, tags, promotion, ...rest } = values;
 
-    const sortedImageFiles = imageFiles
-      .sort((a, b) => Number(a.id) - Number(b.id))
-      .map((f) => f.file);
+    // const sortedImageFiles = imageFiles
+    //   .sort((a, b) => Number(a.id) - Number(b.id))
+    //   .map((f) => f.file);
 
-    const payload: ProductPayload = {
-      ...rest,
-      tags: tags.split(" ; "),
-      promotion: promotion.split(" ; "),
-    };
+    // const payload: ProductPayload = {
+    //   ...rest,
+    //   tags: tags.split(" ; "),
+    //   promotion: promotion.split(" ; "),
+    // };
 
-    if (pid !== "new") {
-      const updatedDetails = updatedDiff(
-        initialData,
-        payload
-      ) as Partial<ProductPayload>;
-      const hadFormChanges = Object.keys(updatedDetails).length > 0;
-      if (hadFormChanges) {
-        await mutateAsync({
-          id: pid,
-          data: updatedDetails,
-        });
-      }
-      if (thumbnailFile || imageFiles.length > 0) {
-        const { status, error } = await uploadImage(data?.id, {
-          file: thumbnailFile,
-          files: sortedImageFiles,
-        });
-        !error && qc.product.one.refetch();
-        error && hadFormChanges && qc.product.one.refetch();
-        return;
-      }
-      hadFormChanges && qc.product.one.refetch();
-    } else {
-      create(
-        { data: payload },
-        {
-          onSuccess: async (data) => {
-            if (thumbnailFile || imageFiles.length > 0) {
-              const { status, error } = await uploadImage(data.id, {
-                file: thumbnailFile,
-                files: sortedImageFiles,
-              });
-              if (status === "error") {
-                mutateAsync({ id: data.id, data: { status: "incomplete" } });
-              }
-            }
-          },
-        }
-      );
-    }
+    // if (pid !== "new") {
+    //   const updatedDetails = updatedDiff(
+    //     initialData,
+    //     payload
+    //   ) as Partial<ProductPayload>;
+    //   const hadFormChanges = Object.keys(updatedDetails).length > 0;
+    //   if (hadFormChanges) {
+    //     await mutateAsync({
+    //       id: pid,
+    //       data: updatedDetails,
+    //     });
+    //   }
+    //   if (thumbnailFile || imageFiles.length > 0) {
+    //     const { status, error } = await uploadImage(data?.id, {
+    //       file: thumbnailFile,
+    //       files: sortedImageFiles,
+    //     });
+    //     !error && qc.product.one.refetch();
+    //     error && hadFormChanges && qc.product.one.refetch();
+    //     return;
+    //   }
+    //   hadFormChanges && qc.product.one.refetch();
+    // } else {
+    //   create(
+    //     { data: payload },
+    //     {
+    //       onSuccess: async (data) => {
+    //         if (thumbnailFile || imageFiles.length > 0) {
+    //           const { status, error } = await uploadImage(data.id, {
+    //             file: thumbnailFile,
+    //             files: sortedImageFiles,
+    //           });
+    //           if (status === "error") {
+    //             mutateAsync({ id: data.id, data: { status: "incomplete" } });
+    //           }
+    //         }
+    //       },
+    //     }
+    //   );
+    // }
   };
 
   useEffect(() => {
@@ -142,8 +143,6 @@ const ProductPage: NextPageWithLayout = () => {
     )
       setTimeout(() => router.replace("/products"), 700);
   }, [error, router]);
-
-  const [variant, setVariant] = useState(true);
 
   if (error) return <p className="text-center">{error.data?.code}</p>;
 
@@ -221,8 +220,6 @@ const ProductPage: NextPageWithLayout = () => {
                 />
 
                 <Form2
-                  setVariant={setVariant}
-                  variant={variant}
                   getFieldProps={getFieldProps}
                   touched={touched}
                   errors={errors}
@@ -248,7 +245,14 @@ const ProductPage: NextPageWithLayout = () => {
                   <div className="rounded-lg p-2 col-span-5 row-span-3 h-full bg-white" />
                 )}
 
-                {variant && <Variants />}
+                <Variants
+                  getFieldProps={getFieldProps}
+                  variants={values.variants}
+                  setFieldValue={setFieldValue}
+                  touched={touched}
+                  errors={errors}
+                  serverVariants={initialData.variants}
+                />
               </div>
             </div>
           </Form>
