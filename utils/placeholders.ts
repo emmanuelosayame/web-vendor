@@ -43,6 +43,7 @@ export const productPLD: Omit<Product, ""> = {
   sold: 0,
   specs: { model: "", others: "" },
   thumbnail: "",
+  variants: [],
 };
 
 export const getProductInitialPayload: (
@@ -67,6 +68,7 @@ export const getProductInitialPayload: (
   thumbnailFile: null,
   images: product?.images || [],
   imageFiles: [],
+  variants: [],
 });
 
 export const getFormIV: (product?: Product | null) => FormValues = (
@@ -91,4 +93,5 @@ export const getFormIV: (product?: Product | null) => FormValues = (
   thumbnailFile: null,
   imageFiles: [],
   images: product?.images || [],
+  variants: product?.variants || [],
 });

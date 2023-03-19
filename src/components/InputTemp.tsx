@@ -4,7 +4,7 @@ import type { HTMLInputTypeAttribute } from "react";
 interface Props {
   heading: string;
   type?: HTMLInputTypeAttribute;
-  fieldProps: FieldInputProps<string | number | readonly string[] | undefined>;
+  fieldProps?: FieldInputProps<string | number | readonly string[] | undefined>;
   touched?: boolean;
   error?: string;
   placeholder?: string;

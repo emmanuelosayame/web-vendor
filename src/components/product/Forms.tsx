@@ -1,6 +1,7 @@
 import InputTemp, { TextareaTemp } from "@components/InputTemp";
 import AlertDialog from "@components/radix/Alert";
 import Select from "@components/radix/Select";
+import Switch from "@components/radix/Switch";
 import { TDivider, THStack, TStack } from "@components/TElements";
 import type { FieldInputProps, FormikErrors, FormikTouched } from "formik";
 import { useRouter } from "next/router";
@@ -24,6 +25,8 @@ interface PropsPlus extends Props {
     shouldValidate?: boolean | undefined
   ) => void;
   setFieldError: (field: string, message: string | undefined) => void;
+  variant: boolean;
+  setVariant: (checked: boolean) => void;
 }
 
 export const Form1 = ({ getFieldProps, touched, errors }: Props) => {
@@ -62,6 +65,8 @@ export const Form2 = ({
   values,
   setFieldValue,
   setFieldError,
+  variant,
+  setVariant,
 }: PropsPlus) => {
   const router = useRouter();
   const { data: categories } = api.category.many.useQuery({ tid: 3 });
@@ -159,8 +164,12 @@ export const Form2 = ({
         />
       </div>
 
+      <div className="p-2">
+        <Switch label="Variants" checked={variant} onCChange={setVariant} />
+      </div>
+
       {pid !== "new" ? (
-        <>
+        <div className="flex gap-2">
           <AlertDialog
             action={status === "active" ? "Disable" : "Enable"}
             title={`Are you sure you want to ${
@@ -188,7 +197,7 @@ export const Form2 = ({
               setTimeout(() => router.replace("/products"), 300);
             }}
           />
-        </>
+        </div>
       ) : null}
     </TStack>
   );

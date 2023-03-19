@@ -19,6 +19,7 @@ import { productVs } from "utils/validation";
 import { type NextPageWithLayout } from "../../../types/shared";
 import Gallery from "@components/product/Gallery";
 import { Form1, Form2 } from "@components/product/Forms";
+import Variants from "@components/product/Variants";
 
 const ProductPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -142,6 +143,8 @@ const ProductPage: NextPageWithLayout = () => {
       setTimeout(() => router.replace("/products"), 700);
   }, [error, router]);
 
+  const [variant, setVariant] = useState(true);
+
   if (error) return <p className="text-center">{error.data?.code}</p>;
 
   return (
@@ -207,7 +210,10 @@ const ProductPage: NextPageWithLayout = () => {
             </MenuFlex>
 
             <div className="overflow-y-auto h-full pb-4">
-              <div className="flex flex-col md:grid md:grid-cols-7 md:grid-rows-5 gap-3 p-2 bg-white/40 rounded-lg">
+              <div
+                className="flex flex-col md:grid md:grid-cols-7 md:grid-rows-7
+               gap-3 p-2 bg-white/40 rounded-lg"
+              >
                 <Form1
                   getFieldProps={getFieldProps}
                   touched={touched}
@@ -215,6 +221,8 @@ const ProductPage: NextPageWithLayout = () => {
                 />
 
                 <Form2
+                  setVariant={setVariant}
+                  variant={variant}
                   getFieldProps={getFieldProps}
                   touched={touched}
                   errors={errors}
@@ -239,6 +247,8 @@ const ProductPage: NextPageWithLayout = () => {
                 ) : (
                   <div className="rounded-lg p-2 col-span-5 row-span-3 h-full bg-white" />
                 )}
+
+                {variant && <Variants />}
               </div>
             </div>
           </Form>

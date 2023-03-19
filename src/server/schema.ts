@@ -6,6 +6,14 @@ const SStatus = z.enum(["active", "disabled", "review"]);
 
 const PStatus = z.enum(["active", "disabled", "review", "incomplete"]);
 
+const ProductVariant = z.object({
+  title: z.string(),
+  price: z.string(),
+  image: z.string(),
+  options: z.array(z.object({ k: z.string(), v: z.string() })),
+  sku: z.string(),
+});
+
 export const ProductSortEnum = z.enum([
   "title-asc",
   "title-desc",
@@ -38,6 +46,7 @@ export const ProductSchema = z.object({
   status: PStatus,
   discountPercentage: z.number(),
   promotion: z.array(z.string()),
+  variants: z.array(ProductVariant),
 });
 
 // export const ProductUpdateSchema = ProductSchema.extend({
