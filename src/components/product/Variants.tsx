@@ -37,8 +37,6 @@ const Variants = ({
   touched,
   serverVariants,
 }: Props) => {
-  console.log(variants);
-
   return (
     <FieldArray name="variants">
       {({ pop, push, remove }) => (

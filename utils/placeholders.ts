@@ -2,13 +2,18 @@ import type { Product, ProductVariant, Store } from "@prisma/client";
 import type { ProductPayload } from "src/server/schema";
 
 export interface FormValues
-  extends Omit<ProductPayload, "tags" | "category" | "promotion" | "variants"> {
+  extends Omit<
+    ProductPayload,
+    "tags" | "category" | "promotions" | "variants"
+  > {
   tags: string;
   category: string;
-  promotion: string;
+  promotions: string;
   thumbnailFile: File | null;
   imageFiles: { id: string; file: File }[];
-  variants: (ProductVariant & { imageFile: File | null })[];
+  variants: (Omit<ProductVariant, "updatedAt" | "sku" | "id"> & {
+    imageFile: File | null;
+  })[];
 }
 
 export const initialSD: Store = {
@@ -30,7 +35,7 @@ export const productPLD: Omit<Product, ""> = {
   description: "",
   discountPercentage: 0,
   price: 0,
-  promotion: [],
+  promotions: [],
   rating: 0,
   status: "review",
   stock: 0,
@@ -65,20 +70,22 @@ export const getProductInitialPayload: (
   tags: product?.tags || [],
   status: product?.status || "review",
   discountPercentage: product?.discountPercentage || 0,
-  promotion: product?.promotion || [],
+  promotions: product?.promotions || [],
   thumbnailFile: null,
   images: product?.images || [],
   imageFiles: [],
-  variants: [],
+  variants:
+    product?.variants.map((vrn) => ({
+      options: vrn.options,
+      price: vrn.price,
+      title: vrn.title,
+    })) || [],
 });
 
-export const vPlaceholder: ProductVariant = {
+export const vPlaceholder = {
   title: "",
   price: 0,
-  image: "",
   options: [],
-  updatedAt: "",
-  sku: "",
 };
 
 export const getFormIV: (product?: Product | null) => FormValues = (
@@ -100,12 +107,24 @@ export const getFormIV: (product?: Product | null) => FormValues = (
     tags: product?.tags?.join(",").replace(",", " ; ") || "",
     status: product?.status || "review",
     discountPercentage: product?.discountPercentage || 0,
-    promotion: product?.promotion.join(",").replace(",", " ; ") || "",
+    promotions: product?.promotions?.join(",").replace(",", " ; ") || "",
     thumbnailFile: null,
     imageFiles: [],
     images: product?.images || [],
     variants:
-      product?.variants.map((variant) => ({ ...variant, imageFile: null })) ||
-      [],
+      product?.variants.map(({ image, options, price, title }) => ({
+        image,
+        options,
+        price,
+        title,
+        imageFile: null,
+      })) || [],
   };
+};
+
+export type MutateValues = {
+  details?: Partial<ProductPayload>;
+  variantFiles?: { id: string; file: File | null }[];
+  thumbnailFile?: File | null;
+  imageFiles?: File[];
 };

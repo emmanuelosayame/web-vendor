@@ -67,6 +67,7 @@ type VariantOption {
 }
 
 type ProductVariant {
+    id        String
     title     String
     price     Int
     image     String
@@ -83,7 +84,7 @@ model Product {
     discountPercentage Float            @default(0.0)
     images             String[]
     price              Int
-    promotion          String[]
+    promotions         String[]
     rating             Float            @default(0.0)
     status             PStatus
     stock              Int

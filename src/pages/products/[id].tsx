@@ -13,6 +13,7 @@ import { api } from "utils/api";
 import {
   getFormIV,
   getProductInitialPayload,
+  type MutateValues,
   type FormValues,
 } from "utils/placeholders";
 import { productVs } from "utils/validation";
@@ -20,12 +21,17 @@ import { type NextPageWithLayout } from "../../../types/shared";
 import Gallery from "@components/product/Gallery";
 import { Form1, Form2 } from "@components/product/Forms";
 import Variants from "@components/product/Variants";
+import { onSubmit } from "@components/product/save";
+import { useMutation } from "@tanstack/react-query";
+import type { Product } from "@prisma/client";
 
 const ProductPage: NextPageWithLayout = () => {
   const router = useRouter();
   const pid = router.query.id?.toString();
-
   const [uploading, setUploading] = useState(false);
+
+  const qc = api.useContext();
+  const refetch = qc.product.one.refetch;
 
   const { data, isFetching, error, status } = api.product.one.useQuery(
     { id: pid },
@@ -35,105 +41,50 @@ const ProductPage: NextPageWithLayout = () => {
   );
 
   const formIV = getFormIV(data);
-  const initialData = getProductInitialPayload(data);
-
-  const qc = api.useContext();
 
   const { open, setOpen, trigger } = useToastTrigger();
 
-  const { mutate: create, isLoading: creating } =
+  const { mutateAsync: create, isLoading: creating } =
     api.product.create.useMutation({
       onSuccess: (data) => {
         trigger();
         router.replace(`/products`);
       },
     });
-  const { mutateAsync, isLoading: mutating } = api.product.update.useMutation({
-    onSettled: () => {
-      trigger();
-    },
-  });
 
-  const uploadImage = async (
-    id: string | undefined,
-    { file, files }: { file: File | null; files: File[] }
-  ) => {
-    const form = new FormData();
-    form.append("id", id || "new");
-    if (file) {
-      form.append("single", file);
-    }
-    if (files.length > 0) {
-      for (const file of files) {
-        form.append("multiple", file);
+  // create fn to upload. formData with type first then json.stringify the rest of payload as "other"field.imagefiles and thumbnail field also variant field
+
+  const { mutateAsync, isLoading: mutating } = useMutation<
+    Product,
+    AxiosError,
+    MutateValues
+  >(
+    async ({ details, imageFiles, thumbnailFile, variantFiles }) => {
+      const form = new FormData();
+      pid && form.append("id", pid);
+      form.append("payload", JSON.stringify(details));
+
+      if (thumbnailFile) {
+        form.append("thumbnail", thumbnailFile);
       }
-    }
-    setUploading(true);
-    try {
-      await axios.put("/api/upload/product", form);
-      setUploading(false);
-      return { status: "success", error: undefined };
-    } catch (err) {
-      setUploading(false);
-      return { status: "error", error: err as AxiosError };
-    }
-  };
 
-  const onSubmit = async (values: FormValues) => {
-    console.log(values);
-    // const { thumbnailFile, imageFiles, tags, promotion, ...rest } = values;
+      if (imageFiles && imageFiles.length > 0) {
+        for (const file of imageFiles) {
+          if (file) form.append("mainImages", file);
+        }
+      }
 
-    // const sortedImageFiles = imageFiles
-    //   .sort((a, b) => Number(a.id) - Number(b.id))
-    //   .map((f) => f.file);
-
-    // const payload: ProductPayload = {
-    //   ...rest,
-    //   tags: tags.split(" ; "),
-    //   promotion: promotion.split(" ; "),
-    // };
-
-    // if (pid !== "new") {
-    //   const updatedDetails = updatedDiff(
-    //     initialData,
-    //     payload
-    //   ) as Partial<ProductPayload>;
-    //   const hadFormChanges = Object.keys(updatedDetails).length > 0;
-    //   if (hadFormChanges) {
-    //     await mutateAsync({
-    //       id: pid,
-    //       data: updatedDetails,
-    //     });
-    //   }
-    //   if (thumbnailFile || imageFiles.length > 0) {
-    //     const { status, error } = await uploadImage(data?.id, {
-    //       file: thumbnailFile,
-    //       files: sortedImageFiles,
-    //     });
-    //     !error && qc.product.one.refetch();
-    //     error && hadFormChanges && qc.product.one.refetch();
-    //     return;
-    //   }
-    //   hadFormChanges && qc.product.one.refetch();
-    // } else {
-    //   create(
-    //     { data: payload },
-    //     {
-    //       onSuccess: async (data) => {
-    //         if (thumbnailFile || imageFiles.length > 0) {
-    //           const { status, error } = await uploadImage(data.id, {
-    //             file: thumbnailFile,
-    //             files: sortedImageFiles,
-    //           });
-    //           if (status === "error") {
-    //             mutateAsync({ id: data.id, data: { status: "incomplete" } });
-    //           }
-    //         }
-    //       },
-    //     }
-    //   );
-    // }
-  };
+      if (variantFiles && variantFiles.length > 0) {
+        for (const variant of variantFiles) {
+          if (variant.file)
+            form.append("variantImages", variant.file, variant.id);
+        }
+      }
+      const { data } = await axios.put<Product>("/api/upload/product", form);
+      return data;
+    },
+    { onSuccess: () => refetch() }
+  );
 
   useEffect(() => {
     if (
@@ -161,7 +112,16 @@ const ProductPage: NextPageWithLayout = () => {
       <Formik
         initialValues={formIV}
         validationSchema={productVs}
-        onSubmit={onSubmit}
+        onSubmit={(values) =>
+          onSubmit({
+            values,
+            data,
+            mutateAsync,
+            create,
+            setUploading,
+            refetch,
+          })
+        }
         enableReinitialize
       >
         {({
@@ -251,7 +211,7 @@ const ProductPage: NextPageWithLayout = () => {
                   setFieldValue={setFieldValue}
                   touched={touched}
                   errors={errors}
-                  serverVariants={initialData.variants}
+                  serverVariants={data?.variants || []}
                 />
               </div>
             </div>

@@ -3,11 +3,12 @@ import AlertDialog from "@components/radix/Alert";
 import Select from "@components/radix/Select";
 import Switch from "@components/radix/Switch";
 import { TDivider, THStack, TStack } from "@components/TElements";
+import type { Product } from "@prisma/client";
 import type { FieldInputProps, FormikErrors, FormikTouched } from "formik";
 import { useRouter } from "next/router";
 import { type ProductPayload } from "src/server/schema";
 import { api } from "utils/api";
-import { type FormValues } from "utils/placeholders";
+import { type MutateValues, type FormValues } from "utils/placeholders";
 
 interface Props {
   getFieldProps: <Value = any>(props: any) => FieldInputProps<Value>;
@@ -17,7 +18,7 @@ interface Props {
 
 interface PropsPlus extends Props {
   pid: string | undefined;
-  mutate: (values: { id?: string; data: Partial<ProductPayload> }) => void;
+  mutate: (values: MutateValues) => Promise<Product>;
   values: FormValues;
   setFieldValue: (
     field: string,
@@ -172,9 +173,8 @@ export const Form2 = ({
                    bg-amber-400 hover:bg-amber-500 text-white"
             onClickConfirm={() =>
               mutate({
-                id: pid,
-                data: {
-                  status: status === "active" ? "disabled" : "active",
+                details: {
+                  status: values.status === "active" ? "disabled" : "active",
                 },
               })
             }

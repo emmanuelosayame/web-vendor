@@ -1,6 +1,4 @@
 import { TRPCError } from "@trpc/server";
-import { nanoid } from "nanoid";
-import { storage } from "utils/f-admin";
 import { z } from "zod";
 import { ProductSortEnum, ProductSchema } from "../schema";
 import { router, protectedProcedure } from "../trpc";

@@ -6,11 +6,13 @@ const SStatus = z.enum(["active", "disabled", "review"]);
 
 const PStatus = z.enum(["active", "disabled", "review", "incomplete"]);
 
+//id on server differs from client, id on client to server is index to string
 const ProductVariant = z.object({
+  // id: z.string().optional(),
   title: z.string(),
   price: z.number(),
   options: z.array(z.object({ k: z.string(), v: z.string() })),
-  sku: z.string(),
+  // sku: z.string(),
   // updatedAt: z.string(),
 });
 
@@ -42,10 +44,10 @@ export const ProductSchema = z.object({
   // thumbnailFile: z.string().nullable(),
   // imageFiles: z.array(z.object({ id: z.string(), url: z.string() })),
   // images: z.array(z.string()),
-  moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
+  // moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
   status: PStatus,
   discountPercentage: z.number(),
-  promotion: z.array(z.string()),
+  promotions: z.array(z.string()),
   variants: z.array(ProductVariant),
 });
 
