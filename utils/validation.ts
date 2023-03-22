@@ -56,10 +56,10 @@ export const productVs = Yup.object().shape({
   price: Yup.number().moreThan(5, "too low").lessThan(1000000).required(),
   stock: Yup.number().moreThan(1, "too low").lessThan(10000),
   package: Yup.string().min(2).max(100).required(),
-  tags: Yup.string().min(2).max(300),
+  tags: Yup.array().of(Yup.string().min(2).max(10)),
   specs: Yup.object({
     model: Yup.string().min(1, "too short").max(30),
-    others: Yup.string().min(5, "too short").max(40),
+    others: Yup.array().of(Yup.string().min(2).max(50)),
   }),
   // thumbnail: Yup.string(),
   // images: Yup.array(Yup.string()),

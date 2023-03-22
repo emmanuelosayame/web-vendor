@@ -28,8 +28,6 @@ import type { Product } from "@prisma/client";
 const ProductPage: NextPageWithLayout = () => {
   const router = useRouter();
   const pid = router.query.id?.toString();
-  const [uploading, setUploading] = useState(false);
-
   const qc = api.useContext();
   const refetch = qc.product.one.refetch;
 
@@ -43,14 +41,6 @@ const ProductPage: NextPageWithLayout = () => {
   const formIV = getFormIV(data);
 
   const { open, setOpen, trigger } = useToastTrigger();
-
-  const { mutateAsync: create, isLoading: creating } =
-    api.product.create.useMutation({
-      onSuccess: (data) => {
-        trigger();
-        router.replace(`/products`);
-      },
-    });
 
   // create fn to upload. formData with type first then json.stringify the rest of payload as "other"field.imagefiles and thumbnail field also variant field
 
@@ -99,7 +89,7 @@ const ProductPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {(isFetching || mutating || creating || uploading) && <LoadingBlur />}
+      {(isFetching || mutating) && <LoadingBlur />}
 
       <Toast
         open={open}
@@ -117,8 +107,6 @@ const ProductPage: NextPageWithLayout = () => {
             values,
             data,
             mutateAsync,
-            create,
-            setUploading,
             refetch,
           })
         }

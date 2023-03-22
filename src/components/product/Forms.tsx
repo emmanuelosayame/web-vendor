@@ -3,9 +3,11 @@ import AlertDialog from "@components/radix/Alert";
 import Select from "@components/radix/Select";
 import Switch from "@components/radix/Switch";
 import { TDivider, THStack, TStack } from "@components/TElements";
+import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Product } from "@prisma/client";
 import type { FieldInputProps, FormikErrors, FormikTouched } from "formik";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { type ProductPayload } from "src/server/schema";
 import { api } from "utils/api";
 import { type MutateValues, type FormValues } from "utils/placeholders";
@@ -132,17 +134,15 @@ export const Form2 = ({
         touched={touched.package}
         error={errors.package}
       />
-      <TextareaTemp
-        heading="Tags"
-        rows={4}
-        fieldProps={getFieldProps("tags")}
-        placeholder="Enter tags sperated by semi-colon, tags written together would exists as a single word"
-        touched={touched.tags}
-        error={errors.tags}
-      />
-      <div className="">
-        <h3 className="border-b border-b-neutral-200">Specifications</h3>
 
+      <TagsComponent
+        name="tags"
+        tags={values.tags}
+        setFieldValue={setFieldValue}
+      />
+
+      <div className="space-y-3 flex-1">
+        <h3 className="border-b border-b-neutral-200">Specifications</h3>
         <InputTemp
           fieldProps={getFieldProps("specs.model")}
           style={{}}
@@ -151,24 +151,22 @@ export const Form2 = ({
           error={errors.specs?.model}
         />
 
-        <TextareaTemp
-          heading="Other Specs"
-          rows={4}
-          fieldProps={getFieldProps("specs.others")}
-          placeholder="Enter tags sperated by semi-colon, tags written together would exists as a single word"
-          touched={touched.specs?.others}
-          error={errors.specs?.others}
+        <TagsComponent
+          name="specs.others"
+          tags={values.specs.others}
+          setFieldValue={setFieldValue}
+          placeholder="Other specs"
         />
       </div>
 
       {pid !== "new" ? (
         <div className="flex gap-2">
           <AlertDialog
-            action={status === "active" ? "Disable" : "Enable"}
+            action={values.status === "active" ? "Disable" : "Enable"}
             title={`Are you sure you want to ${
-              status === "active" ? "disable" : "enable"
+              values.status === "active" ? "disable" : "enable"
             } this product?`}
-            trigger={status === "active" ? "disable" : "enable"}
+            trigger={values.status === "active" ? "disable" : "enable"}
             triggerStyles="py-1 w-11/12 mx-auto rounded-lg
                    bg-amber-400 hover:bg-amber-500 text-white"
             onClickConfirm={() =>
@@ -192,5 +190,69 @@ export const Form2 = ({
         </div>
       ) : null}
     </TStack>
+  );
+};
+
+interface TagProps {
+  tags: string[];
+  setFieldValue: PropsPlus["setFieldValue"];
+  name: string;
+  placeholder?: string;
+}
+
+const TagsComponent = ({
+  tags,
+  setFieldValue,
+  name,
+  placeholder = "Enter tag",
+}: TagProps) => {
+  const [tag, setTag] = useState("");
+  return (
+    <div className="border-200 rounded-lg p-2">
+      <div className="flex gap-4">
+        <input
+          disabled={tags.length > 4}
+          value={tag}
+          maxLength={11}
+          placeholder={placeholder}
+          onChange={(e) => setTag(e.target.value)}
+        />
+        <button
+          disabled={tag.length < 2 || tag.length > 10}
+          type="button"
+          className="rounded-full p-1 bg-amber-400 text-white 
+          disabled:opacity-70 hover:bg-amber-500"
+          onClick={() => {
+            setTag("");
+            setFieldValue(name, [...tags.filter((tg) => tag !== tg), tag]);
+          }}
+        >
+          <PlusIcon width={20} />
+        </button>
+      </div>
+      {tags.length > 0 && (
+        <div className="border-200 rounded-lg p-2 mt-2 flex gap-2 flex-wrap">
+          {tags.map((tag) => (
+            <div
+              key={tag}
+              className="flex items-center gap-1 rounded-lg bg-teal-400 px-3 py-1 text-white text-sm"
+            >
+              <span>{tag}</span>
+              <button
+                type="button"
+                onClick={() =>
+                  setFieldValue(
+                    name,
+                    tags.filter((tg) => tag !== tg)
+                  )
+                }
+              >
+                <XMarkIcon width={20} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };

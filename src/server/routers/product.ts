@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { ProductSortEnum, ProductSchema } from "../schema";
+import { ProductSortEnum } from "../schema";
 import { router, protectedProcedure } from "../trpc";
 
 export const productRouter = router({
@@ -46,38 +46,5 @@ export const productRouter = router({
         orderBy: sort && sort !== "search" ? orderBy : { title: "asc" },
       });
       return result;
-    }),
-  create: protectedProcedure
-    .input(
-      z.object({
-        data: ProductSchema,
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { prisma, sid } = ctx;
-      const { data } = input;
-      const { moreDescr, ...rest } = data;
-
-      const payload = {
-        ...rest,
-        sid,
-      };
-      return await prisma.product.create({ data: payload });
-    }),
-  update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string().optional(),
-        data: ProductSchema.partial(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { id, data } = input;
-      const { moreDescr, ...rest } = data;
-
-      const update = {
-        ...rest,
-      };
-      return ctx.prisma.product.update({ where: { id }, data: update });
     }),
 });

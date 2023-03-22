@@ -2,11 +2,7 @@ import type { Product, ProductVariant, Store } from "@prisma/client";
 import type { ProductPayload } from "src/server/schema";
 
 export interface FormValues
-  extends Omit<
-    ProductPayload,
-    "tags" | "category" | "promotions" | "variants"
-  > {
-  tags: string;
+  extends Omit<ProductPayload, "category" | "promotions" | "variants"> {
   category: string;
   promotions: string;
   thumbnailFile: File | null;
@@ -47,7 +43,7 @@ export const productPLD: Omit<Product, ""> = {
   moreDescr: [],
   sid: "",
   sold: 0,
-  specs: { model: "", others: "" },
+  specs: { model: "", others: [] },
   thumbnail: "",
   variants: [],
 };
@@ -65,7 +61,7 @@ export const getProductInitialPayload: (
   moreDescr: [],
   specs: {
     model: product?.specs?.model || "",
-    others: product?.specs?.others || "",
+    others: product?.specs?.others || [],
   },
   tags: product?.tags || [],
   status: product?.status || "review",
@@ -102,9 +98,9 @@ export const getFormIV: (product?: Product | null) => FormValues = (
     moreDescr: [],
     specs: {
       model: product?.specs?.model || "",
-      others: product?.specs?.others || "",
+      others: product?.specs?.others || [],
     },
-    tags: product?.tags?.join(",").replace(",", " ; ") || "",
+    tags: product?.tags || [],
     status: product?.status || "review",
     discountPercentage: product?.discountPercentage || 0,
     promotions: product?.promotions?.join(",").replace(",", " ; ") || "",

@@ -39,11 +39,6 @@ interface Props {
   values: FormValues;
   data: Product | null | undefined;
   mutateAsync: (values: MutateValues) => Promise<Product>;
-  create: (
-    values: { id?: string; data: ProductPayload },
-    opts: { onSuccess: (data: Product) => void }
-  ) => Promise<Product>;
-  setUploading: (upldn: boolean) => void;
   refetch: () => void;
 }
 
@@ -51,20 +46,32 @@ export const onSubmit = async ({
   data,
   values,
   mutateAsync,
-  create,
-  setUploading,
   refetch,
 }: Props) => {
-  const { variants: initialVariants, ...initialData } =
-    getProductInitialPayload(data);
+  const {
+    variants: initialVariants,
+    tags: initialTags,
+    specs: initialSpecs,
+    ...initialData
+  } = getProductInitialPayload(data);
 
   const initialVariantsWID = initialVariants.map((variant, index) => ({
     ...variant,
     id: (index + 1).toString(),
   }));
 
-  const { thumbnailFile, imageFiles, tags, promotions, variants, ...rest } =
-    values;
+  const {
+    thumbnailFile,
+    imageFiles,
+    variants,
+    specs,
+    tags,
+    promotions,
+    ...rest
+  } = values;
+
+  const changedTags = JSON.stringify(initialTags) !== JSON.stringify(tags);
+  const changedSpecs = JSON.stringify(initialSpecs) !== JSON.stringify(specs);
 
   const sortedImageFiles = imageFiles
     .sort((a, b) => Number(a.id) - Number(b.id))
@@ -97,18 +104,19 @@ export const onSubmit = async ({
     }))
     .filter((varnt) => varnt.file !== null);
 
-  const payload: Omit<ProductPayload, "variants"> = {
+  const payload: Omit<ProductPayload, "variants" | "tags" | "specs"> = {
     ...rest,
-    tags: tags.split(" ; "),
     promotions: promotions.split(" ; "),
   };
 
-  const updatedDetails = JSON.parse(
+  const updatedDetails: Partial<ProductPayload> = JSON.parse(
     JSON.stringify({
       ...updatedDiff(initialData, payload),
       variants: variantPayload.length > 0 ? variantPayload : undefined,
+      tags: changedTags ? tags : undefined,
+      specs: changedSpecs ? specs : undefined,
     })
-  ) as Partial<ProductPayload>;
+  );
 
   mutateAsync({
     details: updatedDetails,
@@ -116,53 +124,4 @@ export const onSubmit = async ({
     thumbnailFile,
     variantFiles,
   });
-
-  //   if (pid !== "new") {
-  //     const updatedDetails = updatedDiff(
-  //       initialData,
-  //       payload
-  //     ) as Partial<ProductPayload>;
-  //     const hadFormChanges = Object.keys(updatedDetails).length > 0;
-  //     if (hadFormChanges) {
-  //       await mutateAsync({
-  //         id: pid,
-  //         data: updatedDetails,
-  //       });
-  //     }
-  //     if (thumbnailFile || imageFiles.length > 0) {
-  //       const { status, error } = await uploadImage(
-  //         data?.id,
-  //         {
-  //           file: thumbnailFile,
-  //           files: sortedImageFiles,
-  //         },
-  //         setUploading
-  //       );
-  //       !error && refetch();
-  //       error && hadFormChanges && refetch();
-  //       return;
-  //     }
-  //     hadFormChanges && refetch();
-  //   } else {
-  //     create(
-  //       { data: payload },
-  //       {
-  //         onSuccess: async (data) => {
-  //           if (thumbnailFile || imageFiles.length > 0) {
-  //             const { status, error } = await uploadImage(
-  //               data.id,
-  //               {
-  //                 file: thumbnailFile,
-  //                 files: sortedImageFiles,
-  //               },
-  //               setUploading
-  //             );
-  //             if (status === "error") {
-  //               mutateAsync({ id: data.id, data: { status: "incomplete" } });
-  //             }
-  //           }
-  //         },
-  //       }
-  //     );
-  //   }
 };

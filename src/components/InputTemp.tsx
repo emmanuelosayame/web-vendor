@@ -6,7 +6,7 @@ interface Props {
   type?: HTMLInputTypeAttribute;
   fieldProps?: FieldInputProps<string | number | readonly string[] | undefined>;
   touched?: boolean;
-  error?: string;
+  error?: string | string[];
   placeholder?: string;
   Ibg?: string;
   style?: { heading?: any; input?: any };

@@ -37,6 +37,7 @@ const Variants = ({
   touched,
   serverVariants,
 }: Props) => {
+  const variantErrors = errors.variants as any;
   return (
     <FieldArray name="variants">
       {({ pop, push, remove }) => (
@@ -112,7 +113,7 @@ const Variants = ({
                         touched={
                           touched.variants && touched.variants[index]?.title
                         }
-                        error={errors.variants && errors.variants[index]?.title}
+                        error={errors.variants && variantErrors[index]?.title}
                       />
                       <InputTemp
                         heading="Price"
@@ -122,7 +123,7 @@ const Variants = ({
                         touched={
                           touched.variants && touched.variants[index]?.price
                         }
-                        error={errors.variants && errors.variants[index]?.price}
+                        error={errors.variants && variantErrors[index]?.price}
                       />
                     </div>
                     <p className="mt-2">Options</p>
