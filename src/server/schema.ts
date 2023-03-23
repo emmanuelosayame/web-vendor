@@ -48,7 +48,7 @@ export const ProductSchema = z.object({
   status: PStatus,
   discountPercentage: z.number(),
   promotions: z.array(z.string()),
-  variants: z.array(ProductVariant),
+  variantsPayload: z.array(ProductVariant),
 });
 
 // export const ProductUpdateSchema = ProductSchema.extend({

@@ -2,7 +2,7 @@ import type { Product, ProductVariant, Store } from "@prisma/client";
 import type { ProductPayload } from "src/server/schema";
 
 export interface FormValues
-  extends Omit<ProductPayload, "category" | "promotions" | "variants"> {
+  extends Omit<ProductPayload, "category" | "promotions" | "variantsPayload"> {
   category: string;
   promotions: string;
   thumbnailFile: File | null;
@@ -70,7 +70,7 @@ export const getProductInitialPayload: (
   thumbnailFile: null,
   images: product?.images || [],
   imageFiles: [],
-  variants:
+  variantsPayload:
     product?.variants.map((vrn) => ({
       options: vrn.options,
       price: vrn.price,
@@ -82,6 +82,7 @@ export const vPlaceholder = {
   title: "",
   price: 0,
   options: [],
+  image: "",
 };
 
 export const getFormIV: (product?: Product | null) => FormValues = (

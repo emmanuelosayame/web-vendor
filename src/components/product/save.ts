@@ -49,7 +49,7 @@ export const onSubmit = async ({
   refetch,
 }: Props) => {
   const {
-    variants: initialVariants,
+    variantsPayload: initialVariants,
     tags: initialTags,
     specs: initialSpecs,
     ...initialData
@@ -78,15 +78,14 @@ export const onSubmit = async ({
     .map((f) => f.file);
 
   const variantPayload = variants
-    .map(({ options, price, title }, index) => ({
+    .map(({ options, price, title }) => ({
       options,
       price,
       title,
-      id: (index + 1).toString(),
     }))
-    .filter((variant) => {
+    .filter((variant, index) => {
       const prevVariant = initialVariantsWID.find(
-        (varnt) => variant.id === varnt.id
+        (varnt) => (index + 1).toString() === varnt.id
       );
       if (!!prevVariant) {
         const changed = Object.keys(diff(variant, prevVariant)).length > 0;
@@ -104,7 +103,7 @@ export const onSubmit = async ({
     }))
     .filter((varnt) => varnt.file !== null);
 
-  const payload: Omit<ProductPayload, "variants" | "tags" | "specs"> = {
+  const payload: Omit<ProductPayload, "variantsPayload" | "tags" | "specs"> = {
     ...rest,
     promotions: promotions.split(" ; "),
   };
@@ -112,7 +111,7 @@ export const onSubmit = async ({
   const updatedDetails: Partial<ProductPayload> = JSON.parse(
     JSON.stringify({
       ...updatedDiff(initialData, payload),
-      variants: variantPayload.length > 0 ? variantPayload : undefined,
+      variantsPayload: variantPayload.length > 0 ? variantPayload : undefined,
       tags: changedTags ? tags : undefined,
       specs: changedSpecs ? specs : undefined,
     })

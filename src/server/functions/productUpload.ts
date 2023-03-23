@@ -3,7 +3,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { formidablePromise, uploadImage } from ".";
 import { prisma } from "src/server/db";
 import { ProductSchema } from "../schema";
-import type { Product } from "@prisma/client";
+import type { Product, ProductVariant } from "@prisma/client";
+import { nanoid } from "nanoid";
 
 interface Args {
   req: NextApiRequest;
@@ -22,17 +23,19 @@ export const uploadProduct = async ({ req, res }: Args) => {
         fields.payload && JSON.parse(fields.payload.toString());
 
       if (id !== "new") {
-        const { variants, ...rest } =
+        const { variantsPayload, ...rest } =
           ProductSchema.partial().parse(parsedPayload);
         const prevData = await prisma.product.findUnique({ where: { id } });
-        const { mainImages, thumbnail } = await handleImages({
+        const { mainImages, thumbnail, variants } = await handleImages({
           imageFiles,
           thumbnailFile,
           prevData,
+          variantFiles,
+          variantsPayload,
         });
         const data = await prisma.product.update({
           where: { id },
-          data: { thumbnail, images: mainImages, ...rest },
+          data: { thumbnail, images: mainImages, variants, ...rest },
         });
         res.status(200).json(data);
       }
@@ -42,14 +45,16 @@ export const uploadProduct = async ({ req, res }: Args) => {
           res.status(500).json("no file");
           return;
         }
-        const { variants, ...rest } = ProductSchema.parse(parsedPayload);
+        const { variantsPayload, ...rest } = ProductSchema.parse(parsedPayload);
 
-        const { mainImages, thumbnail } = await handleImages({
+        const { mainImages, thumbnail, variants } = await handleImages({
           imageFiles,
           thumbnailFile,
+          variantFiles,
+          variantsPayload,
         });
         const data = prisma.product.create({
-          data: { ...rest, images: mainImages, thumbnail },
+          data: { ...rest, images: mainImages, variants, thumbnail },
         });
 
         res.status(200).json({ status: "success" });
@@ -65,21 +70,73 @@ interface HandleImageProps {
   prevData?: Product | null;
   thumbnailFile: File;
   imageFiles: File | File[];
+  variantFiles: File | File[];
+  variantsPayload?: {
+    title: string;
+    price: number;
+    options: {
+      k: string;
+      v: string;
+    }[];
+  }[];
 }
 
 const handleImages = async ({
   prevData,
   thumbnailFile,
   imageFiles,
+  variantFiles,
+  variantsPayload,
 }: HandleImageProps) => {
   let thumbnail: string | undefined = undefined;
   let mainImages: string[] = [];
+  let variants: ProductVariant[] = [];
 
   if (thumbnailFile) {
     thumbnail = await uploadImage(thumbnailFile.filepath, {
       newFileName: "thumbnail",
       oldUrl: prevData?.thumbnail,
     });
+  }
+
+  if (variantFiles || variantsPayload) {
+    const prevImages =
+      prevData?.variants.map((varnt, index) => ({
+        id: (index + 1).toString(),
+        url: varnt.image,
+      })) || [];
+    if (!Array.isArray(variantFiles)) {
+    } else {
+      const filesWPH = ["1", "2", "3", "4", "5"].map((ph) => ({
+        id: ph,
+        path:
+          variantFiles.find((file) => ph === file.originalFilename?.slice(0, 1))
+            ?.filepath || null,
+      }));
+      for await (const file of filesWPH) {
+        const oldUrl = prevImages?.find((img) => img.id === file.id)?.url || "";
+        const vPayload = variantsPayload?.find((varnt, index) =>
+          (index + 1).toString()
+        );
+        const oldVPayload = prevData?.variants?.find((varnt, index) =>
+          (index + 1).toString()
+        );
+        variants.push({
+          id: oldVPayload?.id || nanoid(10),
+          image: file.path
+            ? await uploadImage(file.path, {
+                newFileName: `product-variant-${file.id}`,
+                oldUrl,
+              })
+            : oldUrl,
+          options: vPayload ? vPayload.options : oldVPayload?.options || [],
+          price: vPayload ? vPayload.price : oldVPayload?.price || 0,
+          title: vPayload ? vPayload.title : oldVPayload?.title || "",
+          sku: oldVPayload?.sku || nanoid(15),
+          updatedAt: Date.now().toString(),
+        });
+      }
+    }
   }
 
   if (imageFiles) {
@@ -132,8 +189,10 @@ const handleImages = async ({
       }
     }
   }
+
   return {
     thumbnail,
     mainImages: mainImages.length > 0 ? mainImages : undefined,
+    variants: variantFiles || variantsPayload ? variants : undefined,
   };
 };
