@@ -47,6 +47,7 @@ const SelectStore = ({ onSwitchedFn = () => {} }: Props) => {
               setCookie("sid", account.id, {
                 sameSite: true,
                 secure: true,
+                maxAge: 60 * 60 * 24 * 5 * 1000,
               });
               await router.replace("/");
               await qc.invalidate();
