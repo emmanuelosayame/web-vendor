@@ -64,10 +64,15 @@ const ProductPage: NextPageWithLayout = () => {
         }
       }
 
-      if (variantFiles && variantFiles.length > 0) {
-        for (const variant of variantFiles) {
+      if (variantFiles?.new && variantFiles.new.length > 0) {
+        for (const variant of variantFiles.new) {
+          if (variant.file) form.append("newVImages", variant.file, variant.id);
+        }
+      }
+      if (variantFiles?.updated && variantFiles.updated.length > 0) {
+        for (const variant of variantFiles.updated) {
           if (variant.file)
-            form.append("variantImages", variant.file, variant.id);
+            form.append("updatedVImages", variant.file, variant.id);
         }
       }
       const { data } = await axios.put<Product>("/api/upload/product", form);

@@ -44,7 +44,7 @@ const Variants = ({
   const variantErrors = errors.variants as any;
   const variantsWID = variants.map((varnt, index) => ({
     ...varnt,
-    id: (index + 1).toString(),
+    id: varnt.id || (index + 1).toString(),
   }));
   const [previews, setPreviews] = useState<{ url: string; id: string }[]>();
 
@@ -86,6 +86,7 @@ const Variants = ({
   return (
     <>
       <SelectImage
+        aspect={1}
         open={open}
         previewUrl={activePrev?.url}
         setOpen={setOpen}
@@ -237,7 +238,7 @@ const Variants = ({
                             <button
                               type="button"
                               className="text-orange-500 rounded-full p-1.5 ml-2 bg-orange-200 drop-shadow-md"
-                              onClick={() => setOpen((index + 1).toString())}
+                              onClick={() => setOpen(variant.id)}
                             >
                               <PlusIcon width={20} />
                             </button>

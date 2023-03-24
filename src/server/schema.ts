@@ -8,7 +8,7 @@ const PStatus = z.enum(["active", "disabled", "review", "incomplete"]);
 
 //id on server differs from client, id on client to server is index to string
 const ProductVariant = z.object({
-  // id: z.string().optional(),
+  id: z.string().optional(),
   title: z.string(),
   price: z.number(),
   options: z.array(z.object({ k: z.string(), v: z.string() })),
@@ -41,14 +41,14 @@ export const ProductSchema = z.object({
     model: z.string(),
     others: z.array(z.string()),
   }),
-  // thumbnailFile: z.string().nullable(),
-  // imageFiles: z.array(z.object({ id: z.string(), url: z.string() })),
-  // images: z.array(z.string()),
-  // moreDescr: z.array(z.object({ id: z.string(), url: z.string() })),
   status: PStatus,
   discountPercentage: z.number(),
   promotions: z.array(z.string()),
-  variantsPayload: z.array(ProductVariant),
+  variantsPayload: z.object({
+    new: z.array(ProductVariant).optional(),
+    updated: z.array(ProductVariant).optional(),
+    deleted: z.array(z.string()).optional(),
+  }),
 });
 
 // export const ProductUpdateSchema = ProductSchema.extend({
@@ -122,3 +122,5 @@ export const AssetPayload = z.object({
 export type ProductPayload = z.infer<typeof ProductSchema>;
 
 export type ProductSort = z.infer<typeof ProductSortEnum>;
+
+export type VariantSchemaType = z.infer<typeof ProductVariant>;

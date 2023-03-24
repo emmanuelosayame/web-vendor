@@ -85,3 +85,10 @@ export const uploadImage: (
     metadata.metadata.firebaseStorageDownloadTokens
   );
 };
+
+export const deleteImage = async (url: string) => {
+  const path = getStoragePath(url);
+  console.log(path);
+  if (!path) return;
+  await bucket.file(path).delete();
+};

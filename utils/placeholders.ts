@@ -1,5 +1,5 @@
 import type { Product, ProductVariant, Store } from "@prisma/client";
-import type { ProductPayload } from "src/server/schema";
+import type { ProductPayload, VariantSchemaType } from "src/server/schema";
 
 export interface FormValues
   extends Omit<ProductPayload, "category" | "promotions" | "variantsPayload"> {
@@ -7,8 +7,9 @@ export interface FormValues
   promotions: string;
   thumbnailFile: File | null;
   imageFiles: { id: string; file: File }[];
-  variants: (Omit<ProductVariant, "updatedAt" | "sku" | "id"> & {
+  variants: (VariantSchemaType & {
     imageFile: File | null;
+    image: string;
   })[];
 }
 
@@ -48,9 +49,14 @@ export const productPLD: Omit<Product, ""> = {
   variants: [],
 };
 
-export const getProductInitialPayload: (
-  product?: Product | null
-) => ProductPayload = (product) => ({
+export const getProductInitialPayload: (product?: Product | null) => Omit<
+  ProductPayload,
+  "variantsPayload"
+> & {
+  variantsPayload: (Omit<VariantSchemaType, "id"> & {
+    id: string;
+  })[];
+} = (product) => ({
   title: product?.title || "",
   brand: product?.brand || "",
   description: product?.description || "",
@@ -75,6 +81,7 @@ export const getProductInitialPayload: (
       options: vrn.options,
       price: vrn.price,
       title: vrn.title,
+      id: vrn.id,
     })) || [],
 });
 
@@ -109,19 +116,23 @@ export const getFormIV: (product?: Product | null) => FormValues = (
     imageFiles: [],
     images: product?.images || [],
     variants:
-      product?.variants.map(({ image, options, price, title }) => ({
+      product?.variants.map(({ image, options, price, title, id }) => ({
         image,
         options,
         price,
         title,
         imageFile: null,
+        id,
       })) || [],
   };
 };
 
 export type MutateValues = {
   details?: Partial<ProductPayload>;
-  variantFiles?: { id: string; file: File | null }[];
+  variantFiles?: {
+    new: { id: string; file: File | null }[];
+    updated: { id?: string; file: File | null }[];
+  };
   thumbnailFile?: File | null;
   imageFiles?: File[];
 };

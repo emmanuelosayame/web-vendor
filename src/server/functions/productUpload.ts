@@ -1,6 +1,6 @@
 import { type File } from "formidable";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { formidablePromise, uploadImage } from ".";
+import { deleteImage, formidablePromise, uploadImage } from ".";
 import { prisma } from "src/server/db";
 import { ProductSchema } from "../schema";
 import type { Product, ProductVariant } from "@prisma/client";
@@ -18,7 +18,10 @@ export const uploadProduct = async ({ req, res }: Args) => {
     if (id) {
       const thumbnailFile = files.thumbnail as File;
       const imageFiles = files.mainImages as File | File[];
-      const variantFiles = files.variantFiles as File | File[];
+      const variantFiles = {
+        new: files.newVImages as File | File[],
+        updated: files.updatedVImages as File | File[],
+      };
       const parsedPayload =
         fields.payload && JSON.parse(fields.payload.toString());
 
@@ -57,7 +60,7 @@ export const uploadProduct = async ({ req, res }: Args) => {
           data: { ...rest, images: mainImages, variants, thumbnail },
         });
 
-        res.status(200).json({ status: "success" });
+        res.status(200).json(data);
       }
     } else res.status(400).send("no identifier");
     return;
@@ -66,19 +69,25 @@ export const uploadProduct = async ({ req, res }: Args) => {
   }
 };
 
+type VType = {
+  title: string;
+  price: number;
+  options: {
+    k: string;
+    v: string;
+  }[];
+};
+
 interface HandleImageProps {
   prevData?: Product | null;
   thumbnailFile: File;
   imageFiles: File | File[];
-  variantFiles: File | File[];
+  variantFiles: { new: File | File[]; updated: File | File[] };
   variantsPayload?: {
-    title: string;
-    price: number;
-    options: {
-      k: string;
-      v: string;
-    }[];
-  }[];
+    new?: VType[];
+    updated?: (VType & { id?: string })[];
+    deleted?: string[];
+  };
 }
 
 const handleImages = async ({
@@ -90,6 +99,7 @@ const handleImages = async ({
 }: HandleImageProps) => {
   let thumbnail: string | undefined = undefined;
   let mainImages: string[] = [];
+  let prevVariants: ProductVariant[] | undefined = prevData?.variants;
   let variants: ProductVariant[] = [];
 
   if (thumbnailFile) {
@@ -99,41 +109,85 @@ const handleImages = async ({
     });
   }
 
-  if (variantFiles || variantsPayload) {
-    const prevImages =
-      prevData?.variants.map((varnt, index) => ({
-        id: (index + 1).toString(),
-        url: varnt.image,
-      })) || [];
-    if (!Array.isArray(variantFiles)) {
-    } else {
-      const filesWPH = ["1", "2", "3", "4", "5"].map((ph) => ({
-        id: ph,
-        path:
-          variantFiles.find((file) => ph === file.originalFilename?.slice(0, 1))
-            ?.filepath || null,
-      }));
-      for await (const file of filesWPH) {
-        const oldUrl = prevImages?.find((img) => img.id === file.id)?.url || "";
-        const vPayload = variantsPayload?.find((varnt, index) =>
-          (index + 1).toString()
+  //delete
+  if (variantsPayload?.deleted && variantsPayload?.deleted.length > 0) {
+    for (const id of variantsPayload?.deleted) {
+      const matchedVariant = prevVariants?.find((prevV) => prevV.id === id);
+      if (matchedVariant) {
+        prevVariants = prevVariants?.filter(
+          (varnt) => matchedVariant.id !== varnt.id
         );
-        const oldVPayload = prevData?.variants?.find((varnt, index) =>
-          (index + 1).toString()
+        await deleteImage(matchedVariant.image);
+      }
+    }
+  }
+
+  if (
+    (variantsPayload?.updated && variantsPayload?.updated.length > 0) ||
+    variantFiles.updated
+  ) {
+    if (prevVariants) {
+      for (const variant of prevVariants) {
+        const matchedV = variantsPayload?.updated?.find(
+          (updated) => variant.id === updated.id
         );
+        const matchedFile = variantFiles.updated
+          ? Array.isArray(variantFiles.updated)
+            ? variantFiles.updated.find(
+                (file) => file.originalFilename === variant.id
+              ) || null
+            : variantFiles.updated.originalFilename === variant.id
+            ? variantFiles.updated
+            : null
+          : null;
         variants.push({
-          id: oldVPayload?.id || nanoid(10),
-          image: file.path
-            ? await uploadImage(file.path, {
-                newFileName: `product-variant-${file.id}`,
-                oldUrl,
+          ...variant,
+          price: matchedV?.price || variant.price,
+          options: matchedV?.options || variant.options,
+          title: matchedV?.title || variant.title,
+          image: matchedFile
+            ? await uploadImage(matchedFile.filepath, {
+                newFileName: `variant-${variant.id}`,
+                oldUrl: variant.image,
               })
-            : oldUrl,
-          options: vPayload ? vPayload.options : oldVPayload?.options || [],
-          price: vPayload ? vPayload.price : oldVPayload?.price || 0,
-          title: vPayload ? vPayload.title : oldVPayload?.title || "",
-          sku: oldVPayload?.sku || nanoid(15),
+            : variant.image,
           updatedAt: Date.now().toString(),
+        });
+      }
+    }
+  } else {
+    variants = prevVariants || [];
+  }
+
+  if (
+    (variantsPayload?.new && variantsPayload?.new.length > 0) ||
+    variantFiles.new
+  ) {
+    if (variantsPayload?.new) {
+      for (const variant of variantsPayload.new.map((vrnt, index) => ({
+        ...vrnt,
+        id: (index + 1).toString(),
+      }))) {
+        const filepath = variantFiles.new
+          ? Array.isArray(variantFiles.new)
+            ? variantFiles.new.find(
+                (file) => file.originalFilename === variant.id
+              )?.filepath || null
+            : variant.id === variantFiles.new.originalFilename
+            ? variantFiles.new.filepath
+            : null
+          : null;
+        const id = nanoid();
+        variants.push({
+          image: filepath
+            ? await uploadImage(filepath, { newFileName: `variant-${id}` })
+            : "",
+          options: variant.options,
+          price: variant.price,
+          sku: nanoid(20),
+          title: variant.title,
+          updatedAt: Date.now().toString(),
+          id,
         });
       }
     }
@@ -178,10 +232,7 @@ const handleImages = async ({
         mainImages.push(
           file.path
             ? await uploadImage(imageFiles.filepath, {
-                newFileName: `product-${imageFiles.originalFilename?.slice(
-                  0,
-                  1
-                )}`,
+                newFileName: `product-${imgId}`,
                 oldUrl: prevUrl,
               })
             : prevUrl || ""

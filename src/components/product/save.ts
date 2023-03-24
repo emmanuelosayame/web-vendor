@@ -9,32 +9,6 @@ import {
   type FormValues,
 } from "utils/placeholders";
 
-const uploadImage = async (
-  id: string | undefined,
-  { file, files }: { file: File | null; files: File[] },
-  setUploading: (upldn: boolean) => void
-) => {
-  const form = new FormData();
-  form.append("id", id || "new");
-  if (file) {
-    form.append("single", file);
-  }
-  if (files.length > 0) {
-    for (const file of files) {
-      form.append("multiple", file);
-    }
-  }
-  setUploading(true);
-  try {
-    await axios.put("/api/upload/product", form);
-    setUploading(false);
-    return { status: "success", error: undefined };
-  } catch (err) {
-    setUploading(false);
-    return { status: "error", error: err as AxiosError };
-  }
-};
-
 interface Props {
   values: FormValues;
   data: Product | null | undefined;
@@ -55,11 +29,6 @@ export const onSubmit = async ({
     ...initialData
   } = getProductInitialPayload(data);
 
-  const initialVariantsWID = initialVariants.map((variant, index) => ({
-    ...variant,
-    id: (index + 1).toString(),
-  }));
-
   const {
     thumbnailFile,
     imageFiles,
@@ -77,31 +46,59 @@ export const onSubmit = async ({
     .sort((a, b) => Number(a.id) - Number(b.id))
     .map((f) => f.file);
 
-  const variantPayload = variants
-    .map(({ options, price, title }) => ({
+  const deletedVariants = initialVariants
+    .filter((ivarnt) => !variants.some((varnt) => varnt.id === ivarnt.id))
+    .map((v) => v.id);
+
+  const newVariants = variants
+    .filter((variant) => !variant.id || (variant.id && variant.id.length < 2))
+    .map(({ options, price, title, imageFile }) => ({
       options,
       price,
       title,
-    }))
-    .filter((variant, index) => {
-      const prevVariant = initialVariantsWID.find(
-        (varnt) => (index + 1).toString() === varnt.id
-      );
-      if (!!prevVariant) {
-        const changed = Object.keys(diff(variant, prevVariant)).length > 0;
-        if (changed) {
-          return true;
-        } else return false;
-      }
-      return true;
-    });
+      imageFile,
+    }));
 
-  const variantFiles = variants
+  const updatedVariantFiles = variants
+    .filter((varnt) => !!varnt.id && !!varnt.imageFile)
+    .map((v) => ({
+      id: v.id,
+      file: v?.imageFile,
+    }));
+
+  const newVariantFiles = newVariants
     .map(({ imageFile }, index) => ({
       id: (index + 1).toString(),
       file: imageFile,
     }))
     .filter((varnt) => varnt.file !== null);
+
+  const updatedVPayload = variants
+    .map(({ options, price, title, id }) => ({
+      options,
+      price,
+      title,
+      id,
+    }))
+    .filter(({ options, price, title, id }) => {
+      const oldPayload = initialVariants.find((vrnt) => vrnt.id === id);
+      if (oldPayload) {
+        if (
+          JSON.stringify({ options, price, title, id }) !==
+          JSON.stringify(oldPayload)
+        ) {
+          return true;
+        }
+        return false;
+      }
+      return false;
+    });
+
+  const newVPayload = newVariants.map(({ options, price, title }) => ({
+    options,
+    price,
+    title,
+  }));
 
   const payload: Omit<ProductPayload, "variantsPayload" | "tags" | "specs"> = {
     ...rest,
@@ -111,16 +108,25 @@ export const onSubmit = async ({
   const updatedDetails: Partial<ProductPayload> = JSON.parse(
     JSON.stringify({
       ...updatedDiff(initialData, payload),
-      variantsPayload: variantPayload.length > 0 ? variantPayload : undefined,
+      variantsPayload: {
+        deleted: deletedVariants.length > 0 ? deletedVariants : undefined,
+        updated: updatedVPayload.length > 0 ? updatedVPayload : undefined,
+        new: newVPayload.length > 0 ? newVPayload : undefined,
+      },
       tags: changedTags ? tags : undefined,
       specs: changedSpecs ? specs : undefined,
     })
   );
 
+  console.log(newVariants, newVariantFiles);
+
   mutateAsync({
     details: updatedDetails,
     imageFiles: sortedImageFiles,
     thumbnailFile,
-    variantFiles,
+    variantFiles: {
+      new: newVariantFiles,
+      updated: updatedVariantFiles,
+    },
   });
 };
