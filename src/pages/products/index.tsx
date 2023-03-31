@@ -15,8 +15,6 @@ import {
   ArrowRightIcon,
   ChevronRightIcon,
   MagnifyingGlassIcon,
-  PencilIcon,
-  PencilSquareIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -27,6 +25,7 @@ import { api } from "utils/api";
 import useMediaQuery from "utils/useMediaQuery";
 import { limitText } from "utils/helpers";
 import { LoadingBlur } from "@components/Loading";
+import { useStore } from "store";
 
 const selectList = [
   { item: "A - Z", value: "title-asc" },
@@ -47,7 +46,11 @@ const Products = () => {
 
   const mq = useMediaQuery("(min-width: 800px)");
 
-  const [pagn, setPagn] = useState(1);
+  const { pagn, setPagn } = useStore((state) => ({
+    pagn: state.product.pagn,
+    setPagn: state.setPagn,
+  }));
+
   const limit = 10;
 
   const [sort, setSort] = useState<ProductSort>("title-asc");
@@ -211,7 +214,7 @@ const Products = () => {
                     aria-label="prev"
                     disabled={pagn < 2}
                     onClick={() => {
-                      setPagn((state) => state - 1);
+                      setPagn(pagn - 1);
                     }}
                   >
                     <ArrowLeftIcon stroke="white" width={20} />
@@ -241,7 +244,7 @@ const Products = () => {
                     aria-label="next"
                     disabled={products && products?.length < limit}
                     onClick={() => {
-                      setPagn((state) => state + 1);
+                      setPagn(pagn + 1);
                     }}
                   >
                     <ArrowRightIcon width={20} />

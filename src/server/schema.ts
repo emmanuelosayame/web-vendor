@@ -37,18 +37,21 @@ export const ProductSchema = z.object({
   stock: z.number(),
   package: z.string(),
   tags: z.array(z.string()),
-  specs: z.object({
-    model: z.string(),
-    others: z.array(z.string()),
-  }),
-  status: PStatus,
-  discountPercentage: z.number(),
-  promotions: z.array(z.string()),
+  specs: z
+    .object({
+      model: z.string().optional(),
+      others: z.array(z.string()),
+    })
+    .default({ others: [] }),
+  status: PStatus.optional(),
+  discountPercentage: z.number().optional(),
+  promotions: z.array(z.string()).optional(),
   variantsPayload: z.object({
     new: z.array(ProductVariant).optional(),
     updated: z.array(ProductVariant).optional(),
     deleted: z.array(z.string()).optional(),
   }),
+  moreDescr: z.array(z.object({ id: z.string(), url: z.string() })).default([]),
 });
 
 // export const ProductUpdateSchema = ProductSchema.extend({

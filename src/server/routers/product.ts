@@ -47,4 +47,11 @@ export const productRouter = router({
       });
       return result;
     }),
+  delete: protectedProcedure
+    .input(z.object({ pid: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      // const sid = ctx.sid;
+      const { pid } = input;
+      return await ctx.prisma.product.delete({ where: { id: pid } });
+    }),
 });

@@ -1,12 +1,14 @@
 import { create } from "zustand";
 import { devtools, combine, persist } from "zustand/middleware";
-import type { ColorSchemeSlice } from "types/shared";
+import type { ColorSchemeSlice, DefaultSlice } from "types/shared";
 import { colorSchemeSlice } from "./colorSchemeSlice";
+import { defaultSlice } from "./default";
 
-export const useStore = create<ColorSchemeSlice>()(
+export const useStore = create<ColorSchemeSlice & DefaultSlice>()(
   persist(
     (...args) => ({
       ...colorSchemeSlice(...args),
+      ...defaultSlice(...args),
     }),
     {
       name: "color-scheme",

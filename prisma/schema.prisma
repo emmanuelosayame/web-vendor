@@ -45,7 +45,7 @@ datasource db {
 // }
 
 type Specs {
-    model  String   @default("")
+    model  String?
     others String[]
 }
 
@@ -81,17 +81,17 @@ model Product {
     brand              String
     category           String
     description        String
-    discountPercentage Float            @default(0.0)
+    discountPercentage Float            @default(0)
     images             String[]
     price              Int
-    promotions         String[]
-    rating             Float            @default(0.0)
-    status             PStatus
+    promotions         String[]         @default([])
+    rating             Float            @default(0)
+    status             PStatus          @default(review)
     stock              Int
-    tags               String[]
-    thumbnail          String           @default("")
+    tags               String[]         @default([])
+    thumbnail          String
     title              String
-    sold               Int?
+    sold               Int              @default(0)
     sid                String           @default("delorand")
     package            String
     specs              Specs

@@ -45,7 +45,7 @@ const ProductPage: NextPageWithLayout = () => {
   // create fn to upload. formData with type first then json.stringify the rest of payload as "other"field.imagefiles and thumbnail field also variant field
 
   const { mutateAsync, isLoading: mutating } = useMutation<
-    Product,
+    Product & { mtype: "create" | "update" },
     AxiosError,
     MutateValues
   >(
@@ -75,10 +75,18 @@ const ProductPage: NextPageWithLayout = () => {
             form.append("updatedVImages", variant.file, variant.id);
         }
       }
-      const { data } = await axios.put<Product>("/api/upload/product", form);
+      const { data } = await axios.put("/api/upload/product", form);
       return data;
     },
-    { onSuccess: () => refetch() }
+    {
+      onSuccess: (data) => {
+        if (data.mtype === "create") {
+          router.back();
+        } else {
+          refetch();
+        }
+      },
+    }
   );
 
   useEffect(() => {
@@ -152,8 +160,8 @@ const ProductPage: NextPageWithLayout = () => {
                   !dirty ||
                   (!data?.thumbnail && !values.thumbnailFile) ||
                   !!(!!data
-                    ? data.images.length + values.imageFiles.length < 3
-                    : values.imageFiles.length < 3)
+                    ? data.images.length + values.imageFiles.length < 2
+                    : values.imageFiles.length < 2)
                 }
               >
                 <p>Save</p>

@@ -70,6 +70,10 @@ export const Form2 = ({
   const router = useRouter();
   const { data: categories } = api.category.many.useQuery({ tid: 3 });
 
+  const { mutate: remove } = api.product.delete.useMutation({
+    onSuccess: () => setTimeout(() => router.replace("/products"), 300),
+  });
+
   const catList =
     categories?.map((cat) => ({
       item: cat.name,
@@ -183,9 +187,7 @@ export const Form2 = ({
             trigger="delete"
             triggerStyles="py-1 w-11/12 mx-auto rounded-lg
                    bg-red-500 hover:bg-red-600 text-white"
-            onClickConfirm={() => {
-              setTimeout(() => router.replace("/products"), 300);
-            }}
+            onClickConfirm={() => pid && remove({ pid })}
           />
         </div>
       ) : null}

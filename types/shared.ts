@@ -32,3 +32,8 @@ export interface ColorSchemeSlice {
   colorScheme: CSNames;
   setColorScheme: (name?: CSNames) => void;
 }
+
+export interface DefaultSlice {
+  product: { pagn: number };
+  setPagn: (no: number) => void;
+}

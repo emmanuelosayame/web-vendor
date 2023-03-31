@@ -5,6 +5,7 @@ import { prisma } from "src/server/db";
 import { ProductSchema } from "../schema";
 import type { Product, ProductVariant } from "@prisma/client";
 import { nanoid } from "nanoid";
+import { getCookies } from "cookies-next";
 
 interface Args {
   req: NextApiRequest;
@@ -12,6 +13,9 @@ interface Args {
 }
 
 export const uploadProduct = async ({ req, res }: Args) => {
+  const cookies = getCookies({ req, res });
+  const sid = cookies?.sid;
+
   try {
     const { fields, files } = await formidablePromise(req, { multiples: true });
     const id = fields.id?.toString();
@@ -38,9 +42,9 @@ export const uploadProduct = async ({ req, res }: Args) => {
         });
         const data = await prisma.product.update({
           where: { id },
-          data: { thumbnail, images: mainImages, variants, ...rest },
+          data: { thumbnail, images: mainImages, variants, ...rest, sid },
         });
-        res.status(200).json(data);
+        res.status(200).json({ ...data, mtype: "update" });
       }
       //if new product
       else {
@@ -48,6 +52,7 @@ export const uploadProduct = async ({ req, res }: Args) => {
           res.status(500).json("no file");
           return;
         }
+
         const { variantsPayload, ...rest } = ProductSchema.parse(parsedPayload);
 
         const { mainImages, thumbnail, variants } = await handleImages({
@@ -56,11 +61,10 @@ export const uploadProduct = async ({ req, res }: Args) => {
           variantFiles,
           variantsPayload,
         });
-        const data = prisma.product.create({
-          data: { ...rest, images: mainImages, variants, thumbnail },
+        const data = await prisma.product.create({
+          data: { ...rest, images: mainImages, variants, thumbnail, sid },
         });
-
-        res.status(200).json(data);
+        res.status(200).json({ ...data, mtype: "create" });
       }
     } else res.status(400).send("no identifier");
     return;
