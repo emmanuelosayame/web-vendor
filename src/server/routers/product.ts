@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { ProductSortEnum } from "../schema";
-import { router, protectedProcedure } from "../trpc";
+import { router, protectedProcedure, adminProcedure } from "../trpc";
 
 export const productRouter = router({
   count: protectedProcedure
@@ -10,6 +10,9 @@ export const productRouter = router({
       const sid = ctx.sid;
       return await ctx.prisma.product.count({ where: { sid } });
     }),
+  countA: adminProcedure.input(z.object({})).query(async ({ ctx, input }) => {
+    return await ctx.prisma.product.count();
+  }),
   one: protectedProcedure
     .input(z.object({ id: z.string().optional() }))
     .query(async ({ ctx, input }) => {
@@ -41,6 +44,28 @@ export const productRouter = router({
 
       const result = await ctx.prisma.product.findMany({
         where: { sid },
+        skip: (pagn - 1) * limit,
+        take: limit,
+        orderBy: sort && sort !== "search" ? orderBy : { title: "asc" },
+      });
+      return result;
+    }),
+  manyA: adminProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(30).nullish(),
+        sort: ProductSortEnum.optional(),
+        pagn: z.number().max(11),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { sort, pagn } = input;
+      const limit = input.limit ?? 10;
+      const orderBy = {
+        [sort?.split("-")[0] || ""]: sort?.split("-")[1] || "",
+      };
+
+      const result = await ctx.prisma.product.findMany({
         skip: (pagn - 1) * limit,
         take: limit,
         orderBy: sort && sort !== "search" ? orderBy : { title: "asc" },

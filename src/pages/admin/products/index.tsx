@@ -1,16 +1,16 @@
-import Layout from "@components/Layout";
+import LayoutA from "@components/Layout/Admin";
+import ProductTemp from "@components/product/Products";
 import Select from "@components/radix/Select";
-import { useToastTrigger } from "@components/radix/Toast";
 import { MenuFlex } from "@components/TElements";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
+import type { NextPageWithLayout } from "@t/shared";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { type ProductSort } from "src/server/schema";
+import { useStore } from "store";
 import { api } from "utils/api";
 import useMediaQuery from "utils/useMediaQuery";
-import { useStore } from "store";
-import ProductTemp from "@components/product/Products";
 
 const selectList = [
   { item: "A - Z", value: "title-asc" },
@@ -24,29 +24,27 @@ const selectList = [
   { item: "Stock down", value: "stock-asc" },
 ];
 
-const Products = () => {
-  const router = useRouter();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { trigger } = useToastTrigger();
-
+const Products: NextPageWithLayout = () => {
   const mq = useMediaQuery("(min-width: 800px)");
 
-  const { pagn, setPagn } = useStore((state) => ({
-    pagn: state.product.pagn,
-    setPagn: state.setPagn,
-  }));
+  const router = useRouter();
+
+  const { pagn, setPagn } = {
+    pagn: Number(router.query.pg?.toString()) || 1,
+    setPagn: (pg: number) => router.push({ query: { pg } }),
+  };
 
   const limit = 10;
 
   const [sort, setSort] = useState<ProductSort>("title-asc");
 
-  const { data: products, isLoading } = api.product.many.useQuery({
+  const { data: products, isLoading } = api.product.manyA.useQuery({
     limit,
     sort,
     pagn,
   });
 
-  const { data: count } = api.product.count.useQuery(
+  const { data: count } = api.product.countA.useQuery(
     {},
     { placeholderData: 0 }
   );
@@ -119,9 +117,8 @@ const Products = () => {
     </>
   );
 };
-
-Products.getLayout = function getLayout(page: any) {
-  return <Layout>{page}</Layout>;
+Products.getLayout = function getLayout(page) {
+  return <LayoutA>{page}</LayoutA>;
 };
 
 export default Products;
