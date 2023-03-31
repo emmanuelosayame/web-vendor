@@ -87,7 +87,7 @@ const ProductTemp = ({
                     ) : (
                       <>
                         <td>{limitText(product.title, 12)}</td>
-                        <td>{limitText(product.category, 8)}</td>
+                        <td>{limitText(getCat(product.category), 8)}</td>
                         <td hidden={!mq}>{product.id.slice(19, 25)}</td>
                         <td>{product.stock}</td>
                         <td>{product.sold || 0}</td>

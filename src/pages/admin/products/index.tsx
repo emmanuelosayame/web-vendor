@@ -1,5 +1,5 @@
 import LayoutA from "@components/Layout/Admin";
-import ProductTemp from "@components/product/Products";
+import ProductTemp from "@components/product/ProductsTemp";
 import Select from "@components/radix/Select";
 import { MenuFlex } from "@components/TElements";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";

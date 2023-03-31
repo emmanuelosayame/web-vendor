@@ -10,7 +10,7 @@ import { type ProductSort } from "src/server/schema";
 import { api } from "utils/api";
 import useMediaQuery from "utils/useMediaQuery";
 import { useStore } from "store";
-import ProductTemp from "@components/product/Products";
+import ProductTemp from "@components/product/ProductsTemp";
 
 const selectList = [
   { item: "A - Z", value: "title-asc" },
