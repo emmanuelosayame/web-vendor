@@ -55,12 +55,17 @@ export const uploadProduct = async ({ req, res }: Args) => {
 
         const { variantsPayload, ...rest } = ProductSchema.parse(parsedPayload);
 
-        const { mainImages, thumbnail, variants } = await handleImages({
+        const {
+          mainImages,
+          thumbnail: thumbn,
+          variants,
+        } = await handleImages({
           imageFiles,
           thumbnailFile,
           variantFiles,
           variantsPayload,
         });
+        const thumbnail = thumbn as string;
         const data = await prisma.product.create({
           data: { ...rest, images: mainImages, variants, thumbnail, sid },
         });
