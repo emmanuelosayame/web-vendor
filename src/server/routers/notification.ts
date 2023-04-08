@@ -23,7 +23,9 @@ export const notificationRouter = router({
     .query(async ({ ctx, input }) => {
       const sid = ctx.sid;
       const uid = ctx.session.user.id;
-      return await ctx.prisma.notification.findMany({ where: { rid: uid } });
+      return await ctx.prisma.notification.findMany({
+        where: { OR: [{ rid: "1" }, { rid: sid }] },
+      });
     }),
   manyA: adminProcedure
     .input(
@@ -60,5 +62,23 @@ export const notificationRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { id, data } = input;
       return await ctx.prisma.category.update({ where: { id }, data });
+    }),
+  open: protectedProcedure
+    .input(z.string().optional())
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.notification.update({
+        where: { id: input },
+        data: { opened: new Date(), status: "opened" },
+      });
+    }),
+  unreadCount: protectedProcedure
+    .input(z.undefined())
+    .query(async ({ ctx, input }) => {
+      const sid = ctx.sid;
+      const uid = ctx.session.user.id;
+
+      return await ctx.prisma.notification.count({
+        where: { OR: [{ rid: "1" }, { rid: sid }], status: "sealed" },
+      });
     }),
 });

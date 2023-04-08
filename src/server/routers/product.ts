@@ -4,13 +4,11 @@ import { ProductSortEnum } from "../schema";
 import { router, protectedProcedure, adminProcedure } from "../trpc";
 
 export const productRouter = router({
-  count: protectedProcedure
-    .input(z.object({}))
-    .query(async ({ ctx, input }) => {
-      const sid = ctx.sid;
-      return await ctx.prisma.product.count({ where: { sid } });
-    }),
-  countA: adminProcedure.input(z.object({})).query(async ({ ctx, input }) => {
+  count: protectedProcedure.input(z.object({})).query(async ({ ctx }) => {
+    const sid = ctx.sid;
+    return await ctx.prisma.product.count({ where: { sid } });
+  }),
+  countA: adminProcedure.input(z.object({})).query(async ({ ctx }) => {
     return await ctx.prisma.product.count();
   }),
   one: protectedProcedure
@@ -75,7 +73,6 @@ export const productRouter = router({
   delete: protectedProcedure
     .input(z.object({ pid: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      // const sid = ctx.sid;
       const { pid } = input;
       return await ctx.prisma.product.delete({ where: { id: pid } });
     }),

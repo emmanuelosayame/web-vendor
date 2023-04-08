@@ -197,14 +197,14 @@ enum NStatus {
 }
 
 model Notification {
-    id     String   @id @default(auto()) @map("_id") @db.ObjectId
-    on     DateTime @default(now())
-    read   DateTime @updatedAt()
-    status NStatus
+    id     String    @id @default(auto()) @map("_id") @db.ObjectId
+    sent   DateTime  @default(now())
+    opened DateTime?
+    status NStatus   @default(sealed)
     title  String
     body   String
     // body2  String
-    type   NType
+    type   NType     @default(order)
     rid    String
 }
 

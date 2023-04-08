@@ -14,6 +14,7 @@ import { useState } from "react";
 import SelectStore from "@components/SelectStore";
 import { useStore } from "store";
 import { csToStyle } from "utils/helpers";
+import { api } from "utils/api";
 
 interface Props {
   auth: Session | null;
@@ -26,6 +27,11 @@ const Header = ({ auth, store, refetch }: Props) => {
 
   const [open, setOpen] = useState(false);
   const [sOpen, setSOpen] = useState(false);
+
+  const { data: unreadN } = api.notification.unreadCount.useQuery(undefined, {
+    placeholderData: 0,
+    initialData: 0,
+  });
 
   return (
     <>
@@ -86,8 +92,23 @@ const Header = ({ auth, store, refetch }: Props) => {
                   src={auth?.user.image}
                 />
               </Link>
-              <Link href={"/notifications"} className="opacity-40">
-                <BellAlertIcon width={25} />
+              <Link
+                href={"/notifications"}
+                prefetch={false}
+                className=" relative"
+              >
+                {unreadN > 0 && (
+                  <div
+                    className="w-4 h-4 flex justify-center items-center
+                   rounded-full text-white absolute top-0 right-0 bg-blue-500 font-bold text-xs"
+                  >
+                    {unreadN}
+                  </div>
+                )}
+                <BellAlertIcon
+                  width={25}
+                  className={`${unreadN > 0 ? "" : "opacity-40"}`}
+                />
               </Link>
             </div>
           </div>

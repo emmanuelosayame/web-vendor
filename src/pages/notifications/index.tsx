@@ -12,6 +12,8 @@ const Notifications: NextPageWithLayout = () => {
 
   const { data } = api.notification.many.useQuery({ ntype });
 
+  // console.log(data);
+
   return (
     <>
       <MenuFlex>
@@ -46,7 +48,7 @@ const Notifications: NextPageWithLayout = () => {
           ]}
         />
       </MenuFlex>
-      <NotificationComp />
+      <NotificationComp notifications={data} />
     </>
   );
 };
