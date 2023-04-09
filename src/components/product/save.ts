@@ -1,7 +1,5 @@
 import type { Product } from "@prisma/client";
-import axios, { type AxiosError } from "axios";
-import { detailedDiff, diff, updatedDiff } from "deep-object-diff";
-import { nanoid } from "nanoid";
+import { updatedDiff } from "deep-object-diff";
 import type { ProductPayload } from "src/server/schema";
 import {
   getProductInitialPayload,
@@ -29,6 +27,8 @@ export const onSubmit = async ({
     ...initialData
   } = getProductInitialPayload(data);
 
+  console.log(values);
+
   const {
     thumbnailFile,
     imageFiles,
@@ -36,11 +36,13 @@ export const onSubmit = async ({
     specs,
     tags,
     promotions,
+    package: pkg,
     ...rest
   } = values;
 
   const changedTags = JSON.stringify(initialTags) !== JSON.stringify(tags);
   const changedSpecs = JSON.stringify(initialSpecs) !== JSON.stringify(specs);
+  const changedPackage = JSON.stringify(initialSpecs) !== JSON.stringify(pkg);
 
   const sortedImageFiles = imageFiles
     .sort((a, b) => Number(a.id) - Number(b.id))
@@ -100,7 +102,10 @@ export const onSubmit = async ({
     title,
   }));
 
-  const payload: Omit<ProductPayload, "variantsPayload" | "tags" | "specs"> = {
+  const payload: Omit<
+    ProductPayload,
+    "variantsPayload" | "tags" | "specs" | "package"
+  > = {
     ...rest,
     promotions: promotions.split(" ; "),
   };
@@ -115,10 +120,9 @@ export const onSubmit = async ({
       },
       tags: changedTags ? tags : undefined,
       specs: changedSpecs ? specs : undefined,
+      package: changedPackage ? pkg : undefined,
     })
   );
-
-  console.log(newVariants, newVariantFiles);
 
   mutateAsync({
     details: updatedDetails,

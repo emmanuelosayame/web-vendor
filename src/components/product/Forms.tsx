@@ -48,7 +48,7 @@ export const Form1 = ({ getFieldProps, touched, errors }: Props) => {
       <TextareaTemp
         fieldProps={getFieldProps("description")}
         heading="Product Description"
-        rows={4}
+        rows={5}
         placeholder="Enter Product Description"
         touched={touched.description}
         error={errors.description}
@@ -129,21 +129,34 @@ export const Form2 = ({
         />
       </THStack>
 
-      <TextareaTemp
+      {/* <TextareaTemp
         heading="Package"
-        rows={4}
+        rows={2}
         fieldProps={getFieldProps("package")}
         placeholder="Enter contents sperated by semi-colon, contents written
                  together would exists as a single word"
         touched={touched.package}
         error={errors.package}
-      />
+      /> */}
 
-      <TagsComponent
-        name="tags"
-        tags={values.tags}
-        setFieldValue={setFieldValue}
-      />
+      <div className="">
+        <h3>Package</h3>
+        <TagsComponent
+          name="package"
+          tags={values.package}
+          setFieldValue={setFieldValue}
+          placeholder="Enter Package"
+        />
+      </div>
+
+      <div className="">
+        <h3>Tags</h3>
+        <TagsComponent
+          name="tags"
+          tags={values.tags}
+          setFieldValue={setFieldValue}
+        />
+      </div>
 
       <div className="space-y-3 flex-1">
         <h3 className="border-b border-b-neutral-200">Specifications</h3>
@@ -210,7 +223,7 @@ const TagsComponent = ({
 }: TagProps) => {
   const [tag, setTag] = useState("");
   return (
-    <div className="border-200 rounded-lg p-2">
+    <div className="border-200 rounded-lg py-1 px-2">
       <div className="flex gap-4">
         <input
           disabled={tags.length > 4}
@@ -233,11 +246,12 @@ const TagsComponent = ({
         </button>
       </div>
       {tags.length > 0 && (
-        <div className="border-200 rounded-lg p-2 mt-2 flex gap-2 flex-wrap">
+        <div className="border-200 rounded-lg px-2 py-1 mt-1 flex gap-2 flex-wrap">
           {tags.map((tag) => (
             <div
               key={tag}
-              className="flex items-center gap-1 rounded-lg bg-teal-400 px-3 py-1 text-white text-sm"
+              className="flex items-center gap-1 rounded-lg bg-teal-400 px-3 py-0.5
+               text-white text-sm font-semibold"
             >
               <span>{tag}</span>
               <button
@@ -249,7 +263,7 @@ const TagsComponent = ({
                   )
                 }
               >
-                <XMarkIcon width={20} />
+                <XMarkIcon width={18} />
               </button>
             </div>
           ))}

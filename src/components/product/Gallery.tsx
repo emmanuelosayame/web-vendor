@@ -251,7 +251,7 @@ const Gallery = ({
               </div>
             ))}
         </THStack>
-        <h3 className="mt-3">More Descriptions</h3>
+        {/* <h3 className="mt-3">More Descriptions</h3>
         <TDivider className="mb-4" />
         <THStack className="flex-wrap justify-center gap-5 md:flex-nowrap md:gap-1">
           {imagesPH.slice(0, 2).map((image) => (
@@ -288,7 +288,7 @@ const Gallery = ({
               </div>
             </div>
           ))}
-        </THStack>
+        </THStack> */}
       </div>
     </>
   );

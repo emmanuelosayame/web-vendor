@@ -1,4 +1,4 @@
-import type { Product, ProductVariant, Store } from "@prisma/client";
+import type { Product, Store } from "@prisma/client";
 import type { ProductPayload, VariantSchemaType } from "src/server/schema";
 
 export interface FormValues
@@ -38,7 +38,7 @@ export const productPLD: Omit<Product, ""> = {
   stock: 0,
   tags: [],
   title: "",
-  package: "",
+  package: [],
   id: "",
   images: [],
   moreDescr: [],
@@ -60,7 +60,7 @@ export const getProductInitialPayload: (product?: Product | null) => Omit<
   title: product?.title || "",
   brand: product?.brand || "",
   description: product?.description || "",
-  package: product?.package || "",
+  package: product?.package || [],
   price: product?.price || 0,
   stock: product?.stock || 0,
   category: product?.category || "",
@@ -99,7 +99,7 @@ export const getFormIV: (product?: Product | null) => FormValues = (
     title: product?.title || "",
     brand: product?.brand || "",
     description: product?.description || "",
-    package: product?.package || "",
+    package: product?.package || [],
     price: product?.price || 0,
     stock: product?.stock || 0,
     category: product?.category || "",

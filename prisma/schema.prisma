@@ -93,7 +93,7 @@ model Product {
     title              String
     sold               Int              @default(0)
     sid                String?          @default("delorand")
-    package            String
+    package            String[]
     specs              Specs
     moreDescr          MoreDescr[]
     variants           ProductVariant[]

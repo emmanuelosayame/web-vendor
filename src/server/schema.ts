@@ -35,7 +35,7 @@ export const ProductSchema = z.object({
   category: z.string(),
   price: z.number(),
   stock: z.number(),
-  package: z.string(),
+  package: z.array(z.string()),
   tags: z.array(z.string()),
   specs: z
     .object({
