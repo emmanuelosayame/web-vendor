@@ -5,13 +5,25 @@
       "@components/*": [
         "./src/components/*"
       ],
-      "@lib/*":["./lib/*"],
-       "@radix/*":["src/components/radix/*"],
-       "@utils/*":["./src/utils/*"],
-       "@t/*":["./types/*"],
+      "@lib/*": [
+        "./lib/*"
+      ],
+      "@radix/*": [
+        "src/components/radix/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@t/*": [
+        "t/*"
+      ]
     },
     "target": "es2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -24,8 +36,24 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs", "next.config.js", "next.config.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.cjs",
+    "**/*.mjs",
+    "next.config.js",
+    "next.config.js",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

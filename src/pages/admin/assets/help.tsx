@@ -1,9 +1,9 @@
-import LayoutA from "@components/Layout/Admin";
+import LayoutA from "@components/layout/Admin";
 import Select from "@components/radix/Select";
 import { MenuFlex } from "@components/TElements";
-import { type NextPageWithLayout } from "@t/shared";
+import { type NextPageWithLayout } from "t/shared";
 import { useRouter } from "next/router";
-import { assetsSelectList } from "utils/list";
+import { assetsSelectList } from "@lib/list";
 
 const Assets: NextPageWithLayout = () => {
   const router = useRouter();

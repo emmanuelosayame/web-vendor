@@ -7,9 +7,9 @@ import {
 } from "@heroicons/react/24/outline";
 import type { Product } from "@prisma/client";
 import Link from "next/link";
-import { api } from "utils/api";
-import { limitText } from "utils/helpers";
-import useMediaQuery from "utils/useMediaQuery";
+import { api } from "@lib/api";
+import { limitText } from "@lib/helpers";
+import useMediaQuery from "@lib/useMediaQuery";
 
 interface Props {
   products: Product[] | undefined;
@@ -116,44 +116,29 @@ const ProductTemp = ({
                 <span>{count}</span>
               </h3>
 
-              <THStack>
+              <div className="flex gap-3 items-center">
                 <button
-                  className="bg-blue-400 rounded-xl p-1 text-white hover:bg-blue-600 disabled:opacity-50"
+                  className="text-blue-500 hover:text-blue-600 disabled:opacity-50"
                   aria-label="prev"
                   disabled={pagn < 2}
                   onClick={() => {
                     setPagn(pagn - 1);
                   }}
                 >
-                  <ArrowLeftIcon stroke="white" width={20} />
+                  Prev
                 </button>
-                <span
-                  className={`${pagn > 1 ? "block" : "hidden"} w-6 text-center`}
-                >
-                  {pagn - 1}
-                </span>
-                <span className="bg-blue-600 bg-opacity-75 rounded-xl w-6 text-center text-white">
-                  {pagn}
-                </span>
-                <span className=" w-6 rounded-xl text-center">{pagn + 1}</span>
-                <span
-                  className={`${
-                    pagn > 1 ? "hidden" : "block"
-                  }  w-6 rounded-xl text-center`}
-                >
-                  {pagn + 2}
-                </span>
+                <p>{pagn}</p>
                 <button
-                  className="bg-blue-400 rounded-xl p-1 text-white hover:bg-blue-500 disabled:opacity-50"
+                  className="text-blue-500 hover:text-blue-600 disabled:opacity-50"
                   aria-label="next"
                   disabled={products && products?.length < limit}
                   onClick={() => {
                     setPagn(pagn + 1);
                   }}
                 >
-                  <ArrowRightIcon width={20} />
+                  Next
                 </button>
-              </THStack>
+              </div>
             </TFlex>
           </div>
         </div>

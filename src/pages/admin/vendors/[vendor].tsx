@@ -1,15 +1,15 @@
 import InputTemp, { TextareaTemp } from "@components/InputTemp";
-import LayoutA from "@components/Layout/Admin";
+import LayoutA from "@components/layout/Admin";
 import { Loading, LoadingBlur } from "@components/Loading";
 import RadioGroup from "@components/radix/RadioGroup";
 import { IconBack, IconButton, MenuFlex, THStack } from "@components/TElements";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { api } from "utils/api";
-import { type NextPageWithLayout } from "@t/shared";
+import { api } from "@lib/api";
+import { type NextPageWithLayout } from "t/shared";
 import AlertDialog from "@components/radix/Alert";
-import { vendorVs } from "utils/validation";
+import { vendorVs } from "@lib/validation";
 
 const Vendor: NextPageWithLayout = () => {
   const router = useRouter();

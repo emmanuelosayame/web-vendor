@@ -1,4 +1,4 @@
-import Layout from "@components/Layout";
+import Layout from "@components/layout";
 import AlertDialog from "@components/radix/Alert";
 import RadioGroup from "@components/radix/RadioGroup";
 import Select from "@components/radix/Select";
@@ -14,8 +14,8 @@ import { Formik } from "formik";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { type OrderStatus } from "src/server/routers/order";
-import { api } from "utils/api";
-import { dateTimeLocale, limitText } from "utils/helpers";
+import { api } from "@lib/api";
+import { dateTimeLocale, limitText } from "@lib/helpers";
 
 const Sale = () => {
   const router = useRouter();

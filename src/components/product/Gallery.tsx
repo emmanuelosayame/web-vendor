@@ -4,30 +4,21 @@ import { ArchiveBoxXMarkIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { type ChangeEvent, useRef, useState } from "react";
 import "react-easy-crop/react-easy-crop.css";
-import { type FormValues } from "utils/placeholders";
+import { type FormValues } from "@lib/placeholders";
 import SelectImage from "@components/SelectImage";
+import type { UseFormGetValues, UseFormSetValue } from "react-hook-form";
 
 interface Props {
   thumbnail: string | undefined;
   images?: { id: string; url: string }[];
-  formikValues: FormValues;
-  setFieldValue: (
-    field: string,
-    value: any,
-    shouldValidate?: boolean | undefined
-  ) => void;
+  getValues: UseFormGetValues<FormValues>;
+  setValue: UseFormSetValue<FormValues>;
   pid?: string;
 }
 
 const imagesPH = ["1", "2", "3", "4"];
 
-const Gallery = ({
-  thumbnail,
-  images,
-  formikValues,
-  setFieldValue,
-  pid,
-}: Props) => {
+const Gallery = ({ thumbnail, images, getValues, setValue, pid }: Props) => {
   const imageRef = useRef<HTMLInputElement>(null);
 
   const [croppedTN, setCTNP] = useState(thumbnail);
@@ -82,9 +73,9 @@ const Gallery = ({
       ...state.filter((prev) => prev.id !== id),
       { id, url: serverUrl },
     ]);
-    setFieldValue(
+    setValue(
       "imageFiles",
-      formikValues.imageFiles.filter((f) => f.id !== id)
+      getValues("imageFiles").filter((f) => f.id !== id)
     );
   };
 
@@ -116,8 +107,8 @@ const Gallery = ({
       ...state.filter((prev) => id !== prev.id),
       { id, url: URL.createObjectURL(croppedImage) },
     ]);
-    setFieldValue("imageFiles", [
-      ...formikValues.imageFiles.filter((file) => file.id !== id),
+    setValue("imageFiles", [
+      ...getValues("imageFiles").filter((file) => file.id !== id),
       { id, file: croppedImage },
     ]);
   };
@@ -128,7 +119,7 @@ const Gallery = ({
         if (croppedTN && croppedTN.slice(0, 5) === "blob:")
           URL.revokeObjectURL(croppedTN);
         setCTNP(URL.createObjectURL(croppedImage));
-        setFieldValue("thumbnailFile", croppedImage);
+        setValue("thumbnailFile", croppedImage);
         break;
       case "1":
       case "2":
@@ -169,7 +160,7 @@ const Gallery = ({
                 onClick={() => {
                   // setTNP(undefined);
                   setCTNP(undefined);
-                  setFieldValue("thumbnailFile", null);
+                  setValue("thumbnailFile", null);
                 }}
               >
                 <ArchiveBoxXMarkIcon width={20} />
@@ -220,9 +211,9 @@ const Gallery = ({
                     type="button"
                     className="text-orange-500 rounded-full p-1.5 bg-orange-200 drop-shadow-md"
                     onClick={() => {
-                      setFieldValue(
+                      setValue(
                         "imageFiles",
-                        formikValues.imageFiles.filter(
+                        getValues("imageFiles").filter(
                           (img) => img.id !== image.id
                         )
                       );

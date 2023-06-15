@@ -1,12 +1,11 @@
 import { SessionProvider, useSession } from "next-auth/react";
-import { api } from "../../utils/api";
+import { api } from "../../lib/api";
 import font from "next/font/local";
 import "../styles/globals.css";
 import type { ReactElement, ReactNode } from "react";
 import Login from "@components/Login";
 import { LoadingBlur } from "@components/Loading";
-import Head from "next/head";
-import type { AppPropsWithLayout } from "types/shared";
+import type { AppPropsWithLayout } from "t/shared";
 
 const spaceGrotesk = font({
   src: [
@@ -26,9 +25,6 @@ const MyApp = ({
   const getLayout = Component.getLayout || ((page: ReactElement) => page);
   return (
     <>
-      <Head>
-        <title>vendor@delorand</title>
-      </Head>
       <style jsx global>
         {`
           html {

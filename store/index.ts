@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools, combine, persist } from "zustand/middleware";
-import type { ColorSchemeSlice, DefaultSlice } from "types/shared";
+import type { ColorSchemeSlice, DefaultSlice } from "t/shared";
 import { colorSchemeSlice } from "./colorSchemeSlice";
 import { defaultSlice } from "./default";
 

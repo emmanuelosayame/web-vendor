@@ -1,4 +1,4 @@
-import Layout from "@components/Layout";
+import Layout from "@components/layout";
 import Select from "@components/radix/Select";
 import {
   IconButton,
@@ -23,11 +23,11 @@ import {
 } from "@radix-ui/react-dialog";
 import Link from "next/link";
 import { type Dispatch, type SetStateAction, useState } from "react";
-import { api } from "utils/api";
-import { limitText } from "utils/helpers";
-import useMediaQuery from "utils/useMediaQuery";
+import { api } from "@lib/api";
+import { limitText } from "@lib/helpers";
+import useMediaQuery from "@lib/useMediaQuery";
 import debounce from "lodash/debounce";
-import { type NextPageWithLayout } from "@t/shared";
+import { type NextPageWithLayout } from "t/shared";
 import { useRouter } from "next/router";
 import { type Filter } from "src/server/routers/order";
 import { LoadingBlur } from "@components/Loading";

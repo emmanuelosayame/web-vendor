@@ -205,7 +205,7 @@ model Notification {
     body   String
     // body2  String
     type   NType     @default(order)
-    rid    String
+    rid    String[] 
 }
 
 type OrdersItem {

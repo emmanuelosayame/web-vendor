@@ -5,7 +5,7 @@ import {
   getProductInitialPayload,
   type MutateValues,
   type FormValues,
-} from "utils/placeholders";
+} from "@lib/placeholders";
 
 interface Props {
   values: FormValues;

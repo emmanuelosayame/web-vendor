@@ -1,13 +1,13 @@
-import LayoutA from "@components/Layout/Admin";
+import LayoutA from "@components/layout/Admin";
 import Avatar from "@components/radix/Avatar";
 import Select from "@components/radix/Select";
 import { IconLink, MenuFlex } from "@components/TElements";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { api } from "utils/api";
-import { limitText } from "utils/helpers";
-import useMediaQuery from "utils/useMediaQuery";
-import { type NextPageWithLayout } from "@t/shared";
+import { api } from "@lib/api";
+import { limitText } from "@lib/helpers";
+import useMediaQuery from "@lib/useMediaQuery";
+import { type NextPageWithLayout } from "t/shared";
 
 const Stores: NextPageWithLayout = () => {
   const { data: stores } = api.store.many.useQuery({ limit: 10 });

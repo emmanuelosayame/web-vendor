@@ -5,9 +5,9 @@ import {
 } from "@heroicons/react/24/outline";
 import type { Notification, NType } from "@prisma/client";
 import { useState } from "react";
-import { api } from "utils/api";
-import { dateLocale, timeLocale } from "utils/helpers";
-import { data } from "utils/mock";
+import { api } from "@lib/api";
+import { dateLocale, timeLocale } from "@lib/helpers";
+import { data } from "@lib/mock";
 import { LoadingBlur } from "./Loading";
 
 interface Props {

@@ -1,89 +1,79 @@
-import type { FieldInputProps } from "formik";
-import type { HTMLInputTypeAttribute } from "react";
+import {
+  type InputHTMLAttributes,
+  type TextareaHTMLAttributes,
+  forwardRef,
+} from "react";
 
-interface Props {
-  heading: string;
-  type?: HTMLInputTypeAttribute;
-  fieldProps?: FieldInputProps<string | number | readonly string[] | undefined>;
+interface Props extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
   touched?: boolean;
-  error?: string | string[];
+  error?: string;
   placeholder?: string;
   Ibg?: string;
-  style?: { heading?: any; input?: any };
+  styles?: { heading?: any; input?: any };
   className?: string;
-  disabled?: boolean;
 }
 
-interface TextareaProps extends Omit<Props, "type"> {
-  rows?: number;
-}
-
-const InputTemp = ({
-  heading,
-  type,
-  fieldProps,
-  touched,
-  error,
-  placeholder,
-  Ibg = "",
-  style = { heading: { fontWeight: 600 } },
-  className,
-  disabled,
-}: Props) => {
+export const InputTemp = forwardRef<HTMLInputElement, Props>((props, ref) => {
   //TODO switch ibg to inputprops
+  const { label, touched, styles, required, error, className, ...rest } = props;
+
   return (
     <div className="w-full">
-      <div className="flex justify-between">
-        <p {...style.heading}>{heading}</p>
+      <div className="flex justify-between mb-1 text-sm font-medium">
+        <p {...(styles?.heading || {})} className="whitespace-nowrap">
+          {label} {required && <span className="text-red-500">*</span>}
+        </p>
         {touched && error && (
-          <p className="text-neutral-500 text-center italic text-[13px]">
-            {error}
-          </p>
+          <p className="text-red-500 text-center italic text-xs">{error}</p>
         )}
       </div>
       <input
-        className={`rounded-md w-full py-1 px-2 border border-neutral-300 outline-none ${className}`}
-        type={type}
-        {...fieldProps}
-        placeholder={placeholder}
-        {...style.input}
-        disabled={disabled}
+        ref={ref}
+        className={`rounded-lg w-full py-1 px-4 bg-white outline-none ${className} border border-neutral-300 disabled:bg-neutral-100`}
+        {...rest}
       />
     </div>
   );
-};
+});
 
-export const TextareaTemp = ({
-  heading,
-  fieldProps,
-  touched,
-  error,
-  placeholder,
-  Ibg = "",
-  style = { heading: { fontWeight: 600 } },
-  rows,
-  className,
-  disabled,
-}: TextareaProps) => {
-  //TODO switch ibg to inputprops
-  return (
-    <div className="w-full">
-      <div className="flex justify-between">
-        <p {...style.heading}>{heading}</p>
-        {touched && error && (
-          <p className="text-neutral-500 text-center italic text-sm">{error}</p>
-        )}
+InputTemp.displayName = "InputTemp";
+
+interface TProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  touched?: boolean;
+  error?: string;
+  placeholder?: string;
+  Ibg?: string;
+  styles?: { heading?: any; input?: any };
+  className?: string;
+  rows?: number;
+}
+
+export const TextareaTemp = forwardRef<HTMLTextAreaElement, TProps>(
+  (props, ref) => {
+    //TODO switch ibg to inputprops
+    const { label, touched, styles, required, error, className, ...rest } =
+      props;
+
+    return (
+      <div className="w-full">
+        <div className="flex justify-between mb-1 text-sm font-medium">
+          <p {...(styles?.heading || {})}>
+            {label} {required && <span className="text-red-500">*</span>}
+          </p>
+          {touched && error && (
+            <p className="text-red-500 text-center italic text-xs">{error}</p>
+          )}
+        </div>
+        <textarea
+          ref={ref}
+          className={`text-[15px] rounded-lg w-full py-1 px-2 bg-white outline-none ${className} border border-neutral-300 resize-none`}
+          {...rest}
+        />
       </div>
-      <textarea
-        className={`rounded-md w-full py-1 px-2 border border-neutral-300 outline-none resize-none ${className}`}
-        rows={rows}
-        {...fieldProps}
-        placeholder={placeholder}
-        {...style.input}
-        disabled={disabled}
-      />
-    </div>
-  );
-};
+    );
+  }
+);
 
-export default InputTemp;
+TextareaTemp.displayName = "TextareaTemp";

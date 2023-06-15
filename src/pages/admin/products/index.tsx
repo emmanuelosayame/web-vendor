@@ -1,16 +1,16 @@
-import LayoutA from "@components/Layout/Admin";
+import LayoutA from "@components/layout/Admin";
 import ProductTemp from "@components/product/ProductsTemp";
 import Select from "@components/radix/Select";
 import { MenuFlex } from "@components/TElements";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
-import type { NextPageWithLayout } from "@t/shared";
+import type { NextPageWithLayout } from "t/shared";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { type ProductSort } from "src/server/schema";
 import { useStore } from "store";
-import { api } from "utils/api";
-import useMediaQuery from "utils/useMediaQuery";
+import { api } from "@lib/api";
+import useMediaQuery from "@lib/useMediaQuery";
 
 const selectList = [
   { item: "A - Z", value: "title-asc" },

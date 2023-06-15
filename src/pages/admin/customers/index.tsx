@@ -1,4 +1,4 @@
-import LayoutA from "@components/Layout/Admin";
+import LayoutA from "@components/layout/Admin";
 import Alert from "@components/radix/Alert";
 import Select from "@components/radix/Select";
 import { useToastTrigger } from "@components/radix/Toast";
@@ -21,9 +21,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { type ProductSort } from "src/server/schema";
-import { api } from "utils/api";
-import useMediaQuery from "utils/useMediaQuery";
-import { limitText } from "utils/helpers";
+import { api } from "@lib/api";
+import useMediaQuery from "@lib/useMediaQuery";
+import { limitText } from "@lib/helpers";
 import { LoadingBlur } from "@components/Loading";
 
 const selectList = [

@@ -24,7 +24,7 @@ export const notificationRouter = router({
       const sid = ctx.sid;
       const uid = ctx.session.user.id;
       return await ctx.prisma.notification.findMany({
-        where: { OR: [{ rid: "1" }, { rid: sid }] },
+        where: { OR: [{ rid: { equals: "1" } }, { rid: { equals: sid } }] },
       });
     }),
   manyA: adminProcedure
@@ -78,7 +78,10 @@ export const notificationRouter = router({
       const uid = ctx.session.user.id;
 
       return await ctx.prisma.notification.count({
-        where: { OR: [{ rid: "1" }, { rid: sid }], status: "sealed" },
+        where: {
+          OR: [{ rid: { equals: "1" } }, { rid: { equals: sid } }],
+          status: "sealed",
+        },
       });
     }),
 });

@@ -1,0 +1,63 @@
+"use client";
+
+import Header from "@components/header";
+import type { ReactNode } from "react";
+import { api, trpc } from "@lib/api";
+import { useStore } from "store";
+import { csToStyle } from "@lib/helpers";
+import { Loading } from "@components/Loading";
+import { useSession } from "next-auth/react";
+import SelectStore from "../SelectStore";
+import Login from "@components/Login";
+
+const Layout = ({
+  children,
+  nopx = "sm",
+}: {
+  children: ReactNode;
+  nopx?: "sm" | "lg" | "all";
+}) => {
+  const { data: auth, status } = useSession();
+  const style = csToStyle(useStore((state) => state.colorScheme)).style;
+
+  const {
+    data: store,
+    isLoading,
+    refetch,
+  } = trpc.store.one.useQuery({}, { enabled: !!auth?.user });
+
+  if (status === "unauthenticated") return <Login />;
+  if (status === "loading" || isLoading) return <Loading />;
+
+  if (!store)
+    return (
+      <div
+        className={`fixed inset-0 flex p-2 justify-center items-center}`}
+        style={style}
+      >
+        <div className="w-full md:w-96 max-h-80">
+          <SelectStore refetch={refetch} />
+        </div>
+      </div>
+    );
+
+  return (
+    <div
+      className={`h-full pt-28 md:pt-32 z-20 ${
+        nopx === "sm"
+          ? "md:px-3"
+          : nopx === "lg"
+          ? "px-3 md:px-0"
+          : nopx === "all"
+          ? ""
+          : "px-3"
+      }`}
+      style={style}
+    >
+      <Header auth={auth} store={store} refetch={refetch} />
+      {children}
+    </div>
+  );
+};
+
+export default Layout;

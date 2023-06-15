@@ -1,5 +1,5 @@
 import InputTemp from "@components/InputTemp";
-import LayoutA from "@components/Layout/Admin";
+import LayoutA from "@components/layout/Admin";
 import { Loading, LoadingBlur } from "@components/Loading";
 import AlertDialog from "@components/radix/Alert";
 import { IconBack, MenuFlex } from "@components/TElements";
@@ -15,11 +15,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useStore } from "store";
-import { api } from "utils/api";
-import { csToStyle } from "utils/helpers";
-import { categoryVS } from "utils/validation";
-import { type NextPageWithLayout } from "@t/shared";
-import useMediaQuery from "utils/useMediaQuery";
+import { api } from "@lib/api";
+import { csToStyle } from "@lib/helpers";
+import { categoryVS } from "@lib/validation";
+import { type NextPageWithLayout } from "t/shared";
+import useMediaQuery from "@lib/useMediaQuery";
 
 const CategoriesPage: NextPageWithLayout = () => {
   const router = useRouter();

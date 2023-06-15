@@ -1,71 +1,70 @@
-import InputTemp, { TextareaTemp } from "@components/InputTemp";
+import { InputTemp, TextareaTemp } from "@components/InputTemp";
 import AlertDialog from "@components/radix/Alert";
 import Select from "@components/radix/Select";
 import Switch from "@components/radix/Switch";
 import { TDivider, THStack, TStack } from "@components/TElements";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Product } from "@prisma/client";
-import type { FieldInputProps, FormikErrors, FormikTouched } from "formik";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { type ProductPayload } from "src/server/schema";
-import { api } from "utils/api";
-import { type MutateValues, type FormValues } from "utils/placeholders";
+import { api } from "@lib/api";
+import { type MutateValues, type FormValues } from "@lib/placeholders";
+import type {
+  FieldErrors,
+  UseFormClearErrors,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetError,
+  UseFormSetValue,
+} from "react-hook-form";
 
 interface Props {
-  getFieldProps: <Value = any>(props: any) => FieldInputProps<Value>;
-  touched: FormikTouched<FormValues>;
-  errors: FormikErrors<FormValues>;
+  register: UseFormRegister<FormValues>;
+  errors: FieldErrors<FormValues>;
 }
 
 interface PropsPlus extends Props {
   pid: string | undefined;
   mutate: (values: MutateValues) => Promise<Product>;
-  values: FormValues;
-  setFieldValue: (
-    field: string,
-    value: any,
-    shouldValidate?: boolean | undefined
-  ) => void;
-  setFieldError: (field: string, message: string | undefined) => void;
+  getValues: UseFormGetValues<FormValues>;
+  setValue: UseFormSetValue<FormValues>;
+  setError: UseFormSetError<FormValues>;
+  clearErrors: UseFormClearErrors<FormValues>;
 }
 
-export const Form1 = ({ getFieldProps, touched, errors }: Props) => {
+export const Form1 = ({ register, errors }: Props) => {
   return (
     <div className="rounded-lg bg-white p-2 col-span-5 row-span-2 h-full space-y-1">
       <h3>Product Title and Description</h3>
       <TDivider />
       <TextareaTemp
-        fieldProps={getFieldProps("title")}
-        style={{}}
-        heading="Product Title"
+        {...register("title")}
+        label="Product Title"
         placeholder="Enter Product Title"
         rows={2}
-        touched={touched.title}
-        error={errors.title}
+        error={errors.title?.message?.toString()}
       />
 
       <TextareaTemp
-        fieldProps={getFieldProps("description")}
-        heading="Product Description"
+        {...register("description")}
+        label="Product Description"
         rows={5}
         placeholder="Enter Product Description"
-        touched={touched.description}
-        error={errors.description}
+        error={errors.description?.message?.toString()}
       />
     </div>
   );
 };
 
 export const Form2 = ({
-  getFieldProps,
-  touched,
   errors,
   pid,
   mutate,
-  values,
-  setFieldValue,
-  setFieldError,
+  getValues,
+  setValue,
+  setError,
+  clearErrors,
+  register,
 }: PropsPlus) => {
   const router = useRouter();
   const { data: categories } = api.category.many.useQuery({ tid: 3 });
@@ -86,46 +85,40 @@ export const Form2 = ({
       <TDivider />
       <InputTemp
         type="text"
-        fieldProps={getFieldProps("brand")}
-        style={{}}
-        heading="Brand"
+        {...register("brand")}
+        label="Brand"
         placeholder="Manufacturer / Brand"
-        touched={touched.brand}
-        error={errors.brand}
+        error={errors.brand?.message?.toString()}
       />
 
       <Select
         required
         placeholder="Select category"
         onValueChange={(e) => {
-          e && setFieldValue("category", e);
-          values.category && setFieldError("category", undefined);
+          e && setValue("category", e);
+          getValues("category") && clearErrors("category");
         }}
-        value={values.category}
+        value={getValues("category")}
         disabled={catList.length < 1}
         selectList={catList}
         contentStyles="bg-white"
         triggerStyles="border-200 rounded-lg bg-neutral-100"
       />
-      {errors.category && <p>{errors.category}</p>}
+      {errors.category && <p>{errors.category?.message?.toString()}</p>}
 
       <THStack className="items-center p-2">
         <InputTemp
           type="number"
-          fieldProps={getFieldProps("price")}
-          style={{}}
-          heading="Price"
-          touched={touched.price}
-          error={errors.price}
+          {...register("price")}
+          label="Price"
+          error={errors.price?.message?.toString()}
         />
 
         <InputTemp
           type="number"
-          fieldProps={getFieldProps("stock")}
-          style={{}}
-          heading="Stock"
-          touched={touched.stock}
-          error={errors.stock}
+          {...register("stock")}
+          label="Stock"
+          error={errors.stock?.message?.toString()}
         />
       </THStack>
 
@@ -135,7 +128,6 @@ export const Form2 = ({
         fieldProps={getFieldProps("package")}
         placeholder="Enter contents sperated by semi-colon, contents written
                  together would exists as a single word"
-        touched={touched.package}
         error={errors.package}
       /> */}
 
@@ -143,8 +135,8 @@ export const Form2 = ({
         <h3>Package</h3>
         <TagsComponent
           name="package"
-          tags={values.package}
-          setFieldValue={setFieldValue}
+          tags={getValues("package")}
+          setValue={setValue}
           placeholder="Enter Package"
         />
       </div>
@@ -153,25 +145,23 @@ export const Form2 = ({
         <h3>Tags</h3>
         <TagsComponent
           name="tags"
-          tags={values.tags}
-          setFieldValue={setFieldValue}
+          tags={getValues("tags")}
+          setValue={setValue}
         />
       </div>
 
       <div className="space-y-3 flex-1">
         <h3 className="border-b border-b-neutral-200">Specifications</h3>
         <InputTemp
-          fieldProps={getFieldProps("specs.model")}
-          style={{}}
-          heading="Model"
-          touched={touched.specs?.model}
-          error={errors.specs?.model}
+          {...register("specs.model")}
+          label="Model"
+          error={errors.specs?.model?.message?.toString()}
         />
 
         <TagsComponent
           name="specs.others"
-          tags={values.specs.others}
-          setFieldValue={setFieldValue}
+          tags={getValues("specs.others")}
+          setValue={setValue}
           placeholder="Other specs"
         />
       </div>
@@ -179,17 +169,18 @@ export const Form2 = ({
       {pid !== "new" ? (
         <div className="flex gap-2">
           <AlertDialog
-            action={values.status === "active" ? "Disable" : "Enable"}
+            action={getValues("status") === "active" ? "Disable" : "Enable"}
             title={`Are you sure you want to ${
-              values.status === "active" ? "disable" : "enable"
+              getValues("status") === "active" ? "disable" : "enable"
             } this product?`}
-            trigger={values.status === "active" ? "disable" : "enable"}
+            trigger={getValues("status") === "active" ? "disable" : "enable"}
             triggerStyles="py-1 w-11/12 mx-auto rounded-lg
                    bg-amber-400 hover:bg-amber-500 text-white"
             onClickConfirm={() =>
               mutate({
                 details: {
-                  status: values.status === "active" ? "disabled" : "active",
+                  status:
+                    getValues("status") === "active" ? "disabled" : "active",
                 },
               })
             }
@@ -210,14 +201,14 @@ export const Form2 = ({
 
 interface TagProps {
   tags: string[];
-  setFieldValue: PropsPlus["setFieldValue"];
-  name: string;
+  setValue: PropsPlus["setValue"];
+  name: any;
   placeholder?: string;
 }
 
 const TagsComponent = ({
   tags,
-  setFieldValue,
+  setValue,
   name,
   placeholder = "Enter tag",
 }: TagProps) => {
@@ -239,7 +230,7 @@ const TagsComponent = ({
           disabled:opacity-70 hover:bg-amber-500"
           onClick={() => {
             setTag("");
-            setFieldValue(name, [...tags.filter((tg) => tag !== tg), tag]);
+            setValue(name, [...tags.filter((tg) => tag !== tg), tag]);
           }}
         >
           <PlusIcon width={20} />
@@ -257,7 +248,7 @@ const TagsComponent = ({
               <button
                 type="button"
                 onClick={() =>
-                  setFieldValue(
+                  setValue(
                     name,
                     tags.filter((tg) => tag !== tg)
                   )

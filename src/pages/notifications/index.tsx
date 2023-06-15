@@ -1,9 +1,9 @@
-import Layout from "@components/Layout";
+import Layout from "@components/layout";
 import Select from "@components/radix/Select";
 import { MenuFlex } from "@components/TElements";
-import { type NextPageWithLayout } from "@t/shared";
+import { type NextPageWithLayout } from "t/shared";
 import type { NType } from "@prisma/client";
-import { api } from "utils/api";
+import { api } from "@lib/api";
 import { useState } from "react";
 import NotificationComp from "@components/NotificationComp";
 

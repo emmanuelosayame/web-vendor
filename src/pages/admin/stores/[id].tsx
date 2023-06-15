@@ -1,23 +1,23 @@
 import InputTemp, { TextareaTemp } from "@components/InputTemp";
-import LayoutA from "@components/Layout/Admin";
+import LayoutA from "@components/layout/Admin";
 import { Loading, LoadingBlur } from "@components/Loading";
 import RadioGroup from "@components/radix/RadioGroup";
 import { IconBack, IconButton, MenuFlex, THStack } from "@components/TElements";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { api } from "utils/api";
-import { type NextPageWithLayout } from "@t/shared";
+import { api } from "@lib/api";
+import { type NextPageWithLayout } from "t/shared";
 import AlertDialog from "@components/radix/Alert";
-import { emailV, storeVs } from "utils/validation";
+import { emailV, storeVs } from "@lib/validation";
 import { identity } from "lodash";
-import { limitText } from "utils/helpers";
+import { limitText } from "@lib/helpers";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { type Store, type StoreVendor } from "@prisma/client";
 import Select from "@components/radix/Select";
 import { useSession } from "next-auth/react";
 import StoreComponent from "@components/StoreComponent";
-import { initialSD } from "utils/placeholders";
+import { initialSD } from "@lib/placeholders";
 
 const StorePage: NextPageWithLayout = () => {
   const router = useRouter();

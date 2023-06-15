@@ -1,4 +1,6 @@
-import { FadeLoader } from "react-spinners";
+import { csToStyle } from "@lib/helpers";
+import { CirclesWithBar } from "react-loader-spinner";
+import { useStore } from "store";
 
 export const Loading = ({
   position = "fixed",
@@ -11,7 +13,7 @@ export const Loading = ({
         position === "fixed" ? "fixed" : "absolute"
       } inset-0 bg-white z-50 w-screen h-screen`}
     >
-      <FadeLoader color="gray" />
+      <CirclesWithBar width={70} color="gray" />
     </div>
   );
 };
@@ -21,6 +23,10 @@ export const LoadingBlur = ({
 }: {
   position?: "fixed" | "absolute";
 }) => {
+  const style = csToStyle(useStore((state) => state.colorScheme)).style;
+
+  console.log(style);
+
   return (
     <div
       className={`flex justify-center items-center fixed inset-0 bg-white/30
@@ -28,7 +34,7 @@ export const LoadingBlur = ({
         position === "absolute" ? "inset-[2px]" : ""
       }`}
     >
-      <FadeLoader />
+      <CirclesWithBar width={70} color={"gray"} />
     </div>
   );
 };

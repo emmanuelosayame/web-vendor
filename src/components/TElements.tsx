@@ -1,15 +1,14 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import type { HTMLAttributes, ReactNode } from "react";
-import { useStore } from "store";
 import type {
   // AvatarProps,
   ButtonProps,
   ElementProps,
   IconButtonProps,
   StackProps,
-} from "types/TElements";
-import { csToStyle } from "utils/helpers";
+} from "t/TElements";
+import { csToStyle } from "@lib/helpers";
 
 export const TButton = ({
   type = "button",

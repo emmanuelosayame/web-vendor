@@ -1,5 +1,5 @@
 import InputTemp from "@components/InputTemp";
-import LayoutA from "@components/Layout/Admin";
+import LayoutA from "@components/layout/Admin";
 import AlertDialog from "@components/radix/Alert";
 import { MenuFlex } from "@components/TElements";
 import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -8,10 +8,10 @@ import { Form, Formik } from "formik";
 import Link from "next/link";
 import { Fragment, useState } from "react";
 import { useStore } from "store";
-import type { NextPageWithLayout } from "types/shared";
-import { api } from "utils/api";
-import { csToStyle } from "utils/helpers";
-import { categoryVS } from "utils/validation";
+import type { NextPageWithLayout } from "t/shared";
+import { api } from "@lib/api";
+import { csToStyle } from "@lib/helpers";
+import { categoryVS } from "@lib/validation";
 
 const Categories: NextPageWithLayout = () => {
   const [edit, setEdit] = useState(false);

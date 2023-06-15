@@ -1,4 +1,4 @@
-import InputTemp from "@components/InputTemp";
+import { InputTemp } from "@components/InputTemp";
 import AlertDialog from "@components/radix/Alert";
 import SelectImage from "@components/SelectImage";
 import { TDivider, TFlex } from "@components/TElements";
@@ -9,37 +9,26 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import type { ProductVariant } from "@prisma/client";
-import {
-  type FormikErrors,
-  type FormikTouched,
-  type FieldInputProps,
-  FieldArray,
-} from "formik";
 import Image from "next/image";
 import { type ChangeEvent, useRef, useState, useMemo } from "react";
-import { vPlaceholder, type FormValues } from "utils/placeholders";
+import { vPlaceholder, type FormValues } from "@lib/placeholders";
+import type {
+  FieldErrors,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 
 interface Props {
-  variants: FormValues["variants"];
-  setFieldValue: (
-    field: string,
-    value: any,
-    shouldValidate?: boolean | undefined
-  ) => void;
-  getFieldProps: <Value = any>(props: any) => FieldInputProps<Value>;
-  touched: FormikTouched<FormValues>;
-  errors: FormikErrors<FormValues>;
+  setValue: UseFormSetValue<FormValues>;
+  getValues: UseFormGetValues<FormValues>;
+  register: UseFormRegister<FormValues>;
+  errors: FieldErrors<FormValues>;
   serverVariants: ProductVariant[];
 }
 
-const Variants = ({
-  variants,
-  setFieldValue,
-  getFieldProps,
-  errors,
-  touched,
-  serverVariants,
-}: Props) => {
+const Variants = ({ setValue, getValues, errors, serverVariants }: Props) => {
+  const variants = getValues("variants");
   const imageRef = useRef<HTMLInputElement>(null);
   const variantErrors = errors.variants as any;
   const variantsWID = variants.map((varnt, index) => ({
@@ -69,7 +58,8 @@ const Variants = ({
 
   const handleCropped = (croppedImage: File, opened: string) => {
     const payload = variantsWID.find((varnt) => varnt.id === opened);
-    setFieldValue("variants", [
+    if (!payload) return;
+    setValue("variants", [
       ...variantsWID.filter((varnt) => opened !== varnt.id),
       {
         ...payload,
@@ -102,7 +92,7 @@ const Variants = ({
         onChange={handlePreview}
       />
 
-      <FieldArray name="variants">
+      {/* <FieldArray name="variants">
         {({ pop, push, remove }) => (
           <div className="rounded-lg p-2 col-span-7 row-span-2 h-full bg-white flex flex-col">
             {variants.length < 1 ? (
@@ -117,7 +107,7 @@ const Variants = ({
                 {serverVariants.length > 0 && (
                   <button
                     className="bg-blue-500 px-4 py-2 text-white rounded-lg"
-                    onClick={() => setFieldValue("variants", serverVariants)}
+                    onClick={() => setValue("variants", serverVariants)}
                   >
                     Restore
                   </button>
@@ -130,7 +120,7 @@ const Variants = ({
                   {serverVariants.length < 1 ? (
                     <button
                       className="btn-red py-1 px-4 w-fit mx-auto"
-                      onClick={() => setFieldValue("variants", [])}
+                      onClick={() => setValue("variants", [])}
                     >
                       Cancel
                     </button>
@@ -140,7 +130,7 @@ const Variants = ({
                       trigger="Remove"
                       triggerStyles="btn-red w-fit py-1"
                       title="Are you sure you want to remove all variants from this product?"
-                      onClickConfirm={() => setFieldValue("variants", [])}
+                      onClickConfirm={() => setValue("variants", [])}
                     />
                   )}
                   <button
@@ -179,10 +169,10 @@ const Variants = ({
                           error={errors.variants && variantErrors[index]?.title}
                         />
                         <InputTemp
-                          heading="Price"
+                          label="Price"
                           type={"number"}
                           placeholder="Enter price"
-                          fieldProps={getFieldProps(`variants[${index}].price`)}
+                          {...register("")}
                           touched={
                             touched.variants && touched.variants[index]?.price
                           }
@@ -192,7 +182,7 @@ const Variants = ({
                       <p className="mt-2">Options</p>
                       <Options
                         index={index}
-                        setFieldValue={setFieldValue}
+                        setValue={setValue}
                         options={variant.options}
                       />
 
@@ -214,14 +204,11 @@ const Variants = ({
                                   <button
                                     type="button"
                                     onClick={() =>
-                                      setFieldValue(
-                                        `variants[${index}].options`,
-                                        [
-                                          ...variant.options.filter(
-                                            (opt) => option.k !== opt.k
-                                          ),
-                                        ]
-                                      )
+                                      setValue(`variants[${index}].options`, [
+                                        ...variant.options.filter(
+                                          (opt) => option.k !== opt.k
+                                        ),
+                                      ])
                                     }
                                     className="absolute center-y right-0 z-30
                                  bg-red-500/70 hover:bg-red-500 rounded-full p-0.5 text-white shadow-lg"
@@ -259,7 +246,7 @@ const Variants = ({
             )}
           </div>
         )}
-      </FieldArray>
+      </FieldArray> */}
     </>
   );
 };
@@ -290,10 +277,10 @@ const ImageComp = ({ image }: { image: string }) => {
 
 const Options = ({
   options,
-  setFieldValue,
+  setValue,
   index,
 }: {
-  setFieldValue: (
+  setValue: (
     field: string,
     value: any,
     shouldValidate?: boolean | undefined
@@ -305,7 +292,7 @@ const Options = ({
 
   const add = () => {
     setValues({ k: "", v: "" });
-    setFieldValue(`variants[${index}].options`, [
+    setValue(`variants[${index}].options`, [
       ...options.filter((opt) => k !== opt.k),
       { k, v },
     ]);

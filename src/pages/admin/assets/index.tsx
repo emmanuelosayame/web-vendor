@@ -1,4 +1,4 @@
-import LayoutA from "@components/Layout/Admin";
+import LayoutA from "@components/layout/Admin";
 import Select from "@components/radix/Select";
 import { MenuFlex, TFlex } from "@components/TElements";
 import {
@@ -7,10 +7,10 @@ import {
   PencilSquareIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
-import { type NextPageWithLayout } from "@t/shared";
+import { type NextPageWithLayout } from "t/shared";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { assetsSelectList } from "utils/list";
+import { assetsSelectList } from "@lib/list";
 import img1 from "public/e7e850b1-79ff-4d42-9058-46bf415540a7.webp";
 import img2 from "public/flashsale.png";
 import {
@@ -22,7 +22,7 @@ import {
   type ChangeEvent,
   useMemo,
 } from "react";
-import { api } from "utils/api";
+import { api } from "@lib/api";
 import { LoadingBlur } from "@components/Loading";
 import SelectImage from "@components/SelectImage";
 import axios from "axios";

@@ -3,8 +3,8 @@ import { TDivider } from "@components/TElements";
 import { QrCodeIcon } from "@heroicons/react/24/outline";
 import { getCookie, setCookie } from "cookies-next";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { api } from "utils/api";
+import { usePathname, useRouter } from "next/navigation";
+import { api, trpc } from "@lib/api";
 
 interface Props {
   refetch: () => void;
@@ -15,7 +15,9 @@ const SelectStore = ({ onSwitchedFn = () => {} }: Props) => {
   const router = useRouter();
   const qc = api.useContext();
 
-  const { data: accounts, isLoading } = api.vendor.accounts.useQuery({});
+  const { data: accounts, isLoading } = trpc.vendor.accounts.useQuery({});
+
+  const pathname = usePathname();
 
   const activeStoreId = getCookie("sid");
 
@@ -63,7 +65,7 @@ const SelectStore = ({ onSwitchedFn = () => {} }: Props) => {
 
       {
         !(
-          router.pathname === "/create-store" ||
+          pathname === "/create-store" ||
           (accounts && accounts?.length > 1 && (
             <>
               <TDivider className="my-3" />

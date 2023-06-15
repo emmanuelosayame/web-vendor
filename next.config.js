@@ -5,7 +5,6 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 });
 
 const config = {
-  reactStrictMode: true,
   images: {
     domains: [
       "dummyjson.com",

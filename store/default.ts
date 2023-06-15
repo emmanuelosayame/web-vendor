@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand";
-import type { DefaultSlice } from "types/shared";
+import type { DefaultSlice } from "t/shared";
 
 export const defaultSlice: StateCreator<DefaultSlice> = (set, get) => ({
   product: { pagn: 1 },

@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import formidable, { type File } from "formidable";
 import { nanoid } from "nanoid";
-import { storage } from "utils/f-admin";
+import { storage } from "@lib/f-admin";
 
 const bucket = storage.bucket();
 
