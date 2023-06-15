@@ -1,13 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { adminProcedure, protectedProcedure, router } from "../trpc";
-
-const MutatePayload = z.object({
-  parent: z.string().nullable(),
-  name: z.string(),
-  slug: z.string(),
-  tid: z.number(),
-});
+import { categoryS } from "../schema";
 
 export const categoryRouter = router({
   many: protectedProcedure
@@ -36,13 +30,13 @@ export const categoryRouter = router({
       return await ctx.prisma.category.findUnique({ where: { id } });
     }),
   update: adminProcedure
-    .input(z.object({ id: z.string(), data: MutatePayload.partial() }))
+    .input(z.object({ id: z.string(), data: categoryS.partial() }))
     .mutation(async ({ ctx, input }) => {
       const { id, data } = input;
       return await ctx.prisma.category.update({ where: { id }, data });
     }),
   create: adminProcedure
-    .input(z.object({ data: MutatePayload }))
+    .input(z.object({ data: categoryS }))
     .mutation(async ({ ctx, input }) => {
       const { data } = input;
       return await ctx.prisma.category.create({ data });

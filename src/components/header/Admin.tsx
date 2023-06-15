@@ -1,3 +1,5 @@
+"use client";
+
 import Avatar from "@components/radix/Avatar";
 import {
   Bars2Icon,
@@ -6,7 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import type { Session } from "next-auth";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 import { Content, Root, Trigger } from "@radix-ui/react-dialog";
 import useMediaQuery from "@lib/useMediaQuery";
 import { useState } from "react";
@@ -29,24 +31,22 @@ const HeaderA = ({ auth }: Props) => {
           <div className="hidden md:flex gap-2 items-center">
             <NavLink text="Dashboard" to="/admin/" />
             <NavLink text="Products" to="/admin/products" />
-            <NavLink text="Sales" to="/admin/sales" />
-            <NavLink text="Notifications" to="/admin/notifications" />
+            {/* <NavLink text="Sales" to="/admin/sales" /> */}
+            {/* <NavLink text="Notifications" to="/admin/notifications" /> */}
             <NavLink text="Assets" to="/admin/assets" />
             <NavLink text="Categories" to="/admin/categories" />
             <NavLink text="Vendors" to="/admin/vendors" />
             <NavLink text="Stores" to="/admin/stores" />
             <NavLink text="Customers" to="/admin/customers" />
-            <NavLink text="Settings" to="/admin/settings" />
+            {/* <NavLink text="Settings" to="/admin/settings" /> */}
           </div>
 
-          {!mq && (
-            <button
-              className="hover:text-blue-700"
-              onClick={() => setOpen((state) => !state)}
-            >
-              <Bars2Icon width={30} />
-            </button>
-          )}
+          <button
+            className="md:hidden hover:text-blue-700"
+            onClick={() => setOpen((state) => !state)}
+          >
+            <Bars2Icon width={30} />
+          </button>
 
           <div className="flex items-center flex-row-reverse md:flex-row gap-3">
             <div className="hidden md:flex bg-black/10 py-1 gap-2 text-center px-4 rounded-md leading-3">
@@ -152,11 +152,11 @@ const NavLinkSm = ({
   nested?: boolean;
   onclick: () => void;
 }) => {
-  const router = useRouter();
+  const pathname = usePathname();
   const active = !!(nested
-    ? router.asPath === to
-    : (router.asPath === to || `/${router.route.split("/")[1]}` === to) &&
-      router.asPath !== "/mypages/landing");
+    ? pathname === to
+    : (pathname === to || `/${pathname?.split("/")[1]}` === to) &&
+      pathname !== "/mypages/landing");
 
   return (
     <Link
@@ -180,11 +180,11 @@ const NavLink = ({
   to: string;
   nested?: boolean;
 }) => {
-  const router = useRouter();
+  const pathname = usePathname();
   const active = !!(nested
-    ? router.asPath === to
-    : (router.asPath === to || `/admin/${router.route.split("/")[1]}` === to) &&
-      router.asPath !== "/mypages/landing");
+    ? pathname === to
+    : (pathname === to || `/admin/${pathname?.split("/")[1]}` === to) &&
+      pathname !== "/mypages/landing");
 
   return (
     <Link

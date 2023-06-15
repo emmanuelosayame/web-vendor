@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { VendorData } from "../schema";
+import { vendorS } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
 import { isAdmin } from "../utils";
@@ -43,10 +43,11 @@ export const vendorRouter = router({
       return await ctx.prisma.vendor.findMany({ take: limit });
     }),
   update: protectedProcedure
-    .input(z.object({ vid: z.string().optional(), data: VendorData.partial() }))
+    .input(z.object({ vid: z.string().optional(), data: vendorS.partial() }))
     .mutation(async ({ ctx, input }) => {
       const { prisma } = isAdmin(ctx);
       const { vid, data } = input;
+
       if (data.email) {
         await prisma.store.updateMany({
           where: { vendors: { some: { id: vid } } },
@@ -65,7 +66,7 @@ export const vendorRouter = router({
   new: protectedProcedure
     .input(
       z.object({
-        data: VendorData.partial({
+        data: vendorS.partial({
           location: true,
           status: true,
           role: true,

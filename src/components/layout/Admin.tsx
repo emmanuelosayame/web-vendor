@@ -1,6 +1,7 @@
+"use client";
+
 import Header from "@components/header/Admin";
 import type { ReactNode } from "react";
-import { api } from "@lib/api";
 import { useStore } from "store";
 import { csToStyle } from "@lib/helpers";
 import { Loading } from "@components/Loading";
@@ -16,6 +17,7 @@ const LayoutA = ({
   nopx?: "sm" | "lg" | "all";
 }) => {
   const { data: auth, status } = useSession();
+
   const style = csToStyle(useStore((state) => state.colorScheme)).style;
 
   if (status === "unauthenticated") return <Login />;
@@ -30,7 +32,7 @@ const LayoutA = ({
     <div className="relative h-full">
       <Header auth={auth} />
       <div
-        className={`h-full pt-32 ${
+        className={`fixed inset-0 h-full pt-32 ${
           nopx === "sm"
             ? "md:px-3"
             : nopx === "lg"

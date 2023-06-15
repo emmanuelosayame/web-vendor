@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { StoreSchema } from "../schema";
+import { storeMutateS, storeS } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
 import { isAdmin } from "../utils";
@@ -39,7 +39,7 @@ export const storeRouter = router({
     .input(
       z.object({
         id: z.string().optional(),
-        data: StoreSchema.partial(),
+        data: storeS.partial(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -50,12 +50,7 @@ export const storeRouter = router({
   new: protectedProcedure
     .input(
       z.object({
-        data: StoreSchema.partial({
-          vendors: true,
-          email: true,
-          photoUrl: true,
-          status: true,
-        }),
+        data: storeMutateS,
       })
     )
     .mutation(async ({ ctx, input }) => {

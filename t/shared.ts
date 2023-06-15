@@ -39,6 +39,6 @@ export interface DefaultSlice {
 }
 
 export interface RSCProps {
-  params: { id: string };
+  params: { id: string; [key: string]: string };
   searchParams: { [key: string]: string };
 }

@@ -1,29 +1,27 @@
-import { type File } from "formidable";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { formidablePromise, uploadImage } from ".";
+import { NextResponse } from "next/server";
+import { uploadImage } from ".";
 import { prisma } from "src/server/db";
 
-interface Args {
-  req: NextApiRequest;
-  res: NextApiResponse;
-}
+export const uploadAsset = async (req: Request) => {
+  const res = NextResponse;
 
-export const uploadAsset = async ({ req, res }: Args) => {
+  const payload = await req.formData();
+
   try {
-    const { files, fields } = await formidablePromise(req, { multiples: true });
+    const imageFile = payload.get("file") as unknown as File | null;
+    const tag = payload.get("tag")?.toString();
+    const id = payload.get("id")?.toString();
+    const imageId = payload.get("imageId")?.toString();
 
-    const imageFile = files.file as File;
-    const tag = fields.tag?.toString();
-    const id = fields.id?.toString();
-    const imageId = fields.imageId?.toString();
+    if (!imageFile) return res.json("NO IMAGE", { status: 403 });
 
-    const url = await uploadImage(imageFile.filepath, {
-      newFileName: imageFile.originalFilename,
+    const url = await uploadImage(imageFile, {
+      newFileName: imageFile?.name,
       storagePath: "assets",
     });
+
     if (!tag) {
-      res.status(400).send({ error: "INCOMPLETE PAYLOAD" });
-      return;
+      return res.json({ error: "INCOMPLETE PAYLOAD" }, { status: 400 });
     }
     const prevData = await prisma.asset.findFirst({ where: { id } });
     const prevImages = prevData?.images.map((img, index) => ({
@@ -31,7 +29,7 @@ export const uploadAsset = async ({ req, res }: Args) => {
       ...img,
     }));
     if (!prevData) {
-      res.status(500).send({ error: "CANNOT FIND RELATION" });
+      return res.json({ error: "CANNOT FIND RELATION" }, { status: 500 });
     }
     if (imageId === "new") {
       await prisma.asset.update({
@@ -55,8 +53,8 @@ export const uploadAsset = async ({ req, res }: Args) => {
       });
     }
 
-    res.status(200).json({ status: "success" });
+    return res.json({ status: "success" });
   } catch (err) {
-    res.status(500).send(err as any);
+    return res.json({ error: err }, { status: 500 });
   }
 };

@@ -1,10 +1,8 @@
+"use client";
+
 import { LoadingBlur } from "@components/Loading";
 import { TDivider, TFlex, THStack } from "@components/TElements";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { Product } from "@prisma/client";
 import Link from "next/link";
 import { api } from "@lib/api";
@@ -15,7 +13,8 @@ interface Props {
   products: Product[] | undefined;
   isLoading: boolean;
   pagn: number;
-  setPagn: (no: number) => void;
+  prev: () => void;
+  next: () => void;
   count: number | undefined;
   limit: number;
 }
@@ -23,10 +22,11 @@ interface Props {
 const ProductTemp = ({
   isLoading,
   products,
-  setPagn,
   pagn,
   count,
   limit,
+  prev,
+  next,
 }: Props) => {
   const mq = useMediaQuery("(min-width: 800px)");
 
@@ -121,9 +121,7 @@ const ProductTemp = ({
                   className="text-blue-500 hover:text-blue-600 disabled:opacity-50"
                   aria-label="prev"
                   disabled={pagn < 2}
-                  onClick={() => {
-                    setPagn(pagn - 1);
-                  }}
+                  onClick={prev}
                 >
                   Prev
                 </button>
@@ -132,9 +130,7 @@ const ProductTemp = ({
                   className="text-blue-500 hover:text-blue-600 disabled:opacity-50"
                   aria-label="next"
                   disabled={products && products?.length < limit}
-                  onClick={() => {
-                    setPagn(pagn + 1);
-                  }}
+                  onClick={next}
                 >
                   Next
                 </button>

@@ -1,19 +1,20 @@
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import type { Store, StoreVendor } from "@prisma/client";
 import { diff } from "deep-object-diff";
-import { Form, Formik } from "formik";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "@lib/api";
 import { limitText } from "@lib/helpers";
 import { initialSD } from "@lib/placeholders";
-import { storeVs } from "@lib/validation";
 import { InputTemp, TextareaTemp } from "./InputTemp";
 import { LoadingBlur } from "./Loading";
 import AlertDialog from "./radix/Alert";
 import RadioGroup from "./radix/RadioGroup";
 import Select from "./radix/Select";
 import { THStack } from "./TElements";
+import { useForm } from "react-hook-form";
+import { type StoreMutateS, storeMutateS } from "src/server/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface Props {
   edit: boolean;
@@ -82,7 +83,7 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
       onSuccess: () => router.replace(`/admin/stores`),
     });
 
-  const formIV = {
+  const defaultValues = {
     name: store?.name || "",
     about: store?.about || "",
     email: store?.email || "",
@@ -97,17 +98,10 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
     },
   };
 
-  // type FormIV = Omit<
-  //   Store,
-  //   "vendors" | "photoUrl" | "bannerUrl" | "id" | "status"
-  // >;
-
-  type FormIV = typeof formIV;
-
-  const onSubmit = async (values: FormIV) => {
+  const onSubmit = async (values: StoreMutateS) => {
     if (id !== "new" && !!store) {
       if (!store) return;
-      const payload = diff(formIV, values) as Partial<Store>;
+      const payload = diff(defaultValues, values) as Partial<Store>;
       mutate({ id: store.id, data: payload });
     } else {
       if (isAdmin) {
@@ -143,126 +137,131 @@ const StoreComponent = ({ edit, store = initialSD, id, isAdmin }: Props) => {
     }
   };
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty, touchedFields },
+  } = useForm<StoreMutateS>({
+    defaultValues,
+    resolver: zodResolver(storeMutateS),
+  });
+
   return (
     <>
       {(creating || mutating) && <LoadingBlur />}
 
       <div className="p-2 bg-white/40 rounded-lg flex flex-col md:flex-row gap-2 h-auto md:h-[98%]">
         {/* 1 */}
-        <Formik
-          initialValues={formIV}
-          validationSchema={storeVs}
-          onSubmit={onSubmit}
-          enableReinitialize
+
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="rounded-lg w-full md:w-2/3 flex flex-col md:flex-row gap-2 bg-white"
         >
-          {({ dirty, touched, errors, getFieldProps }) => (
-            <Form className="rounded-lg w-full md:w-2/3 flex flex-col md:flex-row gap-2 bg-white">
-              <div className="bg-white rounded-lg p-4 space-y-3 w-full h-full flex flex-col">
-                <h3 className="w-full text-center text-xl border-b border-b-neutral-300">
-                  Store Info
-                </h3>
+          <div className="bg-white rounded-lg p-4 space-y-3 w-full h-full flex flex-col">
+            <h3 className="w-full text-center text-xl border-b border-b-neutral-300">
+              Store Info
+            </h3>
 
-                <InputTemp
-                  disabled={!edit}
-                  fieldProps={getFieldProps("name")}
-                  heading="Name"
-                  placeholder="name"
-                  touched={touched.name}
-                  error={errors.name}
-                />
+            <InputTemp
+              disabled={!edit}
+              {...register("name")}
+              label="Name"
+              placeholder="name"
+              touched={touchedFields.name}
+              error={errors.name?.message}
+            />
 
-                <InputTemp
-                  disabled={!edit}
-                  fieldProps={getFieldProps("email")}
-                  heading="Email"
-                  placeholder="Email"
-                  touched={touched.email}
-                  error={errors.email}
-                />
+            <InputTemp
+              disabled={!edit}
+              {...register("email")}
+              label="Email"
+              placeholder="Email"
+              touched={touchedFields.email}
+              error={errors.email?.message}
+            />
 
-                <TextareaTemp
-                  disabled={!edit}
-                  fieldProps={getFieldProps("about")}
-                  placeholder="About Store"
-                  heading="About"
-                  rows={3}
-                  touched={touched.about}
-                  error={errors.about}
-                />
-                <div className="w-full flex h-40 gap-2 items-center">
-                  <div className="bg-black/40 rounded-full w-32 h-32 flex justify-center items-center text-white">
-                    <h2>logo</h2>
-                  </div>
-                  <div className="bg-black/40 rounded-lg w-4/6 h-full flex justify-center items-center text-white">
-                    <h2>banner</h2>
-                  </div>
-                </div>
+            <TextareaTemp
+              disabled={!edit}
+              {...register("about")}
+              placeholder="About Store"
+              label="About"
+              rows={3}
+              touched={touchedFields.about}
+              error={errors.about?.message}
+            />
+
+            <div className="w-full flex h-40 gap-2 items-center">
+              <div className="bg-black/40 rounded-full w-32 h-32 flex justify-center items-center text-white">
+                <h2>logo</h2>
               </div>
+              <div className="bg-black/40 rounded-lg w-4/6 h-full flex justify-center items-center text-white">
+                <h2>banner</h2>
+              </div>
+            </div>
+          </div>
 
-              {/* 2 */}
-              <div className={`p-3 w-full flex flex-col gap-3 h-full relative`}>
-                <div className="space-y-2 flex-1">
-                  {id !== "new" ? (
-                    <>
-                      <InputTemp
-                        heading="Account Name"
-                        type="text"
-                        fieldProps={getFieldProps("account.name")}
-                        touched={touched.account?.name}
-                        error={errors.account?.name}
-                      />
-                      <div className="flex items-center gap-3">
-                        <InputTemp
-                          heading="Account No."
-                          type="tel"
-                          fieldProps={getFieldProps("account.number")}
-                          touched={touched.account?.number}
-                          error={errors.account?.number}
-                        />
-
-                        <InputTemp
-                          heading="Bank"
-                          type="text"
-                          fieldProps={getFieldProps("account.bank")}
-                          touched={touched.account?.bank}
-                          error={errors.account?.bank}
-                        />
-                      </div>
-                    </>
-                  ) : null}
-                  <h3 className="text-lg text-center border-b border-b-neutral-200 w-full">
-                    Support
-                  </h3>
-                  <THStack>
+          {/* 2 */}
+          <div className={`p-3 w-full flex flex-col gap-3 h-full relative`}>
+            <div className="space-y-2 flex-1">
+              {id !== "new" ? (
+                <>
+                  <InputTemp
+                    label="Account Name"
+                    type="text"
+                    {...register("account.name")}
+                    touched={touchedFields.account?.name}
+                    error={errors.account?.name?.message}
+                  />
+                  <div className="flex items-center gap-3">
                     <InputTemp
-                      heading="Phone (mobile)."
+                      label="Account No."
                       type="tel"
-                      fieldProps={getFieldProps("support.mobile")}
-                      touched={touched.support?.mobile}
-                      error={errors.support?.mobile}
+                      {...register("account.number")}
+                      touched={touchedFields.account?.number}
+                      error={errors.account?.number?.message}
                     />
 
                     <InputTemp
-                      heading="Phone (whatsapp)"
+                      label="Bank"
                       type="text"
-                      fieldProps={getFieldProps("support.whatsapp")}
-                      touched={touched.support?.whatsapp}
-                      error={errors.support?.whatsapp}
+                      {...register("account.bank")}
+                      touched={touchedFields.account?.bank}
+                      error={errors.account?.bank?.message}
                     />
-                  </THStack>
-                </div>
+                  </div>
+                </>
+              ) : null}
+              <h3 className="text-lg text-center border-b border-b-neutral-200 w-full">
+                Support
+              </h3>
+              <THStack>
+                <InputTemp
+                  label="Phone (mobile)."
+                  type="tel"
+                  {...register("name")}
+                  touched={touchedFields.support?.mobile}
+                  error={errors.support?.mobile?.message}
+                />
 
-                <button
-                  disabled={!edit || !dirty}
-                  type="submit"
-                  className="btn-green"
-                >
-                  Save
-                </button>
-              </div>
-            </Form>
-          )}
-        </Formik>
+                <InputTemp
+                  label="Phone (whatsapp)"
+                  type="text"
+                  {...register("support.whatsapp")}
+                  touched={touchedFields.support?.whatsapp}
+                  error={errors.support?.whatsapp?.message}
+                />
+              </THStack>
+            </div>
+
+            <button
+              disabled={!edit || !isDirty}
+              type="submit"
+              className="btn-green"
+            >
+              Save
+            </button>
+          </div>
+        </form>
 
         {/* 3 */}
 

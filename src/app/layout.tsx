@@ -28,9 +28,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body
-        className={` ${spaceGrotesk.variable} font-spaceGrotesk fixed inset-0`}
-      >
+      <body className={` ${spaceGrotesk.variable} font-spaceGrotesk `}>
         <RootClient session={session}>{children}</RootClient>
       </body>
     </html>

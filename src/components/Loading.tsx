@@ -25,8 +25,6 @@ export const LoadingBlur = ({
 }) => {
   const style = csToStyle(useStore((state) => state.colorScheme)).style;
 
-  console.log(style);
-
   return (
     <div
       className={`flex justify-center items-center fixed inset-0 bg-white/30

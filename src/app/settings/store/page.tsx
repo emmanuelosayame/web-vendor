@@ -1,11 +1,8 @@
+"use client";
 import { InputTemp, TextareaTemp } from "@components/InputTemp";
 import Layout from "@components/layout";
 import StoreComponent from "@components/StoreComponent";
-import {
-  IconBack,
-  IconButton,
-  MenuFlex,
-} from "@components/TElements";
+import { IconBack, IconButton, MenuFlex } from "@components/TElements";
 import {
   CheckIcon,
   PencilSquareIcon,

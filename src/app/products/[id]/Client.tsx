@@ -42,7 +42,7 @@ const Client = ({ data, isFetching }: Props) => {
   >(
     async ({ details, imageFiles, thumbnailFile, variantFiles }) => {
       const form = new FormData();
-      pid && form.append("id", pid);
+      pid && form.append("pid", pid);
       form.append("payload", JSON.stringify(details));
 
       if (thumbnailFile) {

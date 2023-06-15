@@ -58,16 +58,18 @@ export const ProductSchema = z.object({
 //   imageFiles: z.array(z.object({ name: z.string(), size: z.number() })),
 // });
 
-export const VendorData = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string().email(),
-  phoneNo: z.string(),
-  location: z.string(),
-  address: z.string(),
+export const vendorS = z.object({
+  firstName: z.string().min(1, "required").max(200, "too long"),
+  lastName: z.string().min(1, "required").max(200, "too long"),
+  email: z.string().email().min(1, "required"),
+  phoneNo: z.string().min(1, "required").max(200, "too long"),
+  location: z.string().min(1, "required").max(200, "too long"),
+  address: z.string().min(1, "required").max(200, "too long"),
   role: z.enum(["admin", "vendor"]),
   status: z.enum(["active", "disabled"]),
 });
+
+export type VendorS = z.infer<typeof vendorS>;
 
 const StoreVendors = z
   .array(
@@ -91,7 +93,7 @@ const StoreSupport = z.object({
   whatsapp: z.string(),
 });
 
-export const StoreSchema = z.object({
+export const storeS = z.object({
   name: z.string(),
   about: z.string(),
   email: z.string(),
@@ -122,8 +124,27 @@ export const AssetPayload = z.object({
   }),
 });
 
+export const categoryS = z.object({
+  parent: z.string().min(1, "required").max(200, "invalid").nullable(),
+  name: z.string().min(1, "required").max(200, "invalid"),
+  slug: z.string().min(1, "required").max(200, "invalid"),
+  tid: z.number().min(1, "required").max(200, "invalid"),
+});
+
+export type CategoryS = z.infer<typeof categoryS>;
+
 export type ProductPayload = z.infer<typeof ProductSchema>;
 
 export type ProductSort = z.infer<typeof ProductSortEnum>;
 
 export type VariantSchemaType = z.infer<typeof ProductVariant>;
+
+export const storeMutateS = storeS.partial({
+  vendors: true,
+  email: true,
+  photoUrl: true,
+  status: true,
+});
+
+export type StoreS = z.infer<typeof storeS>;
+export type StoreMutateS = z.infer<typeof storeMutateS>;

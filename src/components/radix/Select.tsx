@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import * as RadixSelect from "@radix-ui/react-select";
 import { type CSSProperties } from "react";
@@ -51,9 +53,10 @@ const Select = <T,>({
           <ChevronDownIcon width={25} />
         </RadixSelect.Icon>
       </RadixSelect.Trigger>
+
       <RadixSelect.Portal>
         <RadixSelect.Content
-          className={` ${contentStyles} border border-neutral-100 shadow-lg z-50 overflow-hidden rounded-2xl`}
+          className={` ${contentStyles} fixed border border-neutral-100 shadow-lg z-50 overflow-hidden rounded-2xl transition-all`}
         >
           <RadixSelect.Viewport className="z-50">
             {selectList.map((selectItem) => (

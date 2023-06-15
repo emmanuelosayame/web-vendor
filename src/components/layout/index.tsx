@@ -2,7 +2,7 @@
 
 import Header from "@components/header";
 import type { ReactNode } from "react";
-import { api, trpc } from "@lib/api";
+import { api } from "@lib/api";
 import { useStore } from "store";
 import { csToStyle } from "@lib/helpers";
 import { Loading } from "@components/Loading";
@@ -24,9 +24,9 @@ const Layout = ({
     data: store,
     isLoading,
     refetch,
-  } = trpc.store.one.useQuery({}, { enabled: !!auth?.user });
+  } = api.store.one.useQuery({}, { enabled: !!auth?.user });
 
-  if (status === "unauthenticated") return <Login />;
+  // if (status === "unauthenticated") return <div>lll</div>;
   if (status === "loading" || isLoading) return <Loading />;
 
   if (!store)
@@ -43,7 +43,7 @@ const Layout = ({
 
   return (
     <div
-      className={`h-full pt-28 md:pt-32 z-20 ${
+      className={`fixed inset-0 h-full pt-28 md:pt-32 z-20 ${
         nopx === "sm"
           ? "md:px-3"
           : nopx === "lg"

@@ -4,10 +4,12 @@ import { type ReactNode, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { getBaseUrl } from "@lib/helpers";
-import { trpc } from "@lib/api";
+import { api } from "@lib/api";
 import superjson from "superjson";
-import { SessionProvider } from "next-auth/react";
-import { Session } from "next-auth";
+import { SessionProvider, useSession } from "next-auth/react";
+import { type Session } from "next-auth";
+import Login from "@components/Login";
+import { Loading } from "@components/Loading";
 
 const RootClient = ({
   children,
@@ -31,7 +33,7 @@ const RootClient = ({
   );
 
   const [trpcClient] = useState(() =>
-    trpc.createClient({
+    api.createClient({
       links: [
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,
@@ -41,15 +43,23 @@ const RootClient = ({
     })
   );
 
+  if (session === undefined) return <Loading />;
+
   return (
     <SessionProvider session={session}>
-      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <api.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
-          {children}
+          {!session ? <Login /> : <> {children}</>}
         </QueryClientProvider>
-      </trpc.Provider>
+      </api.Provider>
     </SessionProvider>
   );
 };
+
+// const Auth = ({ children }: { children: ReactNode }) => {
+//   const status = useSession()?.status;
+//   if (status === "loading") return <LoadingBlur />;
+//   return <>{status !== "authenticated" ? <Login /> : { children }}</>;
+// };
 
 export default RootClient;

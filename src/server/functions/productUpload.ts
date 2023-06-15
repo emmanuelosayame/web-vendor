@@ -1,80 +1,80 @@
-import { type File } from "formidable";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { deleteImage, formidablePromise, uploadImage } from ".";
+import { deleteImage, uploadImage } from ".";
 import { prisma } from "src/server/db";
 import { ProductSchema } from "../schema";
 import type { Product, ProductVariant } from "@prisma/client";
 import { nanoid } from "nanoid";
-import { getCookies } from "cookies-next";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
-interface Args {
-  req: NextApiRequest;
-  res: NextApiResponse;
-}
-
-export const uploadProduct = async ({ req, res }: Args) => {
-  const cookies = getCookies({ req, res });
-  const sid = cookies?.sid;
+export const uploadProduct = async (req: Request) => {
+  const res = NextResponse;
+  const sid = cookies().get("sid")?.value;
 
   try {
-    const { fields, files } = await formidablePromise(req, { multiples: true });
-    const id = fields.id?.toString();
-    if (id) {
-      const thumbnailFile = files.thumbnail as File;
-      const imageFiles = files.mainImages as File | File[];
-      const variantFiles = {
-        new: files.newVImages as File | File[],
-        updated: files.updatedVImages as File | File[],
-      };
-      const parsedPayload =
-        fields.payload && JSON.parse(fields.payload.toString());
+    const payload = await req.formData();
 
-      if (id !== "new") {
-        const { variantsPayload, ...rest } =
-          ProductSchema.partial().parse(parsedPayload);
-        const prevData = await prisma.product.findUnique({ where: { id } });
-        const { mainImages, thumbnail, variants } = await handleImages({
-          imageFiles,
-          thumbnailFile,
-          prevData,
-          variantFiles,
-          variantsPayload,
-        });
-        const data = await prisma.product.update({
-          where: { id },
-          data: { thumbnail, images: mainImages, variants, ...rest, sid },
-        });
-        res.status(200).json({ ...data, mtype: "update" });
-      }
-      //if new product
-      else {
-        if (!thumbnailFile && !imageFiles && !variantFiles) {
-          res.status(500).json("no file");
-          return;
-        }
+    const pid = payload.get("pid")?.toString();
+    const thumbnailFile = payload.get("thumbnail") as unknown as File | null;
+    const imageFiles = payload.getAll("images") as unknown as File[];
+    const newVImages = payload.getAll("newVImages") as unknown as File[];
+    const updatedVImages = payload.getAll(
+      "updatedVImages"
+    ) as unknown as File[];
+    const json = payload.get("json")?.toString();
 
-        const { variantsPayload, ...rest } = ProductSchema.parse(parsedPayload);
+    if (!pid) return res.json("NO PID", { status: 403 });
 
-        const {
-          mainImages,
-          thumbnail: thumbn,
-          variants,
-        } = await handleImages({
-          imageFiles,
-          thumbnailFile,
-          variantFiles,
-          variantsPayload,
-        });
-        const thumbnail = thumbn as string;
-        const data = await prisma.product.create({
-          data: { ...rest, images: mainImages, variants, thumbnail, sid },
-        });
-        res.status(200).json({ ...data, mtype: "create" });
-      }
-    } else res.status(400).send("no identifier");
-    return;
+    const variantFiles = {
+      new: newVImages,
+      updated: updatedVImages,
+    };
+
+    const parsedPayload = json && JSON.parse(json);
+
+    if (pid !== "new") {
+      const { variantsPayload, ...rest } =
+        ProductSchema.partial().parse(parsedPayload);
+      const prevData = await prisma.product.findUnique({ where: { id: pid } });
+      const { mainImages, thumbnail, variants } = await handleImages({
+        imageFiles,
+        thumbnailFile,
+        prevData,
+        variantFiles,
+        variantsPayload,
+      });
+
+      const data = await prisma.product.update({
+        where: { id: pid },
+        data: { thumbnail, images: mainImages, variants, ...rest, sid },
+      });
+
+      return res.json({ ...data, mtype: "update" });
+    }
+    //if new product
+    else {
+      if (!thumbnailFile || !imageFiles || !variantFiles)
+        return res.json("NO FILE", { status: 403 });
+
+      const { variantsPayload, ...rest } = ProductSchema.parse(parsedPayload);
+
+      const {
+        mainImages,
+        thumbnail: thumbn,
+        variants,
+      } = await handleImages({
+        imageFiles,
+        thumbnailFile,
+        variantFiles,
+        variantsPayload,
+      });
+      const thumbnail = thumbn as string;
+      const data = await prisma.product.create({
+        data: { ...rest, images: mainImages, variants, thumbnail, sid },
+      });
+      return res.json({ ...data, mtype: "create" });
+    }
   } catch (err) {
-    res.status(500).send(err as any);
+    return res.json(err, { status: 500 });
   }
 };
 
@@ -89,9 +89,9 @@ type VType = {
 
 interface HandleImageProps {
   prevData?: Product | null;
-  thumbnailFile: File;
-  imageFiles: File | File[];
-  variantFiles: { new: File | File[]; updated: File | File[] };
+  thumbnailFile: File | null | undefined;
+  imageFiles: File[];
+  variantFiles: { new: File[]; updated: File[] };
   variantsPayload?: {
     new?: VType[];
     updated?: (VType & { id?: string })[];
@@ -112,7 +112,7 @@ const handleImages = async ({
   let variants: ProductVariant[] = [];
 
   if (thumbnailFile) {
-    thumbnail = await uploadImage(thumbnailFile.filepath, {
+    thumbnail = await uploadImage(thumbnailFile, {
       newFileName: "thumbnail",
       oldUrl: prevData?.thumbnail,
     });
@@ -140,22 +140,19 @@ const handleImages = async ({
         const matchedV = variantsPayload?.updated?.find(
           (updated) => variant.id === updated.id
         );
+
         const matchedFile = variantFiles.updated
-          ? Array.isArray(variantFiles.updated)
-            ? variantFiles.updated.find(
-                (file) => file.originalFilename === variant.id
-              ) || null
-            : variantFiles.updated.originalFilename === variant.id
-            ? variantFiles.updated
-            : null
+          ? variantFiles.updated.find((file) => file.name === variant.id) ||
+            null
           : null;
+
         variants.push({
           ...variant,
           price: matchedV?.price || variant.price,
           options: matchedV?.options || variant.options,
           title: matchedV?.title || variant.title,
           image: matchedFile
-            ? await uploadImage(matchedFile.filepath, {
+            ? await uploadImage(matchedFile, {
                 newFileName: `variant-${variant.id}`,
                 oldUrl: variant.image,
               })
@@ -177,19 +174,13 @@ const handleImages = async ({
         ...vrnt,
         id: (index + 1).toString(),
       }))) {
-        const filepath = variantFiles.new
-          ? Array.isArray(variantFiles.new)
-            ? variantFiles.new.find(
-                (file) => file.originalFilename === variant.id
-              )?.filepath || null
-            : variant.id === variantFiles.new.originalFilename
-            ? variantFiles.new.filepath
-            : null
+        const file = variantFiles.new
+          ? variantFiles.new.find((file) => file.name === variant.id) || null
           : null;
         const id = nanoid();
         variants.push({
-          image: filepath
-            ? await uploadImage(filepath, { newFileName: `variant-${id}` })
+          image: file
+            ? await uploadImage(file, { newFileName: `variant-${id}` })
             : "",
           options: variant.options,
           price: variant.price,
@@ -208,45 +199,22 @@ const handleImages = async ({
         id: (index + 1).toString(),
         url: image,
       })) || [];
-    if (Array.isArray(imageFiles)) {
-      const filesWPH = ["1", "2", "3", "4"].map((ph) => ({
-        id: ph,
-        path:
-          imageFiles.find((file) => ph === file.originalFilename?.slice(0, 1))
-            ?.filepath || null,
-      }));
 
-      for await (const file of filesWPH) {
-        const oldUrl = prevImages?.find((img) => img.id === file.id)?.url;
-        mainImages.push(
-          file.path
-            ? await uploadImage(file.path, {
-                newFileName: `product-${file.id}`,
-                oldUrl,
-              })
-            : oldUrl || ""
-        );
-      }
-    }
-    // not array
-    else {
-      const imgId = imageFiles.originalFilename?.slice(0, 1);
-      const filesWPH = ["1", "2", "3", "4"].map((ph) => ({
-        id: ph,
-        path: imgId === ph ? imageFiles.filepath : null,
-      }));
-      for await (const file of filesWPH) {
-        const prevUrl =
-          prevImages?.find((prev) => file.id === prev.id)?.url || undefined;
-        mainImages.push(
-          file.path
-            ? await uploadImage(imageFiles.filepath, {
-                newFileName: `product-${imgId}`,
-                oldUrl: prevUrl,
-              })
-            : prevUrl || ""
-        );
-      }
+    for await (const file of imageFiles.sort(
+      (a, b) => Number(a.name.slice(0, 1)) - Number(b.name.slice(0, 1))
+    )) {
+      const oldUrl = prevImages?.find(
+        (img) => img.id === file.name.slice(0, 1)
+      )?.url;
+
+      mainImages.push(
+        file
+          ? await uploadImage(file, {
+              newFileName: `product-${file.name.slice(0, 1)}`,
+              oldUrl,
+            })
+          : oldUrl || ""
+      );
     }
   }
 

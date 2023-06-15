@@ -1,25 +1,7 @@
-import type { NextApiRequest } from "next";
-import formidable, { type File } from "formidable";
 import { nanoid } from "nanoid";
 import { storage } from "@lib/f-admin";
 
 const bucket = storage.bucket();
-
-export function formidablePromise(
-  req: NextApiRequest,
-  opts?: Parameters<typeof formidable>[0]
-): Promise<{ fields: formidable.Fields; files: formidable.Files }> {
-  return new Promise((accept, reject) => {
-    const form = formidable(opts);
-
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        return reject(err);
-      }
-      return accept({ fields, files });
-    });
-  });
-}
 
 const createPersistentDownloadUrl = (
   bucket: string,
@@ -43,14 +25,14 @@ export const getStoragePath = (url: string | null | undefined) => {
 };
 
 export const uploadImage: (
-  filepath: string,
+  file: File,
   upload: {
     newFileName?: string | null;
     oldUrl?: string | null;
     storagePath?: string;
   }
 ) => Promise<string> = async (
-  filepath,
+  file,
   { newFileName, oldUrl, storagePath = "products" }
 ) => {
   const fileName = newFileName
@@ -65,19 +47,18 @@ export const uploadImage: (
         : storagePath
     }/${fileName}.webp`;
 
-  const [uploadRes] = await bucket.upload(filepath, {
-    destination: filePath,
+  const bf = Buffer.from(await file.arrayBuffer());
+
+  const fileUpload = bucket.file(filePath);
+
+  await fileUpload.save(bf, {
     contentType: "image/webp",
     metadata: {
-      cacheControl: `public,max-age=31536000`,
-      contentDisposition: `attachment; filename*=utf-8\'\'${fileName}`,
-      metadata: {
-        firebaseStorageDownloadTokens: nanoid(18),
-      },
+      firebaseStorageDownloadTokens: nanoid(18),
     },
   });
 
-  const [metadata] = await uploadRes.getMetadata();
+  const [metadata] = await fileUpload.getMetadata();
 
   return createPersistentDownloadUrl(
     metadata.bucket,
@@ -88,7 +69,6 @@ export const uploadImage: (
 
 export const deleteImage = async (url: string) => {
   const path = getStoragePath(url);
-  console.log(path);
   if (!path) return;
   await bucket.file(path).delete();
 };

@@ -11,6 +11,7 @@ import { api } from "@lib/api";
 import useMediaQuery from "@lib/useMediaQuery";
 import { useStore } from "store";
 import ProductTemp from "@components/product/ProductsTemp";
+import { usePagn } from "@lib/hooks";
 
 const selectList = [
   { item: "A - Z", value: "title-asc" },
@@ -31,10 +32,7 @@ const Products = () => {
 
   const mq = useMediaQuery("(min-width: 800px)");
 
-  const { pagn, setPagn } = useStore((state) => ({
-    pagn: state.product.pagn,
-    setPagn: state.setPagn,
-  }));
+  const [pagn, setPagn] = usePagn();
 
   const limit = 10;
 
@@ -113,7 +111,7 @@ const Products = () => {
         count={count}
         isLoading={isLoading}
         products={products}
-        setPagn={setPagn}
+        {...setPagn}
         limit={limit}
       />
     </>

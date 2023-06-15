@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { VendorData } from "../schema";
+import { vendorS } from "../schema";
 
 import { router, protectedProcedure } from "../trpc";
 import { isAdmin } from "../utils";
@@ -28,7 +28,7 @@ export const customerRouter = router({
       return await prisma.customer.count();
     }),
   update: protectedProcedure
-    .input(z.object({ vid: z.string().optional(), data: VendorData.partial() }))
+    .input(z.object({ vid: z.string().optional(), data: vendorS.partial() }))
     .mutation(async ({ ctx, input }) => {
       const { vid, data } = input;
       return await ctx.prisma.vendor.update({ where: { id: vid }, data });
@@ -36,7 +36,7 @@ export const customerRouter = router({
   new: protectedProcedure
     .input(
       z.object({
-        data: VendorData.partial({
+        data: vendorS.partial({
           location: true,
           status: true,
           role: true,
