@@ -13,7 +13,7 @@ import RadioGroup from "./radix/RadioGroup";
 import Select from "./radix/Select";
 import { THStack } from "./TElements";
 import { useForm } from "react-hook-form";
-import { type StoreMutateS, storeMutateS } from "src/server/schema";
+import { type StoreMutateS, storeMutateS } from "src/server/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 interface Props {

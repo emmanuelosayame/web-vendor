@@ -161,7 +161,8 @@ model Vendor {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
     firstName String
     lastName  String
-    uid       String?  @unique()
+    uid       String   @unique()
+    vendorId  String   @unique()
     role      AuthRole @default(vendor)
     email     String   @unique()
     photoUrl  String?
@@ -281,11 +282,6 @@ type SaleCustomer {
     id   String
 }
 
-// model Sale {
-//     id       String       @id @default(auto()) @map("_id") @db.ObjectId
-//     customer SaleCustomer
-// }
-
 model Category {
     id     String  @id @default(auto()) @map("_id") @db.ObjectId
     parent String?
@@ -313,4 +309,10 @@ model Asset {
     code        Int
     images      AssetImages[]
     texts       AssetTexts[]
+}
+
+model Auth {
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    vendorId String @unique()
+    hash     String
 }

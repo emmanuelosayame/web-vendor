@@ -148,3 +148,10 @@ export const storeMutateS = storeS.partial({
 
 export type StoreS = z.infer<typeof storeS>;
 export type StoreMutateS = z.infer<typeof storeMutateS>;
+
+export const loginS = z.object({
+  vendorId: z.string().length(12, "invalid"),
+  key: z.string().length(24, "invalid"),
+});
+
+export type LoginS = z.infer<typeof loginS>;

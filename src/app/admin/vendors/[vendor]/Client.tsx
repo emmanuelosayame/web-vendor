@@ -11,7 +11,7 @@ import AlertDialog from "@components/radix/Alert";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Vendor } from "@prisma/client";
-import { type VendorS, vendorS } from "src/server/schema";
+import { type VendorS, vendorS } from "src/server/zod";
 
 interface Props {
   vendor: Vendor | null;

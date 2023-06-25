@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { vendorS } from "../schema";
+import { vendorS } from "../zod";
 
 import { router, protectedProcedure } from "../trpc";
 import { isAdmin } from "../utils";

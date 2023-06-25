@@ -20,7 +20,7 @@ import { csToStyle } from "@lib/helpers";
 import useMediaQuery from "@lib/useMediaQuery";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { type CategoryS, categoryS } from "src/server/schema";
+import { type CategoryS, categoryS } from "src/server/zod";
 
 const CategoriesPage = () => {
   const router = useRouter();

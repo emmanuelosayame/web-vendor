@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { adminProcedure, protectedProcedure, router } from "../trpc";
-import { categoryS } from "../schema";
+import { categoryS } from "../zod";
 
 export const categoryRouter = router({
   many: protectedProcedure

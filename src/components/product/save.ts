@@ -1,6 +1,6 @@
 import type { Product } from "@prisma/client";
 import { updatedDiff } from "deep-object-diff";
-import type { ProductPayload } from "src/server/schema";
+import type { ProductPayload } from "src/server/zod";
 import {
   getProductInitialPayload,
   type MutateValues,

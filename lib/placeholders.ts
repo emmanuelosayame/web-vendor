@@ -1,5 +1,5 @@
 import type { Product, Store } from "@prisma/client";
-import type { ProductPayload, VariantSchemaType } from "src/server/schema";
+import type { ProductPayload, VariantSchemaType } from "src/server/zod";
 
 export interface FormValues
   extends Omit<ProductPayload, "category" | "promotions" | "variantsPayload"> {

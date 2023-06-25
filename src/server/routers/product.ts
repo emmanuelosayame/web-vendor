@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { ProductSortEnum } from "../schema";
+import { ProductSortEnum } from "../zod";
 import { router, protectedProcedure, adminProcedure } from "../trpc";
 
 export const productRouter = router({

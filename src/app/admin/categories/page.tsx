@@ -11,7 +11,7 @@ import { useStore } from "store";
 import type { NextPageWithLayout } from "t/shared";
 import { api } from "@lib/api";
 import { csToStyle } from "@lib/helpers";
-import { type CategoryS, categoryS } from "src/server/schema";
+import { type CategoryS, categoryS } from "src/server/zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 

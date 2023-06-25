@@ -1,19 +1,12 @@
-import type { GetServerSidePropsContext } from "next";
 import {
   getServerSession,
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
+// import GitHubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./db";
-
-/**
- * Module augmentation for `next-auth` types.
- * Allows us to add custom properties to the `session` object and keep type
- * safety.
- *
- * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
- **/
+import bcrypt from "bcrypt";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -60,22 +53,48 @@ export const authOptions: NextAuthOptions = {
     },
   },
   providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID || "",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+    // GitHubProvider({
+    //   clientId: process.env.GITHUB_CLIENT_ID || "",
+    //   clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+    // }),
+    CredentialsProvider({
+      credentials: {
+        // username: { label: "Username", type: "text", placeholder: "jsmith" },
+        // password: { label: "Password", type: "password" },
+      } as any,
+      async authorize(credentials, req) {
+        console.log(req);
+        if (!credentials?.vendorId || !credentials?.key) return null;
+        const userAuthRecord = await prisma.auth.findUnique({
+          where: { vendorId: credentials?.vendorId?.toString() },
+        });
+        if (!userAuthRecord) return null;
+        const valid = await bcrypt.compare(
+          credentials?.key?.toString() || "",
+          userAuthRecord.hash
+        );
+        if (!valid) return null;
+        const user = await prisma.vendor.findUnique({
+          where: { vendorId: userAuthRecord.vendorId },
+        });
+        return user
+          ? {
+              id: user.uid,
+              role: user.role,
+              email: user.email,
+              image: user.photoUrl,
+              name: user.firstName + " " + user.lastName,
+            }
+          : null;
+      },
     }),
   ],
   pages: {
+    signIn: "/auth/signin",
     error: "/auth/error",
   },
 };
 
-/**
- * Wrapper for `getServerSession` so that you don't need to import the
- * `authOptions` in every file.
- *
- * @see https://next-auth.js.org/configuration/nextjs
- **/
 export const getServerAuthSession = () => {
   return getServerSession(authOptions);
 };

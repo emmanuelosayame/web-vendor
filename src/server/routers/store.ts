@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { storeMutateS, storeS } from "../schema";
+import { storeMutateS, storeS } from "../zod";
 
 import { router, protectedProcedure } from "../trpc";
 import { isAdmin } from "../utils";

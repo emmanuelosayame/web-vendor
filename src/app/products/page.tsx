@@ -6,7 +6,7 @@ import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { type ProductSort } from "src/server/schema";
+import { type ProductSort } from "src/server/zod";
 import { api } from "@lib/api";
 import useMediaQuery from "@lib/useMediaQuery";
 import { useStore } from "store";

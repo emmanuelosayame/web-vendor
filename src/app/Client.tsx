@@ -1,15 +1,15 @@
 "use client";
 
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { getBaseUrl } from "@lib/helpers";
 import { api } from "@lib/api";
 import superjson from "superjson";
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider, signIn, useSession } from "next-auth/react";
 import { type Session } from "next-auth";
-import Login from "@components/Login";
 import { Loading } from "@components/Loading";
+import { usePathname, useRouter } from "next/navigation";
 
 const RootClient = ({
   children,
@@ -43,23 +43,35 @@ const RootClient = ({
     })
   );
 
-  if (session === undefined) return <Loading />;
-
   return (
     <SessionProvider session={session}>
       <api.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
-          {!session ? <Login /> : <> {children}</>}
+          <Auth>{children}</Auth>
         </QueryClientProvider>
       </api.Provider>
     </SessionProvider>
   );
 };
 
-// const Auth = ({ children }: { children: ReactNode }) => {
-//   const status = useSession()?.status;
-//   if (status === "loading") return <LoadingBlur />;
-//   return <>{status !== "authenticated" ? <Login /> : { children }}</>;
-// };
+const Auth = ({ children }: { children: ReactNode }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const publicRoute = !!(pathname.split("/")[1] === "auth");
+
+  const status = useSession()?.status;
+
+  useEffect(() => {
+    if (pathname === "/signin") return;
+    if (status === "unauthenticated") {
+      router.replace(`/auth/signin?redirect_url=${location.href}`);
+      // signIn();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  if (status === "authenticated" || publicRoute) return <>{children}</>;
+  return <Loading />;
+};
 
 export default RootClient;

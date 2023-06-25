@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { AssetPayload } from "../schema";
+import { AssetPayload } from "../zod";
 import { adminProcedure, protectedProcedure, router } from "../trpc";
 
 export const assetRouter = router({

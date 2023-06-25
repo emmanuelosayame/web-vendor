@@ -1,6 +1,6 @@
 import { deleteImage, uploadImage } from ".";
 import { prisma } from "src/server/db";
-import { ProductSchema } from "../schema";
+import { ProductSchema } from "../zod";
 import type { Product, ProductVariant } from "@prisma/client";
 import { nanoid } from "nanoid";
 import { cookies } from "next/headers";
