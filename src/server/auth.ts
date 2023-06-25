@@ -58,13 +58,13 @@ export const authOptions: NextAuthOptions = {
     //   clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
     // }),
     CredentialsProvider({
-      credentials: {
-        // username: { label: "Username", type: "text", placeholder: "jsmith" },
-        // password: { label: "Password", type: "password" },
-      } as any,
-      async authorize(credentials, req) {
-        console.log(req);
+      credentials: {} as any,
+      async authorize(credentials) {
         if (!credentials?.vendorId || !credentials?.key) return null;
+        // const hash = await bcrypt.hash(credentials?.key, 12);
+        // await prisma.auth.create({
+        //   data: { vendorId: credentials?.vendorId, hash },
+        // });
         const userAuthRecord = await prisma.auth.findUnique({
           where: { vendorId: credentials?.vendorId?.toString() },
         });

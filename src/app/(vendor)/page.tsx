@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { api } from "../../lib/api";
+import { api } from "../../../lib/api";
 import {
   BanknotesIcon,
   ChevronDownIcon,
@@ -10,10 +10,9 @@ import {
   PresentationChartBarIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/solid";
-import { Card1 } from "../components/Card";
-import { LineChart, PieChart } from "../components/Charts";
+import { Card1 } from "../../components/Card";
+import { LineChart, PieChart } from "../../components/Charts";
 import { TFlex } from "@components/TElements";
-import Layout from "@components/layout";
 import { type NextPageWithLayout } from "t/shared";
 import { csToStyle } from "@lib/helpers";
 import { useStore } from "store";
@@ -100,7 +99,7 @@ const salesData = {
 const Home: NextPageWithLayout = () => {
   const style = csToStyle(useStore((state) => state.colorScheme)).style;
   return (
-    <Layout nopx="all">
+    <>
       <div className={`absolute inset-x-0 top-16 md:top-20 z-30`} style={style}>
         <div className="gap-2 px-2 py-2 md:p-4 flex overflow-x-auto md:justify-center">
           <Card1 text="customers" value="5k">
@@ -156,7 +155,7 @@ const Home: NextPageWithLayout = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

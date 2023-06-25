@@ -5,7 +5,7 @@ export const metadata = {
   description: "Delorand | Elctronics and fashion",
 };
 
-export default function CartLayout({
+export default function VendorLayout({
   children,
 }: {
   children: React.ReactNode;

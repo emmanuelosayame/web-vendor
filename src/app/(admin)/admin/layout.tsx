@@ -1,10 +1,10 @@
 import LayoutA from "@components/layout/Admin";
 
 export const metadata = {
-  title: "Notifications",
+  title: "Admin",
 };
 
-export default function CartLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;

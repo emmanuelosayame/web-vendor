@@ -9,7 +9,7 @@ import superjson from "superjson";
 import { SessionProvider, signIn, useSession } from "next-auth/react";
 import { type Session } from "next-auth";
 import { Loading } from "@components/Loading";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const RootClient = ({
   children,
@@ -59,13 +59,18 @@ const Auth = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const publicRoute = !!(pathname.split("/")[1] === "auth");
 
+  const searchParams = useSearchParams();
+
   const status = useSession()?.status;
 
   useEffect(() => {
-    if (pathname === "/signin") return;
+    if (pathname === "/auth/signin" || pathname === "/signin") return;
     if (status === "unauthenticated") {
-      router.replace(`/auth/signin?redirect_url=${location.href}`);
-      // signIn();
+      router.replace(
+        `/auth/signin${
+          !searchParams.get("redirect_url") && `?callbackUrl=${location.href}`
+        }`
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);

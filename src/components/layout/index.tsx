@@ -8,7 +8,6 @@ import { csToStyle } from "@lib/helpers";
 import { Loading } from "@components/Loading";
 import { useSession } from "next-auth/react";
 import SelectStore from "../SelectStore";
-import Login from "@components/Login";
 
 const Layout = ({
   children,
@@ -19,6 +18,8 @@ const Layout = ({
 }) => {
   const { data: auth, status } = useSession();
   const style = csToStyle(useStore((state) => state.colorScheme)).style;
+
+  console.log(auth);
 
   const {
     data: store,

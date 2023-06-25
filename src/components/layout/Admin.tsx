@@ -1,13 +1,13 @@
 "use client";
 
 import Header from "@components/header/Admin";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useStore } from "store";
 import { csToStyle } from "@lib/helpers";
 import { Loading } from "@components/Loading";
 import { useSession } from "next-auth/react";
-import Login from "@components/Login";
 import ErrorScreen from "@components/ErrorScreen";
+import { useRouter } from "next/navigation";
 
 const LayoutA = ({
   children,
@@ -16,11 +16,16 @@ const LayoutA = ({
   children: ReactNode;
   nopx?: "sm" | "lg" | "all";
 }) => {
+  const router = useRouter();
   const { data: auth, status } = useSession();
 
   const style = csToStyle(useStore((state) => state.colorScheme)).style;
 
-  if (status === "unauthenticated") return <Login />;
+  useEffect(() => {
+    if (auth?.user.role !== "admin") router.replace("/");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth?.user.role]);
+
   if (status === "loading") return <Loading />;
 
   if (auth?.user.role !== "admin")
