@@ -4,6 +4,7 @@ import { vendorS } from "../zod";
 
 import { router, protectedProcedure } from "../trpc";
 import { isAdmin } from "../utils";
+import { customAlphabet, nanoid } from "nanoid";
 
 export const vendorRouter = router({
   accounts: protectedProcedure
@@ -76,6 +77,10 @@ export const vendorRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const { data } = input;
-      return await ctx.prisma.vendor.create({ data });
+      const uid = nanoid(24);
+      const vendorId = customAlphabet("1234567890delorand", 12)();
+      return await ctx.prisma.vendor.create({
+        data: { ...data, uid, vendorId },
+      });
     }),
 });

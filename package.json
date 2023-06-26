@@ -53,13 +53,13 @@
     "react-spinners": "^0.13.6",
     "sharp": "^0.31.3",
     "superjson": "1.9.1",
+    "uniqid": "^5.4.0",
     "yup": "^0.32.11",
     "zod": "^3.21.4",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
-    "@types/formidable": "^2.0.5",
     "@types/lodash": "^4.14.191",
     "@types/node": "^18.11.18",
     "@types/prettier": "^2.7.2",
@@ -71,7 +71,7 @@
     "autoprefixer": "^10.4.7",
     "cross-env": "^7.0.3",
     "eslint": "^8.30.0",
-    "eslint-config-next": "13.1.6",
+    "eslint-config-next": "13.4.7",
     "postcss": "^8.4.14",
     "prettier": "^2.8.1",
     "prettier-plugin-tailwindcss": "^0.2.1",
