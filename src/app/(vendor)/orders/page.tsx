@@ -1,16 +1,7 @@
 "use client";
-
 import Select from "@components/radix/Select";
+import { MenuFlex } from "@components/TElements";
 import {
-  IconButton,
-  MenuFlex,
-  TDivider,
-  TFlex,
-  THStack,
-} from "@components/TElements";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
   PencilSquareIcon,
   PlusIcon,
   ShoppingCartIcon,
@@ -29,20 +20,18 @@ import { limitText } from "@lib/helpers";
 import useMediaQuery from "@lib/useMediaQuery";
 import debounce from "lodash/debounce";
 import { type NextPageWithLayout } from "t/shared";
-import { type Filter } from "src/server/routers/order";
 import { LoadingBlur } from "@components/Loading";
-import type { Order } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import TableFooter from "@components/TableFooter";
+import type { OrderStatusSC, OrderStatusS } from "src/server/zod";
 
-const Sales: NextPageWithLayout = () => {
+const Orders: NextPageWithLayout = () => {
   const mq = useMediaQuery("(min-width: 800px)");
 
-  const [pagn, setPagn] = useState(1);
+  const [filter, setFilter] = useState<OrderStatusSC>();
 
-  const [filter, setFilter] = useState<Filter>();
-
-  const { data: sales, isFetching } = api.order.many.useQuery({
-    limit: 10,
+  const { data: orders, isFetching } = api.order.many.useQuery({
+    limit: 15,
     filter,
   });
   const { data: count } = api.order.count.useQuery({}, { placeholderData: 0 });
@@ -51,15 +40,16 @@ const Sales: NextPageWithLayout = () => {
     <>
       {isFetching && <LoadingBlur />}
       <MenuFlex>
-        <Select<Filter>
-          defaultSelected="successful"
-          triggerStyles="bg-white rounded-md w-32"
+        <Select<OrderStatusSC>
+          defaultSelected="pay_successful"
+          triggerStyles="bg-white rounded-md w-fit min-w-[130px]"
           contentStyles="bg-white"
           selectList={[
-            { item: "All Sales", value: "all" },
-            { item: "Successful", value: "successful" },
-            { item: "Canceled", value: "cancelled" },
-            { item: "Failed", value: "failed" },
+            { item: "All Orders", value: "all" },
+            { item: "Paid", value: "pay_successful" },
+            { item: "Pay Cancelled", value: "pay_cancelled" },
+            { item: "Pay Failed", value: "pay_failed" },
+            { item: "Delivered", value: "delivered" },
           ]}
           onValueChange={setFilter}
         />
@@ -76,10 +66,10 @@ const Sales: NextPageWithLayout = () => {
         </div>
 
         <Link
-          href={"/sales/new"}
+          href={"/orders/new"}
           className="flex items-center bg-white rounded-md px-3 py-1 hover:bg-opacity-75"
         >
-          <p>Add Sale</p>
+          <p>Add order</p>
           <PlusIcon width={20} />
         </Link>
       </MenuFlex>
@@ -112,30 +102,29 @@ const Sales: NextPageWithLayout = () => {
                 </tr>
               )}
             </thead>
-            <TDivider className="w-full" />
             <tbody>
-              {sales &&
-                sales.map((sale) => (
-                  <tr key={sale.id} className="text-center">
+              {orders &&
+                orders.map((order) => (
+                  <tr key={order.id} className="text-center">
                     {mq ? (
                       <>
-                        <td>{sale.orderId}</td>
-                        <td>{sale.items.length}</td>
+                        <td>{order.orderId}</td>
+                        <td>{order.items.length}</td>
                         <td>{`${
-                          sale.shipping_details.firstName
-                        } - ${sale.shipping_details.email.slice(
+                          order.shipping_details.firstName
+                        } - ${order.shipping_details.email.slice(
                           0,
-                          sale.shipping_details.email.length - 7
+                          order.shipping_details.email.length - 7
                         )}...`}</td>
-                        <td>{`${sale.shipping_details.state} - ${sale.shipping_details.location}`}</td>
-                        <td>{sale.status}</td>
-                        <td>{`${sale.shipping_option.type} - ${sale.shipping_option.price}`}</td>
-                        <td>{sale.total}</td>
-                        <td>{sale.payment.method || 0}</td>
+                        <td>{`${order.shipping_details.state} - ${order.shipping_details.location}`}</td>
+                        <td>{order.status}</td>
+                        <td>{`${order.shipping_option.type} - ${order.shipping_option.price}`}</td>
+                        <td>{order.total}</td>
+                        <td>{order.payment.method || 0}</td>
                         <td>
                           <Link
-                            href={`/sales/${sale.orderId}`}
-                            className="rounded-lg bg-blue-400 px-3 py-1 text-white hover:bg-blue-600"
+                            href={`/orders/${order.orderId}`}
+                            className=" text-blue-700 hover:opacity-60"
                           >
                             view
                           </Link>
@@ -143,15 +132,15 @@ const Sales: NextPageWithLayout = () => {
                       </>
                     ) : (
                       <>
-                        <td>{limitText(sale.orderId, 12)}</td>
-                        <td>{sale.items.length}</td>
-                        <td>{sale.id.slice(19, 25)}</td>
-                        <td>{sale.shipping_option.type}</td>
-                        <td>{sale.total}</td>
-                        <td>{sale.payment.method || 0}</td>
+                        <td>{limitText(order.orderId, 12)}</td>
+                        <td>{order.items.length}</td>
+                        <td>{order.id.slice(19, 25)}</td>
+                        <td>{order.shipping_option.type}</td>
+                        <td>{order.total}</td>
+                        <td>{order.payment.method || 0}</td>
                         <td className="flex items-center justify-center">
                           <Link
-                            href={`/sales/${sale.id}`}
+                            href={`/orders/${order.id}`}
                             className="rounded-xl bg-neutral-100 p-1 drop-shadow-md
                             flex items-center justify-center w-fit text-blue-500 hover:bg-blue-600"
                           >
@@ -165,51 +154,7 @@ const Sales: NextPageWithLayout = () => {
             </tbody>
           </table>
 
-          <div className="">
-            <TDivider />
-            <TFlex className="justify-between p-2">
-              <h3 className="px-2 text-neutral-700 text-lg">
-                <span>{(pagn - 1) * 10}</span> to{" "}
-                <span>{(pagn - 1) * 10 + (sales?.length || 0)}</span> of{" "}
-                <span>{count}</span>
-              </h3>
-
-              <THStack>
-                <button
-                  className="bg-blue-400 rounded-xl p-1 text-white hover:bg-blue-600 disabled:opacity-50"
-                  aria-label="prev"
-                  disabled={pagn < 2}
-                  onClick={() => {}}
-                >
-                  <ArrowLeftIcon stroke="white" width={20} />
-                </button>
-                <span
-                  className={`${pagn > 1 ? "block" : "hidden"} w-6 text-center`}
-                >
-                  {pagn - 1}
-                </span>
-                <span className="bg-blue-600 bg-opacity-75 rounded-xl w-6 text-center">
-                  {pagn}
-                </span>
-                <span className=" w-6 rounded-xl text-center">{pagn + 1}</span>
-                <span
-                  className={`${
-                    pagn > 1 ? "hidden" : "block"
-                  }  w-6 rounded-xl text-center`}
-                >
-                  {pagn + 2}
-                </span>
-                <button
-                  className="bg-blue-400 rounded-xl p-1 text-white hover:bg-blue-500 disabled:opacity-50"
-                  aria-label="next"
-                  disabled={false}
-                  onClick={() => {}}
-                >
-                  <ArrowRightIcon width={20} />
-                </button>
-              </THStack>
-            </TFlex>
-          </div>
+          <TableFooter dataLength={orders?.length} limit={15} total={count} />
         </div>
       </div>
     </>
@@ -226,7 +171,7 @@ const LoadOrder = () => {
       enabled: false,
       onSuccess: (data) => {
         if (!data) {
-        } else router.push(`/sales/${data.orderId}`);
+        } else router.push(`/orders/${data.orderId}`);
       },
     }
   );
@@ -275,4 +220,4 @@ const LoadOrder = () => {
   );
 };
 
-export default Sales;
+export default Orders;

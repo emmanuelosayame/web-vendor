@@ -1,21 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
-
-const OrderStatusSchema = z.enum([
-  "pending",
-  "successful",
-  "failed",
-  "cancelled",
-  "closedPay",
-]);
-
-const FilterSchema = z
-  .enum(["successful", "failed", "cancelled", "closedPay"])
-  .optional();
-
-export type OrderStatus = z.infer<typeof OrderStatusSchema>;
-
-export type Filter = z.infer<typeof FilterSchema>;
+import { orderStatusS, orderStatusSC } from "../zod";
 
 export const orderRouter = router({
   one: protectedProcedure
@@ -25,12 +10,20 @@ export const orderRouter = router({
       return await ctx.prisma.order.findFirst({ where: { orderId } });
     }),
   many: protectedProcedure
-    .input(z.object({ limit: z.number(), filter: FilterSchema }))
+    .input(
+      z.object({
+        limit: z.number(),
+        filter: orderStatusSC.optional(),
+      })
+    )
     .query(async ({ input, ctx }) => {
       const sid = ctx.sid;
       const { limit, filter } = input;
       return await ctx.prisma.order.findMany({
-        where: { sid, status: filter || "successful" },
+        where: {
+          sid,
+          status: filter === "all" ? undefined : filter || "pay_successful",
+        },
         take: limit,
       });
     }),
@@ -44,7 +37,7 @@ export const orderRouter = router({
     .input(
       z.object({
         orderId: z.string().optional(),
-        status: OrderStatusSchema,
+        status: orderStatusS,
       })
     )
     .mutation(async ({ input, ctx }) => {

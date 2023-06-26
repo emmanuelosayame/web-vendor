@@ -7,7 +7,6 @@ import type { Notification, NType } from "@prisma/client";
 import { useState } from "react";
 import { api } from "@lib/api";
 import { dateLocale, timeLocale } from "@lib/helpers";
-import { data } from "@lib/mock";
 import { LoadingBlur } from "./Loading";
 
 interface Props {

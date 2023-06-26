@@ -49,8 +49,8 @@ const Header = ({ auth, store, refetch }: Props) => {
           <div className="flex h-12 bg-white md:rounded-lg justify-between items-center px-2 md:px-4">
             <div className="hidden md:flex gap-2 items-center">
               <NavLink text="Dashboard" to="/" />
+              <NavLink text="Orders" to="/orders" />
               <NavLink text="Products" to="/products" />
-              <NavLink text="Sales" to="/sales" />
               <NavLink text="Notifications" to="/notifications" />
               <NavLink text="Settings" to="/settings" />
             </div>
@@ -139,14 +139,15 @@ const Header = ({ auth, store, refetch }: Props) => {
                 />
                 <NavLinkSm
                   onclick={() => setOpen(false)}
-                  text="Products"
-                  to="/products"
+                  text="Orders"
+                  to="/orders"
                 />
                 <NavLinkSm
                   onclick={() => setOpen(false)}
-                  text="Sales"
-                  to="/sales"
+                  text="Products"
+                  to="/products"
                 />
+
                 <NavLinkSm
                   onclick={() => setOpen(false)}
                   text="Notifications"

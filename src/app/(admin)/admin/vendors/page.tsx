@@ -10,7 +10,7 @@ import { limitText } from "@lib/helpers";
 import useMediaQuery from "@lib/useMediaQuery";
 
 const Vendors = () => {
-  const { data: vendors } = api.vendor.many.useQuery({ limit: 10 });
+  const { data: vendors } = api.vendor.manyA.useQuery({ limit: 10 });
 
   const mq = useMediaQuery("(min-width: 800px)");
 

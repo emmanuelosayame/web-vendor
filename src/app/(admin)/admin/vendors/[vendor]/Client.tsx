@@ -126,7 +126,7 @@ const VendorClient = ({ vendor, vid }: Props) => {
             />
             <TextareaTemp
               disabled={!edit}
-              {...register("firstName")}
+              {...register("address")}
               placeholder="Enter Address"
               label="Address"
               touched={touchedFields.address}

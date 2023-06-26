@@ -1,4 +1,3 @@
-import { Store } from "@prisma/client";
 import { type CSSProperties } from "react";
 import type { CSNames } from "t/shared";
 

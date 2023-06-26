@@ -174,15 +174,15 @@ model Vendor {
 }
 
 model Customer {
-    id         String @id @default(auto()) @map("_id") @db.ObjectId
-    customerId String
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    uid       String
     // cartId          String?
-    email      String
-    firstName  String
-    lastName   String
-    phone      String
+    email     String
+    firstName String
+    lastName  String
+    phone     String
     //   shippingDetails UsersShippingDetails[]
-    type       String
+    type      String
     //   preferences     UserPreferences
 }
 
@@ -254,11 +254,13 @@ type OrdersShippingOption {
 }
 
 enum OrderStatus {
-    pending
-    successful
-    failed
+    pay_pending
+    pay_successful
+    pay_cancelled
+    pay_closed
+    pay_failed
     cancelled
-    closedPay
+    delivered
 }
 
 model Order {
@@ -270,7 +272,7 @@ model Order {
     payment          OrdersPayment
     shipping_details OrdersShippingDetails
     shipping_option  OrdersShippingOption
-    status           OrderStatus           @default(pending)
+    status           OrderStatus           @default(pay_pending)
     subTotal         Int
     total            Int
     txRef            String?

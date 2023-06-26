@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { vendorS } from "../zod";
 
-import { router, protectedProcedure } from "../trpc";
+import { router, protectedProcedure, adminProcedure } from "../trpc";
 import { isAdmin } from "../utils";
 import { customAlphabet, nanoid } from "nanoid";
 
@@ -38,6 +38,12 @@ export const vendorRouter = router({
       });
     }),
   many: protectedProcedure
+    .input(z.object({ limit: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const { limit } = input;
+      return await ctx.prisma.vendor.findMany({ take: limit });
+    }),
+  manyA: adminProcedure
     .input(z.object({ limit: z.number() }))
     .query(async ({ ctx, input }) => {
       const { limit } = input;

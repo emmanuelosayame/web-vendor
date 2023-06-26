@@ -12,9 +12,9 @@ import {
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { type OrderStatus } from "src/server/routers/order";
 import { api } from "@lib/api";
 import { dateTimeLocale, limitText } from "@lib/helpers";
+import { type OrderStatusS } from "src/server/zod";
 
 const Sale = () => {
   const router = useRouter();
@@ -133,7 +133,7 @@ interface CSProps {
 }
 
 const ChangeStatus = ({ orderId }: CSProps) => {
-  const [selected, setSelected] = useState<OrderStatus | undefined>();
+  const [selected, setSelected] = useState<OrderStatusS | undefined>();
   const qc = api.useContext();
   const { mutate } = api.order.update.useMutation({
     onSuccess: () => {
@@ -149,7 +149,7 @@ const ChangeStatus = ({ orderId }: CSProps) => {
              text-white drop-shadow-md"
       onClickConfirm={() => selected && mutate({ orderId, status: selected })}
     >
-      <RadioGroup<OrderStatus>
+      <RadioGroup<OrderStatusS>
         itemStyles="w-6 h-6"
         defaultValue="fulfilled"
         items={[

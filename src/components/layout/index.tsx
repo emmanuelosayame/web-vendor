@@ -19,7 +19,7 @@ const Layout = ({
   const { data: auth, status } = useSession();
   const style = csToStyle(useStore((state) => state.colorScheme)).style;
 
-  console.log(auth);
+  // console.log(auth);
 
   const {
     data: store,

@@ -155,3 +155,25 @@ export const loginS = z.object({
 });
 
 export type LoginS = z.infer<typeof loginS>;
+
+export const orderStatusS = z.enum([
+  "pay_pending",
+  "pay_successful",
+  "pay_failed",
+  "pay_cancelled",
+  "pay_closed",
+  "cancelled",
+]);
+
+export const orderStatusSC = z.enum([
+  "pay_pending",
+  "pay_successful",
+  "pay_failed",
+  "pay_cancelled",
+  "pay_closed",
+  "cancelled",
+  "all",
+]);
+
+export type OrderStatusS = z.infer<typeof orderStatusS>;
+export type OrderStatusSC = z.infer<typeof orderStatusSC>;
