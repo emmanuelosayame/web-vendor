@@ -1,10 +1,9 @@
 import { Loading, LoadingBlur } from "@components/Loading";
 import { TDivider } from "@components/TElements";
 import { QrCodeIcon } from "@heroicons/react/24/outline";
-import { getCookie, setCookie } from "cookies-next";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 
 interface Props {
   refetch: () => void;
@@ -18,8 +17,6 @@ const SelectStore = ({ onSwitchedFn = () => {} }: Props) => {
   const { data: accounts, isLoading } = api.vendor.accounts.useQuery({});
 
   const pathname = usePathname();
-
-  const activeStoreId = getCookie("sid");
 
   if (isLoading) return <LoadingBlur />;
 
@@ -42,15 +39,15 @@ const SelectStore = ({ onSwitchedFn = () => {} }: Props) => {
             }`}
             key={account.id}
             onClick={async () => {
-              if (activeStoreId === account.id) {
-                onSwitchedFn();
-                return;
-              }
-              setCookie("sid", account.id, {
-                sameSite: true,
-                secure: true,
-                maxAge: 60 * 60 * 24 * 5 * 1000,
-              });
+              // if (activeStoreId === account.id) {
+              //   onSwitchedFn();
+              //   return;
+              // }
+              // setCookie("sid", account.id, {
+              //   sameSite: true,
+              //   secure: true,
+              //   maxAge: 60 * 60 * 24 * 5 * 1000,
+              // });
               await router.replace("/");
               await qc.invalidate();
               await qc.product.one.reset();

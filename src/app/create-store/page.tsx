@@ -8,7 +8,7 @@ import { PencilSquareIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 
 const CreateStore = () => {
   const [edit, setEdit] = useState(true);

@@ -7,7 +7,7 @@ import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useState } from "react";
 import { type ProductSort } from "src/server/zod";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { usePagn } from "@lib/hooks";
 
 const selectList = [

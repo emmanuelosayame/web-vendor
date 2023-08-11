@@ -7,7 +7,7 @@ import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Product } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { type MutateValues, type FormValues } from "@lib/placeholders";
 import type {
   FieldErrors,

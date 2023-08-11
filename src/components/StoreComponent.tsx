@@ -3,7 +3,7 @@ import type { Store, StoreVendor } from "@prisma/client";
 import { diff } from "deep-object-diff";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { limitText } from "@lib/helpers";
 import { initialSD } from "@lib/placeholders";
 import { InputTemp, TextareaTemp } from "./InputTemp";

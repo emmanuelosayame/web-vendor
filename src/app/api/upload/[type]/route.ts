@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerAuthSession } from "src/server/auth";
-import { uploadAsset } from "src/server/functions/assetUpload";
-import { uploadProduct } from "src/server/functions/productUpload";
+import { uploadAsset } from "src/server/f/assetUpload";
+import { uploadProduct } from "src/server/f/productUpload";
 
 export async function PUT(
   req: Request,

@@ -15,7 +15,7 @@ import {
   LinkIcon,
 } from "@heroicons/react/24/outline";
 import { signOut } from "next-auth/react";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 
 const Settings = () => {
   const { data: store } = api.store.one.useQuery({});

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { api } from "../../../lib/api";
+import { api } from "../../server/api";
 import {
   BanknotesIcon,
   ChevronDownIcon,

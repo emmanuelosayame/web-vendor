@@ -2,7 +2,7 @@
 
 import Header from "@components/header";
 import type { ReactNode } from "react";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { useStore } from "store";
 import { csToStyle } from "@lib/helpers";
 import { Loading } from "@components/Loading";

@@ -5,7 +5,7 @@ import Select from "@components/radix/Select";
 import { IconLink, MenuFlex } from "@components/TElements";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { limitText } from "@lib/helpers";
 import useMediaQuery from "@lib/useMediaQuery";
 

@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { useStore } from "store";
 import { type CSNames } from "t/shared";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { csToStyle, limitText } from "@lib/helpers";
 import { vendorVs } from "@lib/validation";
 import { type NextPageWithLayout } from "t/shared";

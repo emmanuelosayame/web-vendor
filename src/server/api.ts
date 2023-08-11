@@ -1,5 +1,5 @@
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
-import { type AppRouter } from "../src/server/routers/root";
+import { type AppRouter } from "./routers/root";
 import { createTRPCReact } from "@trpc/react-query";
 /**
  * Inference helper for inputs.

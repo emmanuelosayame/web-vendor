@@ -14,7 +14,7 @@ import { useState } from "react";
 import SelectStore from "@components/SelectStore";
 import { useStore } from "store";
 import { csToStyle } from "@lib/helpers";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 
 interface Props {
   auth: Session | null;

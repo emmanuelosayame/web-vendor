@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useStore } from "store";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { csToStyle } from "@lib/helpers";
 import useMediaQuery from "@lib/useMediaQuery";
 import { zodResolver } from "@hookform/resolvers/zod";

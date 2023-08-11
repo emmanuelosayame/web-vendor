@@ -45,8 +45,8 @@ datasource db {
 // }
 
 type Specs {
-    model  String?
-    others String[]
+    key   String
+    value String
 }
 
 enum PStatus {
@@ -81,22 +81,20 @@ model Product {
     brand              String
     category           String
     description        String
-    discountPercentage Float            @default(0)
+    discountPercentage Float
     images             String[]
     price              Int
-    promotions         String[]         @default([])
-    rating             Float            @default(0)
-    status             PStatus          @default(review)
+    promotion          String[]
+    rating             Float
+    status             String
+    specs              Specs[]
+    sold               Int?
     stock              Int
-    tags               String[]         @default([])
+    tags               String[]
     thumbnail          String
     title              String
-    sold               Int              @default(0)
-    sid                String?          @default("delorand")
-    package            String[]
-    specs              Specs
-    moreDescr          MoreDescr[]
     variants           ProductVariant[]
+    sid                String
 }
 
 enum VRole {
@@ -276,7 +274,8 @@ model Order {
     subTotal         Int
     total            Int
     txRef            String?
-    sid              String
+    reference        String[]
+    sid              String                @default("delorand")
 }
 
 type SaleCustomer {

@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { useStore } from "store";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { type NextPageWithLayout } from "t/shared";
 
 const Profile: NextPageWithLayout = () => {

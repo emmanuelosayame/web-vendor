@@ -22,7 +22,7 @@ import {
   type ChangeEvent,
   useMemo,
 } from "react";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { LoadingBlur } from "@components/Loading";
 import SelectImage from "@components/SelectImage";
 import axios from "axios";

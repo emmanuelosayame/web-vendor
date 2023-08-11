@@ -4,7 +4,7 @@ import RadioGroup from "@components/radix/RadioGroup";
 import { IconBack, IconButton, MenuFlex, THStack } from "@components/TElements";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { type NextPageWithLayout } from "t/shared";
 import AlertDialog from "@components/radix/Alert";
 import { emailV, storeVs } from "@lib/validation";

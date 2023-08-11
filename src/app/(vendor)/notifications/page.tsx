@@ -3,7 +3,7 @@ import Select from "@components/radix/Select";
 import { MenuFlex } from "@components/TElements";
 import { type NextPageWithLayout } from "t/shared";
 import type { NType } from "@prisma/client";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { useState } from "react";
 import NotificationComp from "@components/NotificationComp";
 
@@ -46,7 +46,7 @@ const Notifications: NextPageWithLayout = () => {
           ]}
         />
       </MenuFlex>
-      <NotificationComp notifications={data} />
+      <NotificationComp notifications={[]} />
     </>
   );
 };

@@ -45,12 +45,10 @@ export const createTRPCContext = async (opts: {
  * transformer.
  */
 import { type inferAsyncReturnType, initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
 
 export type Context = inferAsyncReturnType<typeof createTRPCContext>;
 
 const t = initTRPC.context<Context>().create({
-  transformer: superjson,
   errorFormatter({ shape }) {
     return shape;
   },

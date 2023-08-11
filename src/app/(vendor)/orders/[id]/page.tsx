@@ -12,7 +12,7 @@ import {
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import { dateTimeLocale, limitText } from "@lib/helpers";
 import { type OrderStatusS } from "src/server/zod";
 

@@ -1,1 +1,0 @@
-const multipleNotifications = 1:all-stores, 2:all-users

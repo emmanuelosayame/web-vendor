@@ -4,12 +4,11 @@ import { type ReactNode, useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { getBaseUrl } from "@lib/helpers";
-import { api } from "@lib/api";
-import superjson from "superjson";
 import { SessionProvider, signIn, useSession } from "next-auth/react";
 import { type Session } from "next-auth";
 import { Loading } from "@components/Loading";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { api } from "src/server/api";
 
 const RootClient = ({
   children,
@@ -39,44 +38,42 @@ const RootClient = ({
           url: `${getBaseUrl()}/api/trpc`,
         }),
       ],
-      transformer: superjson,
     })
   );
 
   return (
-    <SessionProvider session={session}>
-      <api.Provider client={trpcClient} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>
-          <Auth>{children}</Auth>
-        </QueryClientProvider>
-      </api.Provider>
-    </SessionProvider>
+    <api.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <Auth>{children}</Auth>
+      </QueryClientProvider>
+    </api.Provider>
   );
 };
 
 const Auth = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
-  const pathname = usePathname();
-  const publicRoute = !!(pathname.split("/")[1] === "auth");
+  // const pathname = usePathname();
+  // const publicRoute = !!(pathname.split("/")[1] === "auth");
 
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
 
-  const status = useSession()?.status;
+  // const session = useSession();
+  // const status = session?.status;
 
-  useEffect(() => {
-    if (pathname === "/auth/signin" || pathname === "/signin") return;
-    if (status === "unauthenticated") {
-      router.replace(
-        `/auth/signin${
-          !searchParams.get("redirect_url") && `?callbackUrl=${location.href}`
-        }`
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  // useEffect(() => {
+  //   if (pathname === "/auth/signin" || pathname === "/signin") return;
+  //   if (status === "unauthenticated") {
+  //     router.replace(
+  //       `/auth/signin${
+  //         !searchParams.get("redirect_url") && `?callbackUrl=${location.href}`
+  //       }`
+  //     );
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [status]);
 
-  if (status === "authenticated" || publicRoute) return <>{children}</>;
-  return <Loading />;
+  // if (status === "authenticated") return <>{children}</>;
+  return <>{children}</>;
 };
 
 export default RootClient;

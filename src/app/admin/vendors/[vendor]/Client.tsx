@@ -6,7 +6,7 @@ import RadioGroup from "@components/radix/RadioGroup";
 import { IconBack, MenuFlex, THStack } from "@components/TElements";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { api } from "@lib/api";
+import { api } from "src/server/api";
 import AlertDialog from "@components/radix/Alert";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
