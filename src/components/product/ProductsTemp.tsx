@@ -29,10 +29,10 @@ const ProductTemp = ({
 }: Props) => {
   const mq = useMediaQuery("(min-width: 800px)");
 
-  const { data: categories } = api.category.many.useQuery({ tid: 3 });
+  // const { data: categories } = api.category.many.useQuery({ tid: 3 });
 
-  const getCat = (id: string) =>
-    categories?.find((cat) => id === cat.id)?.name || id;
+  // const getCat = (id: string) =>
+  //   categories?.find((cat) => id === cat.id)?.name || id;
 
   return (
     <div className="overflow-y-auto h-full pb-2">
@@ -45,7 +45,7 @@ const ProductTemp = ({
               {mq ? (
                 <tr className="text-center">
                   <td>Product Details</td>
-                  <td>Category</td>
+                  {/* <td>Category</td> */}
                   <td>Sku</td>
                   <td>Price</td>
                   <td>Stock</td>
@@ -55,7 +55,7 @@ const ProductTemp = ({
               ) : (
                 <tr className="text-center">
                   <td>Details</td>
-                  <td>Cat.</td>
+                  {/* <td>Cat.</td> */}
                   <td>Stk</td>
                   <td>Sold</td>
                   <td>Opt.</td>
@@ -69,7 +69,7 @@ const ProductTemp = ({
                     {mq ? (
                       <>
                         <td>{limitText(product.title, 20)}</td>
-                        <td>{getCat(product.category)}</td>
+                        {/* <td>{getCat(product.category)}</td> */}
                         <td hidden={!mq}>{product.id.slice(19, 25)}</td>
                         <td>{product.price}</td>
                         <td>{product.stock}</td>
@@ -86,7 +86,7 @@ const ProductTemp = ({
                     ) : (
                       <>
                         <td>{limitText(product.title, 12)}</td>
-                        <td>{limitText(getCat(product.category), 8)}</td>
+                        {/* <td>{limitText(getCat(product.category), 8)}</td> */}
                         <td hidden={!mq}>{product.id.slice(19, 25)}</td>
                         <td>{product.stock}</td>
                         <td>{product.sold || 0}</td>

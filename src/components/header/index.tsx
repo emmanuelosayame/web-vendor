@@ -28,10 +28,12 @@ const Header = ({ auth, store, refetch }: Props) => {
   const [open, setOpen] = useState(false);
   const [sOpen, setSOpen] = useState(false);
 
-  const { data: unreadN } = api.notification.unreadCount.useQuery(undefined, {
+  const { data } = api.notification.unreadCount.useQuery(undefined, {
     placeholderData: 0,
-    initialData: 0,
+    networkMode: "offlineFirst",
   });
+
+  const unreadN = data || 0;
 
   return (
     <>

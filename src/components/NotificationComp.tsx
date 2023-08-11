@@ -102,6 +102,7 @@ const NContainer = ({ notification, setActive }: ContainerProps) => {
   const { mutateAsync, isLoading } = api.notification.open.useMutation({
     onSuccess: () => {
       qc.notification.many.refetch();
+      qc.notification.unreadCount.refetch();
     },
     networkMode: "offlineFirst",
   });
