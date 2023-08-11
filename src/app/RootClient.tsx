@@ -7,7 +7,7 @@ import { getBaseUrl } from "@lib/helpers";
 import { SessionProvider, signIn, useSession } from "next-auth/react";
 import { type Session } from "next-auth";
 import { Loading } from "@components/Loading";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "src/server/api";
 
 const RootClient = ({
@@ -44,7 +44,9 @@ const RootClient = ({
   return (
     <api.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <Auth>{children}</Auth>
+        <SessionProvider>
+          <Auth>{children}</Auth>
+        </SessionProvider>
       </QueryClientProvider>
     </api.Provider>
   );
@@ -52,27 +54,27 @@ const RootClient = ({
 
 const Auth = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
-  // const pathname = usePathname();
-  // const publicRoute = !!(pathname.split("/")[1] === "auth");
+  const pathname = usePathname();
+  const publicRoute = !!(pathname.split("/")[1] === "auth");
 
-  // const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
 
-  // const session = useSession();
-  // const status = session?.status;
+  const session = useSession();
+  const status = session?.status;
 
-  // useEffect(() => {
-  //   if (pathname === "/auth/signin" || pathname === "/signin") return;
-  //   if (status === "unauthenticated") {
-  //     router.replace(
-  //       `/auth/signin${
-  //         !searchParams.get("redirect_url") && `?callbackUrl=${location.href}`
-  //       }`
-  //     );
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [status]);
+  useEffect(() => {
+    if (pathname === "/auth/signin" || pathname === "/signin") return;
+    if (status === "unauthenticated" && !publicRoute) {
+      router.replace(
+        `/auth/signin${
+          !searchParams.get("redirect_url") && `?callbackUrl=${location.href}`
+        }`
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
 
-  // if (status === "authenticated") return <>{children}</>;
+  if (status === "loading") return <Loading />;
   return <>{children}</>;
 };
 

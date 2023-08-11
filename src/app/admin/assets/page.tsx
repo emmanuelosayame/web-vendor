@@ -7,10 +7,8 @@ import {
   PencilSquareIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
-import { type NextPageWithLayout } from "t/shared";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { assetsSelectList } from "@lib/list";
 import img1 from "public/e7e850b1-79ff-4d42-9058-46bf415540a7.webp";
 import img2 from "public/flashsale.png";
 import {
@@ -110,7 +108,7 @@ const reducer: Reducer<typeof initialState, Actions> = (state, actions) => {
   }
 };
 
-const AssetsPage: NextPageWithLayout = () => {
+const AssetsPage = () => {
   const router = useRouter();
   const imageRef = useRef<HTMLInputElement>(null);
   const { data, isFetching } = api.asset.one.useQuery({
@@ -297,7 +295,7 @@ const AssetsPage: NextPageWithLayout = () => {
             router.replace(`/admin/assets/${page}`);
           }}
           defaultSelected=""
-          selectList={assetsSelectList}
+          selectList={[]}
         />
       </MenuFlex>
 

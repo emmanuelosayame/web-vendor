@@ -1,13 +1,12 @@
 "use client";
 import Select from "@components/radix/Select";
 import { MenuFlex } from "@components/TElements";
-import { type NextPageWithLayout } from "t/shared";
 import type { NType } from "@prisma/client";
 import { api } from "src/server/api";
 import { useState } from "react";
 import NotificationComp from "@components/NotificationComp";
 
-const Notifications: NextPageWithLayout = () => {
+const Notifications = () => {
   const [ntype, setNtype] = useState<NType | "all">("all");
 
   const { data } = api.notification.many.useQuery({ ntype });

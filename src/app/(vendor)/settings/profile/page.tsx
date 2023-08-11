@@ -14,10 +14,9 @@ import { type CSNames } from "t/shared";
 import { api } from "src/server/api";
 import { csToStyle, limitText } from "@lib/helpers";
 import { vendorVs } from "@lib/validation";
-import { type NextPageWithLayout } from "t/shared";
 import { useForm } from "react-hook-form";
 
-const Profile: NextPageWithLayout = () => {
+const Profile = () => {
   const router = useRouter();
   const qc = api.useContext();
   const saveRef = useRef<HTMLButtonElement | null>(null);

@@ -6,10 +6,8 @@ import { isAdmin } from "../utils";
 
 export const storeRouter = router({
   one: protectedProcedure.input(z.object({})).query(async ({ ctx, input }) => {
-    const { prisma, session, sid } = ctx;
-
-    const id = sid;
-    const uid = session && session.user.id;
+    const id = ctx.sid;
+    const uid = ctx.session && ctx.session.user.id;
     if (!id) return null;
     const merchant = await ctx.prisma.vendor.findFirst({
       where: { uid },

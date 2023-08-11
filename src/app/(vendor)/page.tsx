@@ -12,8 +12,6 @@ import {
 } from "@heroicons/react/24/solid";
 import { Card1 } from "../../components/Card";
 import { LineChart, PieChart } from "../../components/Charts";
-import { TFlex } from "@components/TElements";
-import { type NextPageWithLayout } from "t/shared";
 import { csToStyle } from "@lib/helpers";
 import { useStore } from "store";
 import Select from "@components/radix/Select";
@@ -97,7 +95,7 @@ const salesData = {
   },
 };
 
-const Home: NextPageWithLayout = () => {
+const Home = () => {
   const style = csToStyle(useStore((state) => state.colorScheme)).style;
 
   return (

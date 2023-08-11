@@ -19,13 +19,12 @@ import { api } from "src/server/api";
 import { limitText } from "@lib/helpers";
 import useMediaQuery from "@lib/useMediaQuery";
 import debounce from "lodash/debounce";
-import { type NextPageWithLayout } from "t/shared";
 import { LoadingBlur } from "@components/Loading";
 import { useRouter } from "next/navigation";
 import TableFooter from "@components/TableFooter";
 import type { OrderStatusSC, OrderStatusS } from "src/server/zod";
 
-const Orders: NextPageWithLayout = () => {
+const Orders = () => {
   const mq = useMediaQuery("(min-width: 800px)");
 
   const [filter, setFilter] = useState<OrderStatusSC>();

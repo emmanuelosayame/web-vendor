@@ -8,9 +8,8 @@ import Link from "next/link";
 import { api } from "src/server/api";
 import { limitText } from "@lib/helpers";
 import useMediaQuery from "@lib/useMediaQuery";
-import { type NextPageWithLayout } from "t/shared";
 
-const Stores: NextPageWithLayout = () => {
+const Stores = () => {
   const { data: stores } = api.store.many.useQuery({ limit: 10 });
 
   const mq = useMediaQuery("(min-width: 800px)");

@@ -13,9 +13,8 @@ import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { useStore } from "store";
 import { api } from "src/server/api";
-import { type NextPageWithLayout } from "t/shared";
 
-const Profile: NextPageWithLayout = () => {
+const Profile = () => {
   const router = useRouter();
   const saveRef = useRef<HTMLButtonElement | null>(null);
   const colorScheme = useStore((state) => state.colorScheme);
@@ -46,7 +45,4 @@ const Profile: NextPageWithLayout = () => {
   );
 };
 
-Profile.getLayout = function getLayout(page) {
-  return <Layout>{page}</Layout>;
-};
 export default Profile;

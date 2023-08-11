@@ -8,14 +8,13 @@ import { Content, Root } from "@radix-ui/react-dialog";
 import Link from "next/link";
 import { Fragment, useState } from "react";
 import { useStore } from "store";
-import type { NextPageWithLayout } from "t/shared";
 import { api } from "src/server/api";
 import { csToStyle } from "@lib/helpers";
 import { type CategoryS, categoryS } from "src/server/zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const Categories: NextPageWithLayout = () => {
+const Categories = () => {
   const [edit, setEdit] = useState(false);
 
   const qc = api.useContext();

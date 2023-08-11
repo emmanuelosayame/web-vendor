@@ -2,11 +2,10 @@
 
 import Select from "@components/radix/Select";
 import { MenuFlex } from "@components/TElements";
-import { type NextPageWithLayout } from "t/shared";
 import { useRouter } from "next/navigation";
-import { assetsSelectList } from "@lib/list";
+// import { assetsSelectList } from "@lib/list";
 
-const Assets: NextPageWithLayout = () => {
+const Assets = () => {
   const router = useRouter();
   return (
     <>
@@ -17,7 +16,7 @@ const Assets: NextPageWithLayout = () => {
             router.replace(`/admin/assets/${page}`);
           }}
           defaultSelected="help"
-          selectList={assetsSelectList}
+          selectList={[]}
         />
       </MenuFlex>
       <div className="outer-box h-[97%]">
