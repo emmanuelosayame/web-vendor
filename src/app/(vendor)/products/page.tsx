@@ -34,7 +34,7 @@ const Products = () => {
 
   const [pagn, setPagn] = usePagn();
 
-  const limit = 10;
+  const limit = 12;
 
   const [sort, setSort] = useState<ProductSort>("title-asc");
 

@@ -3,11 +3,13 @@ import {
   EnvelopeIcon,
   EnvelopeOpenIcon,
 } from "@heroicons/react/24/outline";
-import type { Notification, NType } from "@prisma/client";
+import type { Notification } from "@prisma/client";
 import { useState } from "react";
 import { api } from "src/server/api";
 import { dateLocale, timeLocale } from "@lib/helpers";
 import { LoadingBlur } from "./Loading";
+import { useSession } from "next-auth/react";
+import TimeAgo from "react-timeago";
 
 interface Props {
   notifications: Notification[] | undefined;
@@ -23,7 +25,7 @@ const NotificationComp = ({ notifications }: Props) => {
         <div
           className={`w-full ${
             notifications && notifications.length > 0
-              ? "md:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-2"
+              ? "md:w-1/2 flex flex-col sm:grid sm:grid-cols-2 gap-2"
               : ""
           }  ${!!activeN ? "hidden md:grid" : ""}`}
         >
@@ -57,10 +59,12 @@ const NotificationComp = ({ notifications }: Props) => {
                   >
                     <ChevronLeftIcon width={30} />
                   </button>
-                  <p className="text-lg">{dateLocale(activeN.sent)}</p>
-                  <p className="">{timeLocale(activeN.sent)}</p>
+                  <p className="text-sm text-neutral-600">
+                    {dateLocale(activeN.sent)}
+                  </p>
+                  <p className="text-xs"> {timeLocale(activeN.sent)}</p>
                 </div>
-                <h3 className="text-center text-xl md:text-2xl">
+                <h3 className="text-center text-lg md:text-xl">
                   {activeN.title}
                 </h3>
                 <p>{activeN.body}</p>
@@ -85,7 +89,13 @@ interface ContainerProps {
 }
 
 const NContainer = ({ notification, setActive }: ContainerProps) => {
-  const opened = notification.status === "opened";
+  const { data } = useSession();
+
+  const uid = data?.user.id;
+
+  const opened = notification.recipient.some(
+    (x) => x.id === uid && x.status === "opened"
+  );
 
   const qc = api.useContext();
 
@@ -93,6 +103,7 @@ const NContainer = ({ notification, setActive }: ContainerProps) => {
     onSuccess: () => {
       qc.notification.many.refetch();
     },
+    networkMode: "offlineFirst",
   });
 
   return (
@@ -120,7 +131,10 @@ const NContainer = ({ notification, setActive }: ContainerProps) => {
       </div>
       <div className="flex justify-between text-sm">
         <p>{dateLocale(notification.sent)}</p>
-        <p className="text-[12px]">{timeLocale(notification.sent)}</p>
+        <TimeAgo
+          className="text-xs text-neutral-600"
+          date={notification.sent}
+        />
       </div>
     </div>
   );

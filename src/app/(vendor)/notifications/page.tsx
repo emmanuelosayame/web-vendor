@@ -1,20 +1,22 @@
 "use client";
 import Select from "@components/radix/Select";
 import { MenuFlex } from "@components/TElements";
-import type { NType } from "@prisma/client";
+import type { NotificationType } from "@prisma/client";
 import { api } from "src/server/api";
 import { useState } from "react";
 import NotificationComp from "@components/NotificationComp";
+import { LoadingBlur } from "@components/Loading";
 
 const Notifications = () => {
-  const [ntype, setNtype] = useState<NType | "all">("all");
+  const [ntype, setNtype] = useState<NotificationType | "all">("all");
 
-  const { data } = api.notification.many.useQuery({ ntype });
+  const { data, isLoading } = api.notification.many.useQuery({ ntype });
 
   return (
     <>
+      {isLoading && <LoadingBlur />}
       <MenuFlex>
-        <Select<NType | "all">
+        <Select<NotificationType | "all">
           defaultSelected="all"
           contentStyles="bg-white"
           triggerStyles="bg-white rounded-lg w-32 justify-between"
@@ -35,7 +37,7 @@ const Notifications = () => {
         <Select
           defaultSelected="latest"
           contentStyles="bg-white"
-          triggerStyles="bg-white rounded-lg w-28 justify-between"
+          triggerStyles="bg-white rounded-lg min-w-28 justify-between"
           onValueChange={() => {}}
           selectList={[
             { item: "Latest", value: "latest" },
@@ -45,7 +47,7 @@ const Notifications = () => {
           ]}
         />
       </MenuFlex>
-      <NotificationComp notifications={[]} />
+      <NotificationComp notifications={(data || []) as any} />
     </>
   );
 };

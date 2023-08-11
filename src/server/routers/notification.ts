@@ -21,10 +21,17 @@ export const notificationRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const sid = ctx.sid;
       const uid = ctx.session.user.id;
+
+      const { ntype } = input;
+
       return await ctx.prisma.notification.findMany({
-        where: { OR: [{ rid: { equals: "1" } }, { rid: { equals: sid } }] },
+        where: {
+          AND: [
+            { recipient: { some: { id: uid } } },
+            ntype !== "all" ? { type: ntype } : {},
+          ],
+        },
       });
     }),
   manyA: adminProcedure
@@ -66,21 +73,31 @@ export const notificationRouter = router({
   open: protectedProcedure
     .input(z.string().optional())
     .mutation(async ({ ctx, input }) => {
+      const uid = ctx.session.user.id;
       return await ctx.prisma.notification.update({
         where: { id: input },
-        data: { opened: new Date(), status: "opened" },
+        data: {
+          recipient: {
+            updateMany: {
+              where: { id: uid },
+              data: { opened: new Date(), status: "opened" },
+            },
+          },
+        },
       });
     }),
   unreadCount: protectedProcedure
     .input(z.undefined())
     .query(async ({ ctx, input }) => {
-      const sid = ctx.sid;
       const uid = ctx.session.user.id;
 
       return await ctx.prisma.notification.count({
         where: {
-          OR: [{ rid: { equals: "1" } }, { rid: { equals: sid } }],
-          status: "sealed",
+          recipient: {
+            some: {
+              AND: [{ id: uid }, { status: "closed" }],
+            },
+          },
         },
       });
     }),

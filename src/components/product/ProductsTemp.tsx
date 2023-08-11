@@ -1,7 +1,6 @@
 "use client";
 
 import { LoadingBlur } from "@components/Loading";
-import { TDivider, TFlex, THStack } from "@components/TElements";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { Product } from "@prisma/client";
 import Link from "next/link";
@@ -40,7 +39,7 @@ const ProductTemp = ({
       <div className="bg-white/40 md:rounded-lg w-full p-2 md:h-[95%]">
         <div className="flex flex-col relative justify-between bg-white w-full rounded-lg p-2 h-full">
           {isLoading && <LoadingBlur position="absolute" />}
-          <table className="w-full border-spacing-2 border-separate text-[14px] md:text-base">
+          <table className="w-full border-spacing-2 md:border-spacing-4 border-separate text-[14px] md:text-base">
             {/* <TableCaption>Showing 10 of many</TableCaption> */}
             <thead className="">
               {mq ? (
@@ -108,8 +107,8 @@ const ProductTemp = ({
           </table>
 
           <div className="">
-            <TDivider />
-            <TFlex className="justify-between p-2">
+            <div className="border-b" />
+            <div className="flex justify-between p-2">
               <h3 className="px-2 text-neutral-700 text-lg">
                 <span>{(pagn - 1) * 10}</span> to{" "}
                 <span>{(pagn - 1) * 10 + (products?.length || 0)}</span> of{" "}
@@ -135,7 +134,7 @@ const ProductTemp = ({
                   Next
                 </button>
               </div>
-            </TFlex>
+            </div>
           </div>
         </div>
       </div>

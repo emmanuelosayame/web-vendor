@@ -184,27 +184,31 @@ model Customer {
     //   preferences     UserPreferences
 }
 
-enum NType {
+enum NotificationType {
     support
     complaint
     order
 }
 
-enum NStatus {
+enum NotificationStatus {
     opened
-    sealed
+    closed
+}
+
+type NotificationRecipient {
+    id     String
+    opened DateTime?
+    status NotificationStatus
 }
 
 model Notification {
-    id     String    @id @default(auto()) @map("_id") @db.ObjectId
-    sent   DateTime  @default(now())
-    opened DateTime?
-    status NStatus   @default(sealed)
-    title  String
-    body   String
+    id        String                  @id @default(auto()) @map("_id") @db.ObjectId
+    sent      DateTime                @default(now())
+    title     String
+    body      String
     // body2  String
-    type   NType     @default(order)
-    rid    String[]
+    type      NotificationType        @default(order)
+    recipient NotificationRecipient[]
 }
 
 type OrdersItem {

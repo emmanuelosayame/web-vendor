@@ -75,83 +75,89 @@ const Orders = () => {
 
       <div className="h-[95%] bg-white/40 md:rounded-lg w-full p-2">
         <div className="flex flex-col justify-between bg-white w-full rounded-lg p-2 h-full">
-          <table className="w-full border-spacing-2 border-separate text-[14px] md:text-base">
-            {/* <TableCaption>Showing 10 of many</TableCaption> */}
-            <thead className="">
-              {mq ? (
-                <tr className="text-center">
-                  <td>Order Id</td>
-                  <td>Items</td>
-                  <td>Customer</td>
-                  <td>Location</td>
-                  <td>Status</td>
-                  <td>Shipping</td>
-                  <td>Total</td>
-                  <td>Pay</td>
-                  <td>Option</td>
-                </tr>
-              ) : (
-                <tr className="text-center">
-                  <td>Details</td>
-                  <td>Cat.</td>
-                  <td>Price</td>
-                  <td>Stk</td>
-                  <td>Sold</td>
-                  <td>Opt.</td>
-                </tr>
-              )}
-            </thead>
-            <tbody>
-              {orders &&
-                orders.map((order) => (
-                  <tr key={order.id} className="text-center">
-                    {mq ? (
-                      <>
-                        <td>{order.orderId}</td>
-                        <td>{order.items.length}</td>
-                        <td>{`${
-                          order.shipping_details.firstName
-                        } - ${order.shipping_details.email.slice(
-                          0,
-                          order.shipping_details.email.length - 7
-                        )}...`}</td>
-                        <td>{`${order.shipping_details.state} - ${order.shipping_details.location}`}</td>
-                        <td>{order.status}</td>
-                        <td>{`${order.shipping_option.type} - ${order.shipping_option.price}`}</td>
-                        <td>{order.total}</td>
-                        <td>{order.payment.method || 0}</td>
-                        <td>
-                          <Link
-                            href={`/orders/${order.orderId}`}
-                            className=" text-blue-700 hover:opacity-60"
-                          >
-                            view
-                          </Link>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td>{limitText(order.orderId, 12)}</td>
-                        <td>{order.items.length}</td>
-                        <td>{order.id.slice(19, 25)}</td>
-                        <td>{order.shipping_option.type}</td>
-                        <td>{order.total}</td>
-                        <td>{order.payment.method || 0}</td>
-                        <td className="flex items-center justify-center">
-                          <Link
-                            href={`/orders/${order.id}`}
-                            className="rounded-xl bg-neutral-100 p-1 drop-shadow-md
-                            flex items-center justify-center w-fit text-blue-500 hover:bg-blue-600"
-                          >
-                            <PencilSquareIcon width={20} />
-                          </Link>
-                        </td>
-                      </>
-                    )}
+          {!orders || orders.length < 1 ? (
+            <div className="w-full h-full flex justify-center items-center text-neutral-600 text-lg">
+              Empty
+            </div>
+          ) : (
+            <table className="w-full border-spacing-2 border-separate text-[14px] md:text-base">
+              {/* <TableCaption>Showing 10 of many</TableCaption> */}
+              <thead className="">
+                {mq ? (
+                  <tr className="text-center">
+                    <td>Order Id</td>
+                    <td>Items</td>
+                    <td>Customer</td>
+                    <td>Location</td>
+                    <td>Status</td>
+                    <td>Shipping</td>
+                    <td>Total</td>
+                    <td>Pay</td>
+                    <td>Option</td>
                   </tr>
-                ))}
-            </tbody>
-          </table>
+                ) : (
+                  <tr className="text-center">
+                    <td>Details</td>
+                    <td>Cat.</td>
+                    <td>Price</td>
+                    <td>Stk</td>
+                    <td>Sold</td>
+                    <td>Opt.</td>
+                  </tr>
+                )}
+              </thead>
+              <tbody>
+                {orders &&
+                  orders.map((order) => (
+                    <tr key={order.id} className="text-center">
+                      {mq ? (
+                        <>
+                          <td>{order.orderId}</td>
+                          <td>{order.items.length}</td>
+                          <td>{`${
+                            order.shipping_details.firstName
+                          } - ${order.shipping_details.email.slice(
+                            0,
+                            order.shipping_details.email.length - 7
+                          )}...`}</td>
+                          <td>{`${order.shipping_details.state} - ${order.shipping_details.location}`}</td>
+                          <td>{order.status}</td>
+                          <td>{`${order.shipping_option.type} - ${order.shipping_option.price}`}</td>
+                          <td>{order.total}</td>
+                          <td>{order.payment.method || 0}</td>
+                          <td>
+                            <Link
+                              href={`/orders/${order.orderId}`}
+                              className=" text-blue-700 hover:opacity-60"
+                            >
+                              view
+                            </Link>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td>{limitText(order.orderId, 12)}</td>
+                          <td>{order.items.length}</td>
+                          <td>{order.id.slice(19, 25)}</td>
+                          <td>{order.shipping_option.type}</td>
+                          <td>{order.total}</td>
+                          <td>{order.payment.method || 0}</td>
+                          <td className="flex items-center justify-center">
+                            <Link
+                              href={`/orders/${order.id}`}
+                              className="rounded-xl bg-neutral-100 p-1 drop-shadow-md
+                            flex items-center justify-center w-fit text-blue-500 hover:bg-blue-600"
+                            >
+                              <PencilSquareIcon width={20} />
+                            </Link>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          )}
 
           <TableFooter dataLength={orders?.length} limit={15} total={count} />
         </div>
